@@ -1,4 +1,5 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
+from typing import Dict
 
 @dataclass
 class Sensor:
@@ -9,3 +10,10 @@ class Sensor:
     latitude: float
     batteryLevel: int
     sigStrength: int
+
+    @classmethod
+    def from_dict(self, data: Dict):
+        return self(**data)
+    
+    def to_dict(self):
+        return asdict(self)
