@@ -12,8 +12,8 @@ class Sensor:
     sigStrength: int
 
     @classmethod
-    def from_dict(self, data: Dict):
-        return self(**data)
+    def from_dict(cls, data: Dict):
+        return cls(**data)
     
     def to_dict(self):
         return asdict(self)

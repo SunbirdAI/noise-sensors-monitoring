@@ -1,6 +1,6 @@
 import pytest
 from noise_sensors_monitoring.domain.sensor import Sensor
-from noise_sensors_monitoring.repository.time_series_repo import SensorReadingRepo
+from noise_sensors_monitoring.repository.time_series_repo_interface import SensorReadingRepo
 from noise_sensors_monitoring.use_cases.sensor_reading import add_new_sensor_reading, get_latest_sensor_reading
 
 
