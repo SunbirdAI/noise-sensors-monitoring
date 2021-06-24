@@ -1,8 +1,10 @@
 from noise_sensors_monitoring.domain.sensor import Sensor
 from noise_sensors_monitoring.repository.time_series_repo_interface import SensorReadingRepo
 
+from typing import Dict
 
-def add_new_sensor_reading(sensor_reading: Sensor, repo: SensorReadingRepo):
+
+def add_new_sensor_reading(sensor_reading: Dict, repo: SensorReadingRepo):
     repo.add_new_sensor_reading(sensor_reading)
 
 
