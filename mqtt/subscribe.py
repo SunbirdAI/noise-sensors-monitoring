@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 from noise_sensors_monitoring.repository.influx_db_repo import InfluxDBRepo
 from noise_sensors_monitoring.use_cases.sensor_reading import add_new_sensor_reading
+from noise_sensors_monitoring.requests.sensor_reading import build_sensor_reading_request
 
 load_dotenv()
 
@@ -22,6 +23,6 @@ def on_message(_, __, message):
     print(message.payload.decode('utf-8'))
     message_content = json.loads(message.payload.decode('utf-8'))
     if topic == 'sb/sensor':
-        # TODO: Use requests and responses (probably just log the responses) to validate the received data
-        # TODO: Validation: check if all the fields are of the correct type, if strings try to convert to correct type
-        add_new_sensor_reading(message_content, repo)
+        request = build_sensor_reading_request(message_content)
+        response = add_new_sensor_reading(request, repo)
+        print(response.value)  # Use logs for this
