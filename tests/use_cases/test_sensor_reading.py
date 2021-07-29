@@ -4,6 +4,7 @@ import pytest
 from noise_sensors_monitoring.domain.sensor import Sensor
 from noise_sensors_monitoring.repository.time_series_repo_interface import SensorReadingRepo
 from noise_sensors_monitoring.use_cases.sensor_reading import add_new_sensor_reading, get_latest_sensor_reading
+from noise_sensors_monitoring.requests.sensor_reading import build_sensor_reading_request
 
 
 class InMemorySensorDb(SensorReadingRepo):
@@ -37,8 +38,12 @@ def test_new_sensor_reading(sensor_repo):
         sigStrength=26
     )
 
-    add_new_sensor_reading(sensor_reading.to_dict(), repo)
+    request = build_sensor_reading_request(sensor_reading.to_dict())
+
+    response = add_new_sensor_reading(request, repo)
 
     latest_sensor = get_latest_sensor_reading(repo)
 
+    assert bool(response) is True
     assert sensor_reading == latest_sensor
+    assert response.value == "Successfully added the new sensor reading"
