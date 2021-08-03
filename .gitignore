@@ -6,3 +6,4 @@ __pycache__
 data
 try_broker_publish.py
 try_influx_db.py
+coverage.xml
