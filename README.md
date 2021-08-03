@@ -23,8 +23,9 @@ and using prebuilt containers.
 - Clone this repository and cd into this project's directory.
 - (Optional) Add your mosquitto configuration in the file `./docker/mosquitto/config/mosquitto.conf`
 - Make sure you have [docker](https://www.docker.com/) and [docker-compose](https://docs.docker.com/compose/) installed
-- Run the command `docker-compose -f docker/docker-compose.yml up` (add `-d` to run in detached mode)
-  (**TODO**: create docker build file for the mqtt_client step)
+- Run the command `docker-compose up -d --build`
+- To view logs (in case something fails to work): `docker-compose logs`
+  (**TODO**: create docker build file for the mqtt_client step) 
 - Visit `http:\\localhost:8086` to setup influx db.
 - Visit `http:\\localhost:3001` to view grafana and setup your dashboard.
 - Create `.env` file with the following info (Refer to the influxdb tutorial for how to get some of these):
