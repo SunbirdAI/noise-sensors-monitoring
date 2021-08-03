@@ -21,4 +21,8 @@ jobs:
           docker-compose exec -T web coverage run -a --source=users manage.py test
           docker-compose exec -T web coverage report -m
       - name: Upload Coverage to Codecov
-        uses: codecov/codecov-action@v1
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        run: |
+          docker-compose exec -T web pip install codecov
+          docker-compose exec -T web codecov -t $CODECOV_TOKEN
