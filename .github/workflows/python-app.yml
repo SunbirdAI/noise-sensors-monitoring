@@ -17,8 +17,8 @@ jobs:
         run: docker-compose up -d --build
       - name: Run Django and pytest tests and generate report
         run: |
-          docker-compose exec web coverage run --source=noise_sensors_monitoring,mqtt -m pytest
-          docker-compose exec web coverage run -a --source=users manage.py test
-          docker-compose exec web coverage report -m
+          docker-compose exec -T web coverage run --source=noise_sensors_monitoring,mqtt -m pytest
+          docker-compose exec -T web coverage run -a --source=users manage.py test
+          docker-compose exec -T web coverage report -m
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v1
