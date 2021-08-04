@@ -23,11 +23,13 @@ and using prebuilt containers.
 - Clone this repository and cd into this project's directory.
 - (Optional) Add your mosquitto configuration in the file `./docker/mosquitto/config/mosquitto.conf`
 - Make sure you have [docker](https://www.docker.com/) and [docker-compose](https://docs.docker.com/compose/) installed
-- Run the command `docker-compose up -d --build`
+- Run the command `docker-compose up -d --build` to run the containers.
 - To view logs (in case something fails to work): `docker-compose logs`
   (**TODO**: create docker build file for the mqtt_client step) 
 - Visit `http:\\localhost:8086` to setup influx db.
+    - You'll need to setup a username, an organization and a bucket. Refer to the influx db docs.
 - Visit `http:\\localhost:3001` to view grafana and setup your dashboard.
+    - Refer to the grafana docs for setting up an admin user
 - Create `.env` file with the following info (Refer to the influxdb tutorial for how to get some of these):
 ```
 INFLUX_DB_URL=http://localhost:8086
@@ -45,3 +47,12 @@ Below are the MQTT Topics implemented in this project.
 |sb/sensor|{"deviceId": "SB1002", "dbLevel": 76...}| topic to which sensor sends its status. Required fields are `devicdId`, `dbLevel`, `connected`, `batteryLevel`, `sigStrength` |
 
 **TODO**: Add description of the other topics as they're implemented.
+
+## Setting up and running Django commands
+- Ensure the containers are running. Use `docker ps` to see running containers.
+- Apply the migrations using the command: `docker-compose exec web python manage.py migrate`
+- Visit the app at `http://127.0.0.1:8000/`
+- Use the following commands for running the tests:
+  - Pytest tests (tests the functionality in the `noise_sensors_monitoring` package): `docker-compose exec web coverage run --source=noise_sensors_monitoring -m pytest`
+  - Django tests: `docker-compose exec web coverage run -a --source=users manage.py test`
+  - View coverage report `docker-compose exec web coverage report -m`
