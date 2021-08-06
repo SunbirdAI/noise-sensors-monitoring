@@ -6,10 +6,10 @@ from django.db import models
 
 class Device(models.Model):
     class ProductionStage(models.TextChoices):
-        DEPLOYED = 'DL', _('Deployed')
-        TESTING = 'TS', _('Testing')
-        RECALLED = 'RC', _('Recalled')
-        FIXING = 'FX', _('Fixing')
+        DEPLOYED = 'Deployed', _('Deployed')
+        TESTING = 'Testing', _('Testing')
+        RECALLED = 'Recalled', _('Recalled')
+        FIXING = 'Fixing', _('Fixing')
 
     id = models.UUIDField(
         primary_key=True,
@@ -21,7 +21,7 @@ class Device(models.Model):
     device_name = models.CharField(max_length=200)
     phone_number = models.CharField(max_length=10)
     production_stage = models.CharField(
-        max_length=2,
+        max_length=50,
         choices=ProductionStage.choices,
         default=ProductionStage.TESTING
     )

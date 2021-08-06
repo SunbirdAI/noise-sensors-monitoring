@@ -3,7 +3,8 @@
 {% block title %}Devices{% endblock title %}
 
 {% block content %}
-    <table style="width: 100%">
+    <table class="table table-hover">
+        <thead>
         <tr>
             <th>DEVICE ID</th>
             <th>IMEI NUMBER</th>
@@ -11,6 +12,8 @@
             <th>PHONE NUMBER</th>
             <th>PRODUCTION STAGE</th>
         </tr>
+        </thead>
+        <tbody>
         {% for device in device_list %}
             <tr>
                 <td>{{ device.device_id }}</td>
@@ -20,5 +23,6 @@
                 <td>{{ device.production_stage }}</td>
             </tr>
         {% endfor %}
+        </tbody>
     </table>
 {% endblock content %}
