@@ -8,8 +8,9 @@ class Device(models.Model):
     class ProductionStage(models.TextChoices):
         DEPLOYED = 'Deployed', _('Deployed')
         TESTING = 'Testing', _('Testing')
-        RECALLED = 'Recalled', _('Recalled')
-        FIXING = 'Fixing', _('Fixing')
+        SHELVED = 'Shelved', _('Shelved')
+        MAINTENANCE = 'Maintenance', _('Maintenance')
+        RETIRED = 'Retired', _('Retired')
 
     id = models.UUIDField(
         primary_key=True,
