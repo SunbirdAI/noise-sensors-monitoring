@@ -1,0 +1,24 @@
+{% extends '_base.html' %}
+
+{% block title %}Devices{% endblock title %}
+
+{% block content %}
+    <table style="width: 100%">
+        <tr>
+            <th>DEVICE ID</th>
+            <th>IMEI NUMBER</th>
+            <th>DEVICE NAME</th>
+            <th>PHONE NUMBER</th>
+            <th>PRODUCTION STAGE</th>
+        </tr>
+        {% for device in device_list %}
+            <tr>
+                <td>{{ device.device_id }}</td>
+                <td>{{ device.imei }}</td>
+                <td>{{ device.device_name }}</td>
+                <td>{{ device.phone_number }}</td>
+                <td>{{ device.production_stage }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock content %}
