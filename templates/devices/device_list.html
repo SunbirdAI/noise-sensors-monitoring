@@ -15,13 +15,13 @@
         </thead>
         <tbody>
         {% for device in device_list %}
-            <tr>
-                <td>{{ device.device_id }}</td>
-                <td>{{ device.imei }}</td>
-                <td>{{ device.device_name }}</td>
-                <td>{{ device.phone_number }}</td>
-                <td>{{ device.production_stage }}</td>
-            </tr>
+                <tr>
+                    <td><a href="{{ device.get_absolute_url }}">{{ device.device_id }}</a></td>
+                    <td>{{ device.imei }}</td>
+                    <td>{{ device.device_name }}</td>
+                    <td>{{ device.phone_number }}</td>
+                    <td>{{ device.production_stage }}</td>
+                </tr>
         {% endfor %}
         </tbody>
     </table>

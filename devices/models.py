@@ -2,6 +2,7 @@ import uuid
 from django.utils.translation import gettext_lazy as _
 
 from django.db import models
+from django.urls import reverse
 
 
 class Device(models.Model):
@@ -29,3 +30,6 @@ class Device(models.Model):
 
     def __str__(self):
         return self.device_id
+
+    def get_absolute_url(self):
+        return reverse('device_detail', args=[str(self.id)])
