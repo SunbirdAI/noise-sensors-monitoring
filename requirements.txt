@@ -4,6 +4,7 @@ autopep8==1.5.7
 certifi==2021.5.30
 coverage==5.5
 Django==3.2.6
+django-crispy-forms==1.12.0
 influxdb-client==1.18.0
 iniconfig==1.1.1
 packaging==20.9
