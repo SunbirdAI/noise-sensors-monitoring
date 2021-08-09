@@ -3,27 +3,49 @@
 {% block title %}Devices{% endblock title %}
 
 {% block content %}
-    <a href="{% url 'create_device' %}" class="btn btn-primary">Add New Device</a>
-    <table class="table table-hover">
-        <thead>
-        <tr>
-            <th>DEVICE ID</th>
-            <th>IMEI NUMBER</th>
-            <th>DEVICE NAME</th>
-            <th>PHONE NUMBER</th>
-            <th>PRODUCTION STAGE</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for device in device_list %}
-                <tr>
-                    <td><a href="{{ device.get_absolute_url }}">{{ device.device_id }}</a></td>
-                    <td>{{ device.imei }}</td>
-                    <td>{{ device.device_name }}</td>
-                    <td>{{ device.phone_number }}</td>
-                    <td>{{ device.production_stage }}</td>
-                </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+{% include "sidebar.html" %}
+<div class="content-container">
+  <div class="container-fluid">
+    {% include "navbar.html" %}
+    <a href="{% url 'create_device' %}" class="btn btn-primary m-3"
+      >Add New Device</a
+    >
+
+    <div class="row">
+        <div class="col mb-4 mb-lg-0 ml-3 mr-3">
+          <div class="card">
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th scope="col">DEVICE ID</th>
+                      <th scope="col">IMEI NUMBER</th>
+                      <th scope="col">DEVICE NAME</th>
+                      <th scope="col">PHONE NUMBER</th>
+                      <th scope="col">PRODUCTION STAGE</th>
+                      <th scope="col"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for device in device_list %}
+                    <tr>
+                      <td>
+                        <a href="{{ device.get_absolute_url }}">{{ device.device_id }}</a>
+                      </td>
+                      <td>{{ device.imei }}</td>
+                      <td>{{ device.device_name }}</td>
+                      <td>{{ device.phone_number }}</td>
+                      <td>{{ device.production_stage }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
 {% endblock content %}
