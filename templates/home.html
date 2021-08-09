@@ -1,5 +1,99 @@
 <!-- templates/home.html -->
-{% extends '_base.html' %}
-{% block content %}
-  {% include "sidebar.html" %}
+{% extends '_base.html' %} {% block content %} {% include "sidebar.html" %}
+<div class="content-container">
+  <div class="container-fluid">
+    {% include "navbar.html" %}
+    <div class="row my-4">
+      <div class="col mb-4 mb-lg-0">
+        <div class="card">
+          <h5 class="card-header">Sensors</h5>
+          <div class="card-body">
+            <h5 class="card-title">50</h5>
+            <p class="card-text">Deployed: 30</p>
+            <p class="card-text text-success">
+              9.4% increase since last month
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col mb-4 mb-lg-0">
+        <div class="card">
+          <h5 class="card-header">Noise samples</h5>
+          <div class="card-body">
+            <h5 class="card-title">1349</h5>
+            <p class="card-text">Sucessful: 30</p>
+            <p class="card-text text-success">15.8% increase since last month</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col mb-4 mb-lg-0 ml-3 mr-3">
+      <div class="card">
+        <h5 class="card-header">Devices</h5>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Device ID</th>
+                  <th scope="col">IMEI Number</th>
+                  <th scope="col">Device name</th>
+                  <th scope="col">Phone Number</th>
+                  <th scope="col">Production Stage</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">123456</th>
+                  <td>1234567890</td>
+                  <td>Sample Device 1</td>
+                  <td>0775123456</td>
+                  <td>Testing</td>
+                  <td><a href="#" class="btn btn-sm btn-primary">View</a></td>
+                </tr>
+                <tr>
+                  <th scope="row">123456</th>
+                  <td>1234567890</td>
+                  <td>Sample Device 1</td>
+                  <td>0775123456</td>
+                  <td>Testing</td>
+                  <td><a href="#" class="btn btn-sm btn-primary">View</a></td>
+                </tr>
+                <tr>
+                  <th scope="row">123456</th>
+                  <td>1234567890</td>
+                  <td>Sample Device 1</td>
+                  <td>0775123456</td>
+                  <td>Testing</td>
+                  <td><a href="#" class="btn btn-sm btn-primary">View</a></td>
+                </tr>
+                <tr>
+                  <th scope="row">123456</th>
+                  <td>1234567890</td>
+                  <td>Sample Device 1</td>
+                  <td>0775123456</td>
+                  <td>Testing</td>
+                  <td><a href="#" class="btn btn-sm btn-primary">View</a></td>
+                </tr>
+                <tr>
+                  <th scope="row">123456</th>
+                  <td>1234567890</td>
+                  <td>Sample Device 1</td>
+                  <td>0775123456</td>
+                  <td>Testing</td>
+                  <td><a href="#" class="btn btn-sm btn-primary">View</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <a href="#" class="btn btn-block btn-light">View all</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock content %}
