@@ -1,0 +1,17 @@
+{% extends '_base.html' %}
+
+
+{% block title %}{{ device.device_id }}{% endblock title %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+            <div class="card-title">{{ device.device_id }}</div>
+            <p><strong>Device ID</strong>: {{ device.device_id }}</p>
+            <p><strong>Device Name</strong>: {{ device.device_name }}</p>
+            <p><strong>IMEI Number</strong>: {{ device.imei }}</p>
+            <p><strong>Phone Number</strong>: {{ device.phone_number }}</p>
+            <p><strong>Production Stage</strong>: {{ device.production_stage }}</p>
+        </div>
+    </div>
+{% endblock content %}
