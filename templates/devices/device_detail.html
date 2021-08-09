@@ -19,6 +19,7 @@
                 <p><strong>Production Stage</strong>: {{ device.production_stage }}</p>
             </div>
         </div>
+        <a href="{% url 'edit_device' device.id %}" class="btn btn-primary mx-3 my-1">Edit</a>
     </div>
 </div>
 {% endblock content %}
