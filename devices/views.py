@@ -1,5 +1,5 @@
 from django.views.generic import ListView, DetailView
-from django.views.generic.edit import FormView
+from django.views.generic.edit import FormView, UpdateView, CreateView
 from .models import Device
 from django.http import HttpResponseRedirect
 
@@ -18,11 +18,15 @@ class DeviceDetailView(DetailView):
     template_name = 'devices/device_detail.html'
 
 
-class DeviceFormView(FormView):
-    template_name = 'devices/create_device.html'
+class DeviceCreateView(CreateView):
+    model = Device
     form_class = DeviceForm
     success_url = '/devices/'
+    template_name = 'devices/create_device.html'
 
-    def form_valid(self, form):
-        form.save()
-        return super().form_valid(form)
+
+class DeviceUpdateView(UpdateView):
+    model = Device
+    form_class = DeviceForm
+    success_url = '/devices/'
+    template_name = 'devices/edit_device.html'

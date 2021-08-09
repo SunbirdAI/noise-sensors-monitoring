@@ -2,7 +2,7 @@
 
 {% load crispy_forms_filters %}
 
-{% block title%}Create Device{% endblock title %}
+{% block title%}Edit Device{% endblock title %}
 
 {% block content %}
 {% include "sidebar.html" %}
@@ -10,10 +10,10 @@
   <div class="container-fluid">
     {% include "navbar.html" %}
     <div class="mt-4 mx-3">
-      <h4 class="my-3">Create New Device</h4>
+      <h4 class="my-3">Edit Device</h4>
       <form method="post">
         {% csrf_token %} {{ form|crispy }}
-        <button class="btn btn-primary mt-2" type="submit">Create Device</button>
+        <button class="btn btn-primary mt-2" type="submit">Save</button>
       </form>
     </div>
   </div>
