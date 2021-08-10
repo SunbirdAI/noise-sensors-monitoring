@@ -38,7 +38,32 @@ class DeviceTests(TestCase):
     def test_device_edit_view(self):
         response = self.client.post(
             reverse('edit_device', kwargs={'pk': self.device.id}),
-            {'device_name': 'First sensor - edited'}
+            {
+                'device_name': 'First sensor - edited',
+                'imei': '123456789012345',
+                'phone_number': '0771234567'
+            }
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'First sensor - edited')
+
+    def test_device_edit_view_short_phone_no(self):
+        response = self.client.post(
+            reverse('edit_device', kwargs={'pk': self.device.id}),
+            {'phone_number': '077123456'}
+        )
+        self.assertContains(response, 'Please enter a valid phone number')
+
+    def test_device_edit_view_wrong_phone_no(self):
+        response = self.client.post(
+            reverse('edit_device', kwargs={'pk': self.device.id}),
+            {'phone_number': '0990123456'}
+        )
+        self.assertContains(response, 'Please enter a valid phone number')
+
+    def test_device_edit_view_invalid_imei(self):
+        response = self.client.post(
+            reverse('edit_device', kwargs={'pk': self.device.id}),
+            {'imei': '1234567890'}
+        )
+        self.assertContains(response, 'IMEI must be 15-digit number')
