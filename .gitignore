@@ -2,6 +2,7 @@ venv/
 __pycache__
 .coverage
 .idea
+.vscode
 .env
 data
 try_broker_publish.py
