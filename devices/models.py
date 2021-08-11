@@ -4,6 +4,15 @@ from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.urls import reverse
 
+from taggit.managers import TaggableManager
+from taggit.models import GenericUUIDTaggedItemBase, TaggedItemBase
+
+
+class UUIDTaggedItem(GenericUUIDTaggedItemBase, TaggedItemBase):
+    class Meta:
+        verbose_name = _("Tag")
+        verbose_name_plural = _("Tags")
+
 
 class Device(models.Model):
     class ProductionStage(models.TextChoices):
@@ -27,6 +36,7 @@ class Device(models.Model):
         choices=ProductionStage.choices,
         default=ProductionStage.TESTING
     )
+    tags = TaggableManager(through=UUIDTaggedItem)
 
     def __str__(self):
         return self.device_id
