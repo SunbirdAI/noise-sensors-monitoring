@@ -27,9 +27,21 @@ class Device(models.Model):
         choices=ProductionStage.choices,
         default=ProductionStage.TESTING
     )
+    tags = models.ManyToManyField(
+        'devices.Tag',
+        related_name='devices'
+    )
 
     def __str__(self):
         return self.device_id
 
     def get_absolute_url(self):
         return reverse('device_detail', args=[str(self.id)])
+
+
+class Tag(models.Model):
+    tag = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.tag

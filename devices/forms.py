@@ -6,7 +6,7 @@ import re
 class DeviceForm(ModelForm):
     class Meta:
         model = Device
-        exclude = ['id']
+        exclude = ['id', 'tags']
 
     def clean_imei(self, *args, **kwargs):
         imei = self.cleaned_data.get('imei')
