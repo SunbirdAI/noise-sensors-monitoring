@@ -10,8 +10,9 @@
         justify-content-between
       "
     >
-    <a class="navbar-brand" href="{% url 'home' %}">Noise Monitoring Dashboard</a>
-
+      <a class="navbar-brand" href="{% url 'home' %}"
+        >Noise Monitoring Dashboard</a
+      >
     </div>
     <div
       class="
@@ -22,15 +23,22 @@
         mt-3 mt-md-0
       "
     >
+      {% if user.is_authenticated %}
       <div>
-        <button
-          class="btn btn-secondary"
-          type="button"
-          id="dropdownMenuButton"
-        >
-          Logout
+        <button class="btn btn-light" type="button">
+          <a href="{% url 'logout' %}">Log Out</a>
         </button>
       </div>
+      {% else %}
+      <div>
+        <button class="btn btn-light" type="button">
+          <a href="{% url 'login' %}">Log In</a>
+        </button>
+        <button class="btn btn-light" type="button">
+          <a href="{% url 'signup' %}">Sign Up</a>
+        </button>
+      </div>
+      {% endif %}
     </div>
   </nav>
 </div>
