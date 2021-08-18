@@ -12,6 +12,7 @@ class DeviceTests(TestCase):
             imei='33414214123',
             device_name='First sensor',
             phone_number='0700443425',
+            version_number='1.0.0',
             production_stage='Testing'
         )
 
@@ -20,6 +21,7 @@ class DeviceTests(TestCase):
         self.assertEqual(f'{self.device.imei}', '33414214123'),
         self.assertEqual(f'{self.device.phone_number}', '0700443425')
         self.assertEqual(f'{self.device.production_stage}', 'Testing')
+        self.assertEqual(f'{self.device.version_number}', '1.0.0')
 
     def test_device_list_view(self):
         response = self.client.get(reverse('device_list'))

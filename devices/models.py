@@ -31,6 +31,7 @@ class Device(models.Model):
     imei = models.CharField(max_length=15)
     device_name = models.CharField(max_length=200)
     phone_number = models.CharField(max_length=10)
+    version_number = models.CharField(max_length=10)
     production_stage = models.CharField(
         max_length=50,
         choices=ProductionStage.choices,
