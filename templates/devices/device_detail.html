@@ -16,8 +16,9 @@
                 <p><strong>Device Name</strong>: {{ device.device_name }}</p>
                 <p><strong>IMEI Number</strong>: {{ device.imei }}</p>
                 <p><strong>Phone Number</strong>: {{ device.phone_number }}</p>
+                <p><strong>Version Number</strong>: {{ device.version_number }}</p>
                 <p><strong>Production Stage</strong>: {{ device.production_stage }}</p>
-                <p>
+                <p><strong>Tags:</strong>
                     {% for tag in device.tags.all %}
                     <span class="btn btn-light btn-outline-secondary btn-sm">{{ tag }}</span>
                     {% endfor %}
