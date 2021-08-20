@@ -22,7 +22,7 @@ def on_message(_, __, message):
     # TODO: First validate if this is valid json
     print(message.payload.decode('utf-8'))
     message_content = json.loads(message.payload.decode('utf-8'))
-    if topic == 'sb/sensor':
+    if topic == 'sb/sensor/logs':
         request = build_sensor_reading_request(message_content)
         response = add_new_sensor_reading(request, repo)
         print(response.value)  # Use logs for this
