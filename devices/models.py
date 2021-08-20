@@ -38,6 +38,7 @@ class Device(models.Model):
         default=ProductionStage.TESTING
     )
     tags = TaggableManager(through=UUIDTaggedItem)
+    metrics_url = models.URLField(max_length=255, default="http://localhost:3000/")
 
     def __str__(self):
         return self.device_id
