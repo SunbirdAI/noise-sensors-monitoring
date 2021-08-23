@@ -7,13 +7,15 @@ from .models import Device
 class DeviceTests(TestCase):
 
     def setUp(self) -> None:
+        self.metrics_url = 'http://localhost:3000/d/Fmi1Q1qGk/sensor-metrics-dashboard?orgId=1&refresh=30s'
         self.device = Device.objects.create(
             device_id='SB1001',
             imei='33414214123',
             device_name='First sensor',
             phone_number='0700443425',
             version_number='1.0.0',
-            production_stage='Testing'
+            production_stage='Testing',
+            metrics_url=self.metrics_url
         )
 
     def test_device_listing(self):
@@ -22,6 +24,7 @@ class DeviceTests(TestCase):
         self.assertEqual(f'{self.device.phone_number}', '0700443425')
         self.assertEqual(f'{self.device.production_stage}', 'Testing')
         self.assertEqual(f'{self.device.version_number}', '1.0.0')
+        self.assertEqual(f'{self.device.metrics_url}', self.metrics_url)
 
     def test_device_list_view(self):
         response = self.client.get(reverse('device_list'))
