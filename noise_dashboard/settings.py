@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     # Local
     'users.apps.UsersConfig',
     'pages.apps.PagesConfig',
-    'devices.apps.DevicesConfig'
+    'devices.apps.DevicesConfig',
+    'recordings.apps.RecordingsConfig'
 ]
 
 # django-crispy-forms
