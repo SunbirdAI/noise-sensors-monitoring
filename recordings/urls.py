@@ -1,7 +1,6 @@
-from django.urls import path
-from .views import receive_audio
+from .views import ReceiveAudioViewSet
+from rest_framework.routers import SimpleRouter
 
-
-urlpatterns = [
-    path('', receive_audio),
-]
+router = SimpleRouter()
+router.register('', ReceiveAudioViewSet)
+urlpatterns = router.urls

@@ -1,11 +1,11 @@
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
+from rest_framework import viewsets, parsers
+
+from .models import Recording
+from .serializers import RecordingSerializer
 
 
-@api_view(['POST'])
-def receive_audio(request):
-    audio_file = request.data['audio']
-
-    return Response(f"Successfully received file {str(audio_file)}")
+class ReceiveAudioViewSet(viewsets.ModelViewSet):
+    queryset = Recording.objects.all()
+    serializer_class = RecordingSerializer
+    parser_classes = [parsers.MultiPartParser]
+    http_method_names = ['post']
