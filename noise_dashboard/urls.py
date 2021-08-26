@@ -27,4 +27,5 @@ urlpatterns = [
     path('accounts/', include('users.urls')),
     path('', include('pages.urls')),
     path('devices/', include('devices.urls')),
+    path('audio/', include('recordings.urls'))
 ]

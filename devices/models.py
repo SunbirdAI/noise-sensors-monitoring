@@ -27,7 +27,7 @@ class Device(models.Model):
         default=uuid.uuid4,
         editable=False
     )
-    device_id = models.CharField(max_length=200)
+    device_id = models.CharField(max_length=200, unique=True)
     imei = models.CharField(max_length=15)
     device_name = models.CharField(max_length=200)
     phone_number = models.CharField(max_length=10)

@@ -1,13 +1,18 @@
 asgiref==3.4.1
 attrs==21.2.0
 autopep8==1.5.7
+boto3==1.18.29
+botocore==1.21.29
 certifi==2021.5.30
 coverage==5.5
 Django==3.2.6
 django-crispy-forms==1.12.0
+django-storages==1.11.1
 django-taggit==1.5.1
+djangorestframework==3.12.4
 influxdb-client==1.18.0
 iniconfig==1.1.1
+jmespath==0.10.0
 packaging==20.9
 paho-mqtt==1.5.1
 pluggy==0.13.1
@@ -21,6 +26,7 @@ python-dateutil==2.8.1
 python-dotenv==0.18.0
 pytz==2021.1
 Rx==3.2.0
+s3transfer==0.5.0
 six==1.16.0
 sqlparse==0.4.1
 toml==0.10.2
