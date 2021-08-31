@@ -4,7 +4,7 @@ from noise_sensors_monitoring.requests.sensor_reading import build_sensor_readin
 def test_build_request_without_data():
     request = build_sensor_reading_request()
 
-    assert request.sensor_reading is None
+    assert request.request_dict is None
     assert request.has_errors()
     assert request.errors[0]["type"] == "No data"
     assert bool(request) is False
@@ -72,4 +72,4 @@ def test_build_valid_request():
 
     assert bool(request) is True
     assert not request.has_errors()
-    assert request.sensor_reading == sensor_reading
+    assert request.request_dict == sensor_reading

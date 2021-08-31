@@ -1,4 +1,4 @@
-from noise_sensors_monitoring.requests.sensor_reading import SensorReadingInvalidRequest
+from noise_sensors_monitoring.requests.generic_requests import InvalidRequest
 from noise_sensors_monitoring.responses import (
     ResponseTypes,
     ResponseSuccess,
@@ -54,7 +54,7 @@ def test_response_failure_initialisation_with_exception():
 
 
 def test_response_failure_from_invalid_request():
-    request = SensorReadingInvalidRequest({"randomField": "generic", "connected": 7678})
+    request = InvalidRequest({"randomField": "generic", "connected": 7678})
     request.add_error("invalid field", "randomField is not a valid field")
     request.add_error("invalid type", "connected should be boolean data type")
 

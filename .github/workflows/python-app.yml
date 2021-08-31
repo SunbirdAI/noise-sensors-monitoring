@@ -14,7 +14,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build the project
-        run: docker-compose up -d --build
+        run: |
+          docker network create -d bridge djangonetwork
+          docker-compose up -d --build
       - name: Run Django and pytest tests and generate report
         run: |
           docker-compose exec -T web coverage run --source=noise_sensors_monitoring,mqtt -m pytest
