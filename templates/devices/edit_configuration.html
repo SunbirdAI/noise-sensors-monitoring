@@ -1,0 +1,22 @@
+{% extends '_base.html' %}
+
+{% load crispy_forms_filters %}
+
+{% block title %}Edit Device Configuration{% endblock title %}
+
+{% block content %}
+    {% include "sidebar.html" %}
+    <div class="content-container">
+        <div class="container-fluid">
+            {% include "navbar.html" %}
+            <div class="mt-4 mx-3">
+                <h4 class="my-3">Edit Device Configuration</h4>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <button class="btn btn-primary mt-2" type="submit">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

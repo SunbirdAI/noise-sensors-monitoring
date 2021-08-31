@@ -40,7 +40,7 @@
             </div>
             <a href="{% url 'edit_device' device.id %}" class="btn btn-primary mx-3 my-1">Edit</a>
             <a href="{{ device.metrics_url }}" class="btn btn-primary mx-3 my-1" target="_blank">View Metrics</a>
-            <a class="btn btn-primary mx-3 my-1 pull-right">Edit Configuration</a>
+            <a href="{% url 'edit_config' device.id %}" class="btn btn-primary mx-3 my-1 pull-right">Edit Configuration</a>
         </div>
     </div>
 {% endblock content %}
