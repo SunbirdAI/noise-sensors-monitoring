@@ -1,5 +1,6 @@
-from abc import ABC, abstractmethod
 from typing import Optional, Dict
+
+from noise_sensors_monitoring.requests.generic_requests import Request, InvalidRequest, ValidRequest
 
 REQUIRED_FIELDS = ["deviceId", "dbLevel", "connected", "longitude", "latitude", "batteryLevel", "sigStrength"]
 REQUIRED_TYPES = {
@@ -19,51 +20,8 @@ TYPE_TO_WORD = {
 }
 
 
-class Request(ABC):
-    @abstractmethod
-    def __init__(self, sensor_reading: Dict):
-        """Receives a sensor reading for validation"""
-        self.sensor_reading = sensor_reading
-        self.errors = []
-
-    @abstractmethod
-    def __bool__(self):
-        """True if the sensor_reading is valid. False if the sensor reading is invalid"""
-        pass
-
-    @abstractmethod
-    def has_errors(self):
-        pass
-
-
-class SensorReadingInvalidRequest(Request):
-    def __init__(self, sensor_reading: Optional[Dict]):
-        self.sensor_reading = sensor_reading
-        self.errors = []
-
-    def has_errors(self):
-        return len(self.errors) > 0
-
-    def add_error(self, error_type: str, message: str):
-        self.errors.append({"type": error_type, "message": message})
-
-    def __bool__(self):
-        return False
-
-
-class SensorReadingValidRequest(Request):
-    def __init__(self, sensor_reading: Dict):
-        self.sensor_reading = sensor_reading
-
-    def __bool__(self):
-        return True
-
-    def has_errors(self):
-        return False
-
-
-def build_sensor_reading_request(sensor_reading_dict: Optional[Dict]=None) -> Request:
-    invalid_req = SensorReadingInvalidRequest(sensor_reading_dict)
+def build_sensor_reading_request(sensor_reading_dict: Optional[Dict] = None) -> Request:
+    invalid_req = InvalidRequest(sensor_reading_dict)
     if sensor_reading_dict is None:
         invalid_req.add_error("No data", "The sensor reading has no data")
         return invalid_req
@@ -82,4 +40,4 @@ def build_sensor_reading_request(sensor_reading_dict: Optional[Dict]=None) -> Re
     if invalid_req.has_errors():
         return invalid_req
 
-    return SensorReadingValidRequest(sensor_reading_dict)
+    return ValidRequest(sensor_reading_dict)
