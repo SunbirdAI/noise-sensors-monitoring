@@ -10,7 +10,7 @@ class RecordingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recording
-        fields = ['id', 'recording_name', 'time_recorded', 'audio', 'device']
+        fields = ['id', 'time_recorded', 'audio', 'device']
         read_only_fields = ['time_uploaded']
 
     def to_representation(self, instance):
