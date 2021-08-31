@@ -11,6 +11,8 @@ from noise_sensors_monitoring.requests.device_config import build_device_config_
 from noise_sensors_monitoring.repository.devices_repo import DevicesRepo
 from noise_sensors_monitoring.use_cases.devices_config import get_device_config
 
+from mqtt.publish import publish_device_configuration
+
 load_dotenv()
 
 repo = InfluxDBRepo({
@@ -35,8 +37,7 @@ def on_message(_, __, message):
         request = build_device_config_request(message_content)
         response = get_device_config(request, devices_repo)
         if response:
-            # TODO: Publish response to broker
-            print(response.value)
-            pass
+            publish_device_configuration(response.value, request.request_dict["imei"])
+            print(response.value)  # TODO: Use logs for this
         else:
             print(response.value)  # TODO: Use logs for this
