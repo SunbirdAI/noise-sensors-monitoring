@@ -10,6 +10,8 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    networks:
+      - djangonetwork
 
   web:
     build: .
@@ -20,13 +22,22 @@ services:
       - 8000:8000
     depends_on:
       - postgres_db
+    links:
+      - postgres_db:postgres_db
+    networks:
+      - djangonetwork
+    environment:
+      - MOSQUITTO_URL=Mosquitto
 
   mosquitto:
     image: eclipse-mosquitto
+    container_name: Mosquitto
     ports:
       - 1883:1883
     volumes:
       - ./mosquitto:/mosquitto/
+    networks:
+      - djangonetwork
     restart: unless-stopped
 
   influxdb:
@@ -50,3 +61,7 @@ volumes:
   postgres_data:
   influxdb:
   grafana-data:
+
+networks:
+  djangonetwork:
+    external: true

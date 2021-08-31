@@ -7,6 +7,10 @@ from noise_sensors_monitoring.repository.influx_db_repo import InfluxDBRepo
 from noise_sensors_monitoring.use_cases.sensor_reading import add_new_sensor_reading
 from noise_sensors_monitoring.requests.sensor_reading import build_sensor_reading_request
 
+from noise_sensors_monitoring.requests.device_config import build_device_config_request
+from noise_sensors_monitoring.repository.devices_repo import DevicesRepo
+from noise_sensors_monitoring.use_cases.devices_config import get_device_config
+
 load_dotenv()
 
 repo = InfluxDBRepo({
@@ -15,6 +19,7 @@ repo = InfluxDBRepo({
     "influx_org": os.environ["INFLUX_ORG"],
     "influx_bucket": os.environ["INFLUX_BUCKET"]
 })
+devices_repo = DevicesRepo()
 
 
 def on_message(_, __, message):
@@ -25,4 +30,13 @@ def on_message(_, __, message):
     if topic == 'sb/sensor/logs':
         request = build_sensor_reading_request(message_content)
         response = add_new_sensor_reading(request, repo)
-        print(response.value)  # Use logs for this
+        print(response.value)  # TODO: Use logs for this
+    elif topic == 'sb/sensor/configs':
+        request = build_device_config_request(message_content)
+        response = get_device_config(request, devices_repo)
+        if response:
+            # TODO: Publish response to broker
+            print(response.value)
+            pass
+        else:
+            print(response.value)  # TODO: Use logs for this
