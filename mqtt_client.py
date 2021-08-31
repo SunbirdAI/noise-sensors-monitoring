@@ -3,13 +3,11 @@ import time
 
 import paho.mqtt.client as mqtt
 
-from dotenv import load_dotenv
 from mqtt.subscribe import on_message
 
-load_dotenv()
-TOPICS = [("sb/sensor", 1)]
+TOPICS = [("sb/sensor/logs", 1), ("sb/sensor/configs", 1)]
 
-mqttBroker = os.environ['MQTT_BROKER']
+mqttBroker = os.environ['MOSQUITTO_URL']
 client = mqtt.Client("SB_Server")
 client.connect(mqttBroker)
 

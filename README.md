@@ -23,6 +23,7 @@ and using prebuilt containers.
 - Clone this repository and cd into this project's directory.
 - (Optional) Add your mosquitto configuration in the file `./docker/mosquitto/config/mosquitto.conf`
 - Make sure you have [docker](https://www.docker.com/) and [docker-compose](https://docs.docker.com/compose/) installed
+- Create an external docker network named `djangonetwork`. `docker network create -d bridge djangonetwork`. This allows easy communication between the different containers that will be running.
 - Run the command `docker-compose up -d --build` to run the containers.
 - To view logs (in case something fails to work): `docker-compose logs`
   (**TODO**: create docker build file for the mqtt_client step) 
