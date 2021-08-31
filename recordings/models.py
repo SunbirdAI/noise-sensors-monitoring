@@ -14,3 +14,4 @@ class Recording(models.Model):
     time_uploaded = models.DateTimeField(auto_now_add=True)
     device = models.ForeignKey(Device, on_delete=models.CASCADE)
     audio = models.FileField(upload_to=recording_directory)
+    triggering_threshold = models.IntegerField(default=50)
