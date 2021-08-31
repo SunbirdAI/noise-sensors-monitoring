@@ -11,7 +11,7 @@ def add_new_sensor_reading(request: Request, repo: SensorReadingRepo):
     if not request:
         return build_response_from_invalid_request(request)
     try:
-        repo.add_new_sensor_reading(request.sensor_reading)
+        repo.add_new_sensor_reading(request.request_dict)
         return ResponseSuccess("Successfully added the new sensor reading")
     except Exception as exc:
         return ResponseFailure(ResponseTypes.SYSTEM_ERROR, exc)
