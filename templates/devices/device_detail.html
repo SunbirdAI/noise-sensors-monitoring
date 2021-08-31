@@ -9,25 +9,38 @@
     <div class="content-container">
         <div class="container-fluid">
             {% include "navbar.html" %}
-            <div class="card m-3">
-                <div class="card-body">
-                    <div class="card-title">{{ device.device_id }}</div>
-                    <p><strong>Device ID</strong>: {{ device.device_id }}</p>
-                    <p><strong>Device Name</strong>: {{ device.device_name }}</p>
-                    <p><strong>IMEI Number</strong>: {{ device.imei }}</p>
-                    <p><strong>Phone Number</strong>: {{ device.phone_number }}</p>
-                    <p><strong>Version Number</strong>: {{ device.version_number }}</p>
-                    <p><strong>Production Stage</strong>: {{ device.production_stage }}</p>
-                    <p><strong>Tags:</strong>
-                        {% for tag in device.tags.all %}
-                            <span class="btn btn-light btn-outline-secondary btn-sm">{{ tag }}</span>
-                        {% endfor %}
-                    </p>
+            <div class="card-group m-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="card-title"><h4>{{ device.device_id }} Details</h4></div>
+                        <p><strong>Device ID</strong>: {{ device.device_id }}</p>
+                        <p><strong>Device Name</strong>: {{ device.device_name }}</p>
+                        <p><strong>IMEI Number</strong>: {{ device.imei }}</p>
+                        <p><strong>Phone Number</strong>: {{ device.phone_number }}</p>
+                        <p><strong>Version Number</strong>: {{ device.version_number }}</p>
+                        <p><strong>Production Stage</strong>: {{ device.production_stage }}</p>
+                        <p><strong>Tags:</strong>
+                            {% for tag in device.tags.all %}
+                                <span class="btn btn-light btn-outline-secondary btn-sm">{{ tag }}</span>
+                            {% endfor %}
+                        </p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="card-title"><h4>{{ device.device_id }} Configuration</h4></div>
+                        <p><strong>Configured/Enabled</strong>: {{ device.get_configured_display }}</p>
+                        <p><strong>Mode</strong>: {{ device.get_mode_display }}</p>
+                        <p><strong>DB Level</strong>: {{ device.dbLevel }}</p>
+                        <p><strong>Recording Length</strong>: {{ device.recLength }}</p>
+                        <p><strong>Recording Interval</strong>: {{ device.recInterval }}</p>
+                        <p><strong>Upload Address</strong>: {{ device.uploadAddr }}</p>
+                    </div>
                 </div>
             </div>
             <a href="{% url 'edit_device' device.id %}" class="btn btn-primary mx-3 my-1">Edit</a>
             <a href="{{ device.metrics_url }}" class="btn btn-primary mx-3 my-1" target="_blank">View Metrics</a>
+            <a class="btn btn-primary mx-3 my-1 pull-right">Edit Configuration</a>
         </div>
     </div>
 {% endblock content %}
-

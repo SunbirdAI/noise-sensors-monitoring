@@ -1,7 +1,6 @@
 from django.views.generic import ListView, DetailView
-from django.views.generic.edit import FormView, UpdateView, CreateView
+from django.views.generic.edit import UpdateView, CreateView
 from .models import Device
-from django.http import HttpResponseRedirect
 
 from .forms import DeviceForm
 
