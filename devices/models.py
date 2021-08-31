@@ -22,6 +22,14 @@ class Device(models.Model):
         MAINTENANCE = 'Maintenance', _('Maintenance')
         RETIRED = 'Retired', _('Retired')
 
+    class Configured(models.IntegerChoices):
+        CONFIGURED = (1, _("Configured"))
+        NOT_CONFIGURED = (0, _("Not Configured"))
+
+    class Mode(models.IntegerChoices):
+        AUTO_MODE = (1, _("Auto"))
+        MANUAL_MODE = (2, _("Manual"))
+
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -39,6 +47,14 @@ class Device(models.Model):
     )
     tags = TaggableManager(through=UUIDTaggedItem)
     metrics_url = models.URLField(max_length=255, default="http://localhost:3000/")
+
+    # Configuration fields
+    configured = models.IntegerField(choices=Configured.choices, default=Configured.NOT_CONFIGURED)
+    mode = models.IntegerField(choices=Mode.choices, default=Mode.AUTO_MODE)
+    dbLevel = models.IntegerField(default=50)
+    recLength = models.IntegerField(default=10)
+    recInterval = models.IntegerField(default=10)
+    uploadAddr = models.CharField(default='http://localhost:8000/audio/', max_length=100)
 
     def __str__(self):
         return self.device_id

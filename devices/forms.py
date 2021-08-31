@@ -6,7 +6,8 @@ import re
 class DeviceForm(ModelForm):
     class Meta:
         model = Device
-        exclude = ['id']
+        fields = ['device_id', 'imei', 'device_name', 'phone_number', 'version_number',
+                  'production_stage', 'tags', 'metrics_url']
 
     def clean_imei(self, *args, **kwargs):
         imei = self.cleaned_data.get('imei')
@@ -21,3 +22,9 @@ class DeviceForm(ModelForm):
         if not re.match(pattern, phone_number):
             raise ValidationError('Please enter a valid phone number')
         return phone_number
+
+
+class DeviceConfigurationForm(ModelForm):
+    class Meta:
+        model = Device
+        fields = ['configured', 'mode', 'dbLevel', 'recLength', 'recInterval', 'uploadAddr']
