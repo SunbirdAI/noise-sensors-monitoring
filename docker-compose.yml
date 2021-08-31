@@ -26,6 +26,18 @@ services:
       - postgres_db:postgres_db
     networks:
       - djangonetwork
+
+  mqtt:
+    build: .
+    command: python /code/mqtt_client.py
+    volumes:
+      - .:/code
+    depends_on:
+      - web
+    links:
+      - postgres_db:postgres_db
+    networks:
+      - djangonetwork
     environment:
       - MOSQUITTO_URL=Mosquitto
 
