@@ -7,9 +7,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     networks:
       - djangonetwork
 
@@ -25,8 +25,9 @@ services:
     links:
       - postgres_db:postgres_db
     environment:
-      - ENVIRONMENT=development
-      - DEBUG=True
+      - ENVIRONMENT=production
+      - DEBUG=False
+      - SECRET_KEY=${DJANGO_SECRET_KEY}
     networks:
       - djangonetwork
 
