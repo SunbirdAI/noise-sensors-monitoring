@@ -16,15 +16,15 @@ jobs:
       - name: Build the project
         run: |
           docker network create -d bridge djangonetwork
-          docker-compose -f docker-compose-test.yml up -d --build
+          docker-compose up -d --build
       - name: Run Django and pytest tests and generate report
         run: |
-          docker-compose -f docker-compose-test.yml exec -T web coverage run --source=noise_sensors_monitoring,mqtt -m pytest
-          docker-compose -f docker-compose-test.yml exec -T web coverage run -a --source=users,pages,devices manage.py test
-          docker-compose -f docker-compose-test.yml exec -T web coverage report -m
+          docker-compose exec -T web coverage run --source=noise_sensors_monitoring,mqtt -m pytest
+          docker-compose exec -T web coverage run -a --source=users,pages,devices manage.py test
+          docker-compose exec -T web coverage report -m
       - name: Upload Coverage to Codecov
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: |
-          docker-compose -f docker-compose-test.yml exec -T web pip install codecov
-          docker-compose -f docker-compose-test.yml exec -T web codecov -t $CODECOV_TOKEN
+          docker-compose exec -T web pip install codecov
+          docker-compose exec -T web codecov -t $CODECOV_TOKEN
