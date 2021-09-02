@@ -13,6 +13,10 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
+import mimetypes
+
+
+mimetypes.add_type("text/css", ".css", True)
 
 load_dotenv()
 
