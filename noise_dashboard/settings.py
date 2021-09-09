@@ -28,6 +28,7 @@ if ENVIRONMENT == "production":
     CSRF_COOKIE_SECURE = True
     STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Quick-start development settings - unsuitable for production
@@ -39,7 +40,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', default="django-insecure-xf6&3^n9d1@43akuqx
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG') != 'False'
 
-ALLOWED_HOSTS = [os.getenv('SERVER_IP', default='*'), 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default="localhost 127.0.0.1").split(" ")
 
 # Application definition
 
