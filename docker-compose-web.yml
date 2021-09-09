@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+
+  postgres_db:
+    image: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+  web:
+    build: .
+    command: gunicorn --workers=20 --threads=2 --bind 0.0.0.0:8000 noise_dashboard.wsgi --timeout 300 --capture-output
+    volumes:
+      - .:/code
+    ports:
+      - 8000:8000
+    depends_on:
+      - postgres_db
+    links:
+      - postgres_db:postgres_db
+    environment:
+      - ENVIRONMENT=production
+      - DEBUG=False
+      - SECRET_KEY=${DJANGO_SECRET_KEY}
+
+volumes:
+  postgres_data:

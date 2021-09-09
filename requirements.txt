@@ -5,6 +5,7 @@ boto3==1.18.29
 botocore==1.21.29
 certifi==2021.5.30
 coverage==5.5
+dj-database-url==0.5.0
 Django==3.2.6
 django-crispy-forms==1.12.0
 django-storages==1.11.1
