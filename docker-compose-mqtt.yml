@@ -1,43 +1,11 @@
 version: '3'
 
 services:
-
-  postgres_db:
-    image: postgres
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    networks:
-      - djangonetwork
-
-  web:
-    build: .
-    command: gunicorn --workers=20 --threads=2 --bind 0.0.0.0:8000 noise_dashboard.wsgi
-    volumes:
-      - .:/code
-    ports:
-      - 8000:8000
-    depends_on:
-      - postgres_db
-    links:
-      - postgres_db:postgres_db
-    environment:
-      - ENVIRONMENT=production
-      - DEBUG=False
-      - SECRET_KEY=${DJANGO_SECRET_KEY}
-    networks:
-      - djangonetwork
-
   mqtt:
     build: .
     command: python /code/mqtt_client.py
     volumes:
       - .:/code
-    depends_on:
-      - web
     links:
       - postgres_db:postgres_db
     networks:
@@ -74,7 +42,6 @@ services:
       - influxdb
 
 volumes:
-  postgres_data:
   influxdb:
   grafana-data:
 
