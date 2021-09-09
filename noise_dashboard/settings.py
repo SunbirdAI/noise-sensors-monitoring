@@ -10,13 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
+import dj_database_url
 from pathlib import Path
 
 from dotenv import load_dotenv
-import mimetypes
 
-
-mimetypes.add_type("text/css", ".css", True)
 
 load_dotenv()
 
@@ -29,6 +27,8 @@ if ENVIRONMENT == "production":
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    SECURE_SSL_REDIRECT = True
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -167,3 +167,5 @@ AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
 AWS_QUERYSTRING_AUTH = False
+db_from_env = dj_database_url.config(conn_max_age=500)
+DATABASES['default'].update(db_from_env)
