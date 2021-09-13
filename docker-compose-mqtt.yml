@@ -6,8 +6,6 @@ services:
     command: python /code/mqtt_client.py
     volumes:
       - .:/code
-    links:
-      - postgres_db:postgres_db
     networks:
       - djangonetwork
     environment:
@@ -29,7 +27,7 @@ services:
     ports:
       - "8086:8086"
     volumes:
-      - influxdb:/var/lib/influxdb
+      - influxdb-data:/var/lib/influxdb
     restart: unless-stopped
 
   grafana:
