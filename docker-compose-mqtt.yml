@@ -35,13 +35,15 @@ services:
     ports:
       - "3001:3000"
     volumes:
-      - ./data/grafana-data:/var/lib/grafana
+      - grafana-data:/var/lib/grafana
     depends_on:
       - influxdb
 
 volumes:
   influxdb-data:
+    external: true
   grafana-data:
+    external: true
 
 networks:
   djangonetwork:
