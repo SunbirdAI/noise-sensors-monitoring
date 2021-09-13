@@ -3,14 +3,15 @@ from typing import Optional, Dict
 from noise_sensors_monitoring.requests.generic_requests import Request, InvalidRequest, ValidRequest
 
 REQUIRED_FIELDS = ["deviceId", "dbLevel", "connected", "batteryLevel", "sigStrength"]
+OPTIONAL_FIELDS = ["latitude", "longitude"]
 REQUIRED_TYPES = {
     "deviceId": str,
-    "dbLevel": float,
+    "dbLevel": int,
     "connected": bool,
     "longitude": float,
     "latitude": float,
     "batteryLevel": int,
-    "sigStrength": float
+    "sigStrength": int
 }
 TYPE_TO_WORD = {
     str: "string",
@@ -31,7 +32,7 @@ def build_sensor_reading_request(sensor_reading_dict: Optional[Dict] = None) -> 
             invalid_req.add_error("Missing values", f"{field} is required.")
 
     for (key, value) in sensor_reading_dict.items():
-        if key not in REQUIRED_FIELDS:
+        if key not in REQUIRED_FIELDS and key not in OPTIONAL_FIELDS:
             invalid_req.add_error("Invalid field", f"{key} is not a valid field for sensor data")
         elif type(value) != REQUIRED_TYPES[key]:
             req_type = TYPE_TO_WORD[REQUIRED_TYPES[key]]
