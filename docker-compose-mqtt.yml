@@ -42,8 +42,10 @@ services:
       - influxdb
 
 volumes:
-  influxdb:
+  influxdb-data:
+    external: true
   grafana-data:
+    external: true
 
 networks:
   djangonetwork:
