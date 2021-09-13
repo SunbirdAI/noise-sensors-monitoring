@@ -2,15 +2,15 @@ from typing import Optional, Dict
 
 from noise_sensors_monitoring.requests.generic_requests import Request, InvalidRequest, ValidRequest
 
-REQUIRED_FIELDS = ["deviceId", "dbLevel", "connected", "longitude", "latitude", "batteryLevel", "sigStrength"]
+REQUIRED_FIELDS = ["deviceId", "dbLevel", "connected", "batteryLevel", "sigStrength"]
 REQUIRED_TYPES = {
     "deviceId": str,
-    "dbLevel": int,
+    "dbLevel": float,
     "connected": bool,
     "longitude": float,
     "latitude": float,
     "batteryLevel": int,
-    "sigStrength": int
+    "sigStrength": float
 }
 TYPE_TO_WORD = {
     str: "string",
