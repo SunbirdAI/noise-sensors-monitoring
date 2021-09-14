@@ -30,12 +30,13 @@ def test_new_sensor_reading(sensor_repo):
     repo: SensorReadingRepo = sensor_repo
     sensor_reading = Sensor(
         deviceId="SB1001",
-        dbLevel=76,
+        dbLevel=76.0,
         connected=True,
         longitude=1.034,
         latitude=0.564,
-        batteryLevel=30,
-        sigStrength=26
+        batteryLevel=30.0,
+        sigStrength=26.0,
+        DataBalance=67
     )
 
     request = build_sensor_reading_request(sensor_reading.to_dict())

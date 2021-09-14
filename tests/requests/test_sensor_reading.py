@@ -18,7 +18,7 @@ def test_build_request_without_all_fields():
 
     assert bool(request) is False
     assert request.has_errors()
-    assert len(request.errors) == 5
+    assert len(request.errors) == 4
     assert request.errors[0]["type"] == "Missing values"
 
 
@@ -31,7 +31,8 @@ def test_build_request_with_invalid_fields():
         "latitude": 0.564,
         "batteryLevel": 30,
         "sigStrength": 26,
-        "randomField": 26
+        "randomField": 26,
+        "DataBalance": 67.0
     })
 
     assert bool(request) is False
@@ -49,11 +50,12 @@ def test_build_request_with_invalid_types():
         "latitude": 0.564,
         "batteryLevel": 30.9,
         "sigStrength": 26,
+        "DataBalance": 67.0
     })
 
     assert bool(request) is False
     assert request.has_errors()
-    assert len(request.errors) == 2
+    assert len(request.errors) == 1
     assert request.errors[0]["type"] == "Invalid type"
     assert request.errors[0]["message"] == "Field 'connected' should have boolean data type."
 
@@ -66,7 +68,8 @@ def test_build_valid_request():
         "longitude": 1.034,
         "latitude": 0.564,
         "batteryLevel": 30,
-        "sigStrength": 26
+        "sigStrength": 26,
+        "DataBalance": 67.0
     }
     request = build_sensor_reading_request(sensor_reading)
 

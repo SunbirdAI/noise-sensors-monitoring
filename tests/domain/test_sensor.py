@@ -9,7 +9,8 @@ def test_sensor_model_init():
         longitude=1.034,
         latitude=0.564,
         batteryLevel=30,
-        sigStrength=26
+        sigStrength=26,
+        DataBalance=56.0
     )
 
     assert sensor.deviceId == "SB1001"
@@ -29,7 +30,8 @@ def test_from_dict_init():
         "longitude": 1.034,
         "latitude": 0.564,
         "batteryLevel": 30,
-        "sigStrength": 26
+        "sigStrength": 26,
+        "DataBalance": 56.0,
     }
 
     sensor = Sensor.from_dict(init_dict)

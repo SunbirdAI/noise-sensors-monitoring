@@ -4,12 +4,13 @@ from typing import Dict
 @dataclass
 class Sensor:
     deviceId: str
-    dbLevel: int
+    dbLevel: float
     connected: bool
     longitude: float
     latitude: float
-    batteryLevel: int
-    sigStrength: int
+    batteryLevel: float
+    sigStrength: float
+    DataBalance: float
 
     @classmethod
     def from_dict(cls, data: Dict):
