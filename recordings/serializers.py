@@ -15,4 +15,6 @@ class RecordingSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         self.fields['device'] = DeviceSerializer(read_only=True)
-        return super(RecordingSerializer, self).to_representation(instance)
+        return {
+            "result": "success"
+        }
