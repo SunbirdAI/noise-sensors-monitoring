@@ -40,7 +40,40 @@
             </div>
             <a href="{% url 'edit_device' device.id %}" class="btn btn-primary mx-3 my-1">Edit</a>
             <a href="{{ device.metrics_url }}" class="btn btn-primary mx-3 my-1" target="_blank">View Metrics</a>
-            <a href="{% url 'edit_config' device.id %}" class="btn btn-primary mx-3 my-1 pull-right">Edit Configuration</a>
+            <a href="{% url 'edit_config' device.id %}" class="btn btn-primary mx-3 my-1 pull-right">Edit
+                Configuration</a>
+            <div class="card m-3">
+                <div class="card-body">
+                    <div class="card-title"><h4>{{ device.device_id }} Recordings</h4></div>
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th scope="col">Time Recorded</th>
+                            <th scope="col">Time Uploaded</th>
+                            <th scope="col">Triggering Threshold</th>
+                            <th scope="col">Audio</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for recording in device.recording_set.all %}
+                            <tr>
+                                <td>
+                                    {{ recording.time_recorded }}
+                                </td>
+                                <td>{{ recording.time_uploaded }}</td>
+                                <td>{{ recording.triggering_threshold }}</td>
+                                <td>
+                                    <audio controls>
+                                        <source src="{{ recording.audio_url }}" type="audio/wav">
+                                        {{ recording.audio_url }}
+                                    </audio>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock content %}

@@ -1,12 +1,16 @@
 from django.utils import timezone
+from django.core.files.storage import get_storage_class
 
 from django.db import models
 
 from devices.models import Device
 
 
+media_storage = get_storage_class()()
+
+
 def recording_directory(instance, filename):
-    return f'audio/{instance.device.device_id}/{filename}-{instance.time_uploaded}'
+    return f'audio/{instance.device.device_id}/{instance.time_uploaded}-{filename}'
 
 
 class Recording(models.Model):
@@ -15,3 +19,7 @@ class Recording(models.Model):
     device = models.ForeignKey(Device, on_delete=models.CASCADE)
     audio = models.FileField(upload_to=recording_directory)
     triggering_threshold = models.IntegerField(default=50)
+
+    @property
+    def audio_url(self):
+        return media_storage.url(self.audio.name)
