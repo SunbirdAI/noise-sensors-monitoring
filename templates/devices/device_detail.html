@@ -48,6 +48,7 @@
                     <table class="table table-hover">
                         <thead>
                         <tr>
+                            <th scope="col">Recording Directory</th>
                             <th scope="col">Time Recorded</th>
                             <th scope="col">Time Uploaded</th>
                             <th scope="col">Triggering Threshold</th>
@@ -57,6 +58,7 @@
                         <tbody>
                         {% for recording in device.get_recordings %}
                             <tr>
+                                <td>{{ recording.audio }}</td>
                                 <td>
                                     {{ recording.time_recorded }}
                                 </td>
