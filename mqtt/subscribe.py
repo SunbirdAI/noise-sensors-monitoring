@@ -3,6 +3,8 @@ import os
 
 from dotenv import load_dotenv
 
+from json import JSONDecodeError
+
 from noise_sensors_monitoring.repository.influx_db_repo import InfluxDBRepo
 from noise_sensors_monitoring.use_cases.sensor_reading import add_new_sensor_reading
 from noise_sensors_monitoring.requests.sensor_reading import build_sensor_reading_request
@@ -28,7 +30,11 @@ def on_message(_, __, message):
     topic = message.topic
     # TODO: First validate if this is valid json
     print(message.payload.decode('utf-8'))
-    message_content = json.loads(message.payload.decode('utf-8'))
+    try:
+        message_content = json.loads(message.payload.decode('utf-8'))
+    except JSONDecodeError:
+        print("Received Invalid json.")
+        return
     if topic == 'sb/sensor/logs':
         request = build_sensor_reading_request(message_content)
         response = add_new_sensor_reading(request, repo)
