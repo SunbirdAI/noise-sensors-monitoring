@@ -10,7 +10,8 @@ media_storage = get_storage_class()()
 
 
 def recording_directory(instance, filename):
-    return f'audio/{instance.device.device_id}/{instance.time_uploaded}-{filename}'
+    time_recorded = instance.time_recorded.strftime("%Y-%m-%dT%H:%M:%S")
+    return f'audio/{instance.device.device_id}/{instance.device.device_id}-{time_recorded}-{filename}'
 
 
 class Recording(models.Model):
