@@ -61,7 +61,7 @@ class Device(models.Model):
 
     @property
     def get_recordings(self):
-        return self.recording_set.order_by('time_uploaded')[:10:-1]
+        return self.recording_set.order_by('-time_recorded')[:10]
 
     def get_absolute_url(self):
         return reverse('device_detail', args=[str(self.id)])
