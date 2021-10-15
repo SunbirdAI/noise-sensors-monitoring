@@ -9,4 +9,4 @@ release:
   command:
     - python manage.py collectstatic --noinput
 run:
-  web: gunicorn noise_dashboard.wsgi --timeout 300
+  web: gunicorn noise_dashboard.wsgi --workers=8 --threads=2 --timeout 300
