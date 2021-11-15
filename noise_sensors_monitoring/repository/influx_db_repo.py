@@ -7,9 +7,6 @@ from influxdb_client.client.write_api import ASYNCHRONOUS, SYNCHRONOUS
 from datetime import datetime
 from typing import Dict
 
-MEASUREMENTS = ["BATTERY_VOLTAGE", "PANEL_VOLTAGE", "SIGNAL_STRENGTH", "DB_LEVEL",
-                "DATA_BALANCE", "LAST_RECORDED", "LAST_UPLOADED"]
-
 
 class InfluxDBRepo(SensorReadingRepo):
 
@@ -37,12 +34,13 @@ class InfluxDBRepo(SensorReadingRepo):
 
     def add_new_sensor_reading(self, sensor_reading: Dict):
         sensor = Sensor.from_dict(sensor_reading)
-        self.write_measurement(MEASUREMENTS[0], sensor.bV, sensor)
-        self.write_measurement(MEASUREMENTS[1], sensor.pV, sensor)
-        self.write_measurement(MEASUREMENTS[2], sensor.sigStrength, sensor)
-        self.write_measurement(MEASUREMENTS[3], sensor.dbLevel, sensor)
-        self.write_measurement(MEASUREMENTS[4], sensor.LastRec, sensor)
-        self.write_measurement(MEASUREMENTS[5], sensor.LastUpl, sensor)
+        self.write_measurement("BATTERY_VOLTAGE", sensor.bV, sensor)
+        self.write_measurement("PANEL_VOLTAGE", sensor.pV, sensor)
+        self.write_measurement("SIGNAL_STRENGTH", sensor.sigStrength, sensor)
+        self.write_measurement("DB_LEVEL", sensor.dbLevel, sensor)
+        self.write_measurement("DATA_BALANCE", sensor.DataBalance, sensor)
+        self.write_measurement("LAST_RECORDED", sensor.LastRec, sensor)
+        self.write_measurement("LAST_UPLOADED", sensor.LastUpl, sensor)
 
     def get_latest_sensor_reading(self) -> Sensor:
         pass
