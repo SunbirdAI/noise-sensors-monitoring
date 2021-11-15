@@ -5,15 +5,15 @@ from typing import Dict
 class Sensor:
     deviceId: str
     dbLevel: float
-    connected: bool
-    longitude: float
-    latitude: float
     bV: float
     pV: float
     LastRec: float
     LastUpl: float
     sigStrength: float
     DataBalance: float
+    connected: bool = True
+    longitude: float = 0
+    latitude: float = 0
 
     @classmethod
     def from_dict(cls, data: Dict):
