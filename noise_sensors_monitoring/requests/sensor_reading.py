@@ -2,15 +2,18 @@ from typing import Optional, Dict
 
 from noise_sensors_monitoring.requests.generic_requests import Request, InvalidRequest, ValidRequest
 
-REQUIRED_FIELDS = ["deviceId", "dbLevel", "connected", "batteryLevel", "sigStrength", "DataBalance"]
-OPTIONAL_FIELDS = ["latitude", "longitude"]
+REQUIRED_FIELDS = ["deviceId", "dbLevel", "LastRec", "LastUpl", "pV", "bV", "sigStrength", "DataBalance"]
+OPTIONAL_FIELDS = ["latitude", "longitude", "connected"]
 REQUIRED_TYPES = {
     "deviceId": str,
     "dbLevel": float,
     "connected": bool,
     "longitude": float,
     "latitude": float,
-    "batteryLevel": float,
+    "LastRec": float,
+    "LastUpl": float,
+    "pV": float,
+    "bV": float,
     "sigStrength": float,
     "DataBalance": float
 }
