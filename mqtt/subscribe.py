@@ -28,10 +28,9 @@ devices_repo = DevicesRepo()
 
 def on_message(_, __, message):
     topic = message.topic
-    # TODO: First validate if this is valid json
-    print(message.payload.decode('utf-8'))
     try:
         message_content = json.loads(message.payload.decode('utf-8'))
+        print(message_content)
     except JSONDecodeError:
         print("Received Invalid json.")
         return
