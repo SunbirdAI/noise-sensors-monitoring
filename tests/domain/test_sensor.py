@@ -29,7 +29,6 @@ def test_from_dict_init():
     init_dict = {
         "deviceId": "SB1001",
         "dbLevel": 76,
-        "connected": True,
         "longitude": 1.034,
         "latitude": 0.564,
         "bV": 30,
