@@ -18,7 +18,7 @@ def test_build_request_without_all_fields():
 
     assert bool(request) is False
     assert request.has_errors()
-    assert len(request.errors) == 4
+    assert len(request.errors) == 6
     assert request.errors[0]["type"] == "Missing values"
 
 
@@ -29,7 +29,10 @@ def test_build_request_with_invalid_fields():
         "connected": True,
         "longitude": 1.034,
         "latitude": 0.564,
-        "batteryLevel": 30,
+        "bV": 30,
+        "pV": 30,
+        "LastRec": 3,
+        "LastUpl": 2,
         "sigStrength": 26,
         "randomField": 26,
         "DataBalance": 67.0
@@ -48,7 +51,10 @@ def test_build_request_with_invalid_types():
         "connected": 78,
         "longitude": 1.034,
         "latitude": 0.564,
-        "batteryLevel": 30.9,
+        "bV": 30,
+        "pV": 30,
+        "LastRec": 3,
+        "LastUpl": 2,
         "sigStrength": 26,
         "DataBalance": 67.0
     })
@@ -67,7 +73,10 @@ def test_build_valid_request():
         "connected": True,
         "longitude": 1.034,
         "latitude": 0.564,
-        "batteryLevel": 30,
+        "bV": 30,
+        "pV": 30,
+        "LastRec": 3,
+        "LastUpl": 2,
         "sigStrength": 26,
         "DataBalance": 67.0
     }

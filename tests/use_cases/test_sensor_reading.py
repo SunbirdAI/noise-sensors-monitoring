@@ -34,7 +34,10 @@ def test_new_sensor_reading(sensor_repo):
         connected=True,
         longitude=1.034,
         latitude=0.564,
-        batteryLevel=30.0,
+        bV=30,
+        pV=30,
+        LastRec=3,
+        LastUpl=2,
         sigStrength=26.0,
         DataBalance=67
     )

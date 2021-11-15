@@ -8,7 +8,10 @@ class Sensor:
     connected: bool
     longitude: float
     latitude: float
-    batteryLevel: float
+    bV: float
+    pV: float
+    LastRec: float
+    LastUpl: float
     sigStrength: float
     DataBalance: float
 
