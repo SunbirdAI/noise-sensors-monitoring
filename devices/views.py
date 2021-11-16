@@ -1,7 +1,11 @@
+from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import UpdateView, CreateView
 from .models import Device
+from .serializers import DeviceConfigSerializer
+from rest_framework import viewsets
 
 from .forms import DeviceForm, DeviceConfigurationForm
 
@@ -39,3 +43,9 @@ class DeviceConfigurationUpdateView(UpdateView):
 
     def get_success_url(self):
         return reverse('device_detail', kwargs={'pk': self.object.pk})
+
+
+class DeviceConfigurationViewSet(viewsets.ModelViewSet):
+    serializer_class = DeviceConfigSerializer
+    queryset = Device.objects.all()
+    lookup_field = 'imei'
