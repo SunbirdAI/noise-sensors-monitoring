@@ -16,6 +16,7 @@ services:
   web:
     build: .
     command: python /code/manage.py runserver 0.0.0.0:8000
+    container_name: HTTPCLIENT
     volumes:
       - .:/code
     ports:
@@ -40,6 +41,7 @@ services:
       - djangonetwork
     environment:
       - MOSQUITTO_URL=Mosquitto
+      - HTTP_APP_HOST=http://HTTPCLIENT:8000
 
   mosquitto:
     image: eclipse-mosquitto
