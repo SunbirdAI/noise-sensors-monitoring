@@ -21,7 +21,7 @@ class DevicesRepo:
         url = f"{BASE_URL}/devices/config/{imei}"
         response = requests.request("GET", url)
         if response.status_code == 200:
-            return response.text
+            return response.json()
         return {
             "error": response.status_code
         }
