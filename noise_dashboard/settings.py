@@ -61,7 +61,8 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'pages.apps.PagesConfig',
     'devices.apps.DevicesConfig',
-    'recordings.apps.RecordingsConfig'
+    'recordings.apps.RecordingsConfig',
+    'device_metrics.apps.DeviceMetricsConfig'
 ]
 
 # django-crispy-forms
