@@ -13,7 +13,7 @@ services:
 
   web:
     build: .
-    command: gunicorn --workers=20 --threads=2 --bind 0.0.0.0:8000 noise_dashboard.wsgi --timeout 300 --capture-output
+    command: python /code/manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
     ports:
@@ -24,7 +24,7 @@ services:
       - postgres_db:postgres_db
     environment:
       - ENVIRONMENT=production
-      - DEBUG=False
+      - DEBUG=True
       - SECRET_KEY=${DJANGO_SECRET_KEY}
 
 volumes:
