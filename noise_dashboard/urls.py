@@ -29,5 +29,6 @@ urlpatterns = [
     path('accounts/', include('users.urls')),
     path('', include('pages.urls')),
     path('devices/', include('devices.urls')),
-    path('audio/', include('recordings.urls'))
+    path('audio/', include('recordings.urls')),
+    path('device_metrics/', include('device_metrics.urls'))
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
