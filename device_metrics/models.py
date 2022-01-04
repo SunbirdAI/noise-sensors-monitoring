@@ -3,6 +3,7 @@ import uuid
 from django.db import models
 from django.db.models.fields import PositiveIntegerField
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db.models.fields.files import ImageField
 
 from devices.models import Device
 
@@ -23,4 +24,3 @@ class DeviceMetrics(models.Model):
     battery_voltage = models.PositiveIntegerField()
     data_balance = models.PositiveIntegerField()
     datetime_uploaded = models.DateTimeField(auto_now_add=True)
-
