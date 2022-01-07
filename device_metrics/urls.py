@@ -1,9 +1,6 @@
-from django.urls import path, include
+from .views import ReceiveDeviceMetricsViewSet
+from rest_framework.routers import SimpleRouter
 
-from .views import DeviceMetricsCreateView, DeviceMetricsListView
-
-
-urlpatterns = [
-    path('', DeviceMetricsListView.as_view(), name='device_metrics_list'),
-    path('create_device_metrics/', DeviceMetricsCreateView.as_view(), name='create_device_metrics'),
-]
+router = SimpleRouter()
+router.register('', ReceiveDeviceMetricsViewSet)
+urlpatterns = router.urls
