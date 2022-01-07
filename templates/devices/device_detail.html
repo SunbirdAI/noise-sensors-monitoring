@@ -77,6 +77,39 @@
                     </table>
                 </div>
             </div>
+            <div class="card m-3">
+                <div class="card-body">
+                    <div class="card-title"><h4>{{ device.device_id }} Metrics (Latest 10 or less)</h4></div>
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th scope="col">Signal strength</th>
+                            <th scope="col">DB Level</th>
+                            <th scope="col">Last Recorded</th>
+                            <th scope="col">Last Uploaded</th>
+                            <th scope="col">Panel Voltage</th>
+                            <th scope="col">Battery Voltage</th>
+                            <th scope="col">Data Balance</th>
+                            <th scope="col">Time Uploaded</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for metric in device.get_metrics %}
+                            <tr>
+                                <td>{{ metric.sig_strength }}</td>
+                                <td>{{ metric.db_level }}</td>
+                                <td>{{ metric.last_rec }}</td>
+                                <td>{{ metric.last_upl }}</td>
+                                <td>{{ metric.panel_voltage }}</td>
+                                <td>{{ metric.battery_voltage }}</td>
+                                <td>{{ metric.data_balance }}</td>
+                                <td>{{ metrics.datetime_uploaded }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock content %}
