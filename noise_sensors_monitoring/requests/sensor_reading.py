@@ -2,8 +2,8 @@ from typing import Optional, Dict
 
 from noise_sensors_monitoring.requests.generic_requests import Request, InvalidRequest, ValidRequest
 
-REQUIRED_FIELDS = ["deviceId", "dbLevel", "LastRec", "LastUpl", "pV", "bV", "sigStrength", "DataBalance"]
-OPTIONAL_FIELDS = ["latitude", "longitude", "connected"]
+REQUIRED_FIELDS = ["deviceId", "dbLevel", "LastRec", "LastUpl", "pV", "bV", "sigStrength"]
+OPTIONAL_FIELDS = ["latitude", "longitude", "connected", "DataBalance"]
 REQUIRED_TYPES = {
     "deviceId": str,
     "dbLevel": float,

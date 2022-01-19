@@ -10,7 +10,7 @@ class Sensor:
     LastRec: float
     LastUpl: float
     sigStrength: float
-    DataBalance: float
+    DataBalance: float = 0
     connected: bool = True
     longitude: float = 0
     latitude: float = 0
