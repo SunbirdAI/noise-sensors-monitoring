@@ -22,6 +22,8 @@ class Location(models.Model):
     )
     longitude = models.FloatField()
     latitude = models.FloatField()
+    city = models.CharField(max_length=200)
+    place_name = models.CharField(max_length=200)
 
 class Device(models.Model):
     class ProductionStage(models.TextChoices):
