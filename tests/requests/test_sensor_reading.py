@@ -18,7 +18,7 @@ def test_build_request_without_all_fields():
 
     assert bool(request) is False
     assert request.has_errors()
-    assert len(request.errors) == 6
+    assert len(request.errors) == 5
     assert request.errors[0]["type"] == "Missing values"
 
 
