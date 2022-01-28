@@ -10,3 +10,4 @@ try_influx_db.py
 coverage.xml
 audio/
 staticfiles
+**/.DS_Store

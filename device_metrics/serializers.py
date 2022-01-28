@@ -10,6 +10,7 @@ class DeviceMetricsFullSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DeviceMetrics
+        fields='__all__'
 
     def to_representation(self, instance):
         self.fields['device'] = DeviceSerializer(read_only=True)
