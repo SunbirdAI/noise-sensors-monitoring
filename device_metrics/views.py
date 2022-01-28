@@ -7,4 +7,4 @@ from .serializers import DeviceMetricsFullSerializer
 class ReceiveDeviceMetricsViewSet(viewsets.ModelViewSet):
     queryset = DeviceMetrics.objects.all()
     serializer_class = DeviceMetricsFullSerializer
-    http_method_names = ['post']
+    http_method_names = ['get', 'post']
