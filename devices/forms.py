@@ -7,7 +7,9 @@ class DeviceForm(ModelForm):
     class Meta:
         model = Device
         fields = ['device_id', 'imei', 'device_name', 'phone_number', 'version_number',
-                  'production_stage', 'tags', 'metrics_url', 'location']
+                  'production_stage', 'tags', 'metrics_url'] 
+                  # temporarily removed 'location' field form these form fields,
+                  # pending a `create/edit form` task
 
     def clean_imei(self, *args, **kwargs):
         imei = self.cleaned_data.get('imei')
