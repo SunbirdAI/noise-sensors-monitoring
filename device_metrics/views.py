@@ -6,16 +6,6 @@ from .models import DeviceMetrics
 from .serializers import DeviceMetricsSerializer
 
 
-class DeviceMetricsListCreateView(ListCreateAPIView):
-    queryset = DeviceMetrics.objects.all()
-    serializer_class = DeviceMetricsSerializer
-
-    def list(self, request):
-        queryset = self.get_queryset()
-        serializer = DeviceMetricsSerializer(queryset, many=True)
-        return Response(serializer.data)
-
-
 class ReceiveDeviceMetricsViewSet(viewsets.ModelViewSet):
     queryset = DeviceMetrics.objects.all()
     serializer_class = DeviceMetricsSerializer
