@@ -10,4 +10,8 @@ class DeviceMetricsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DeviceMetrics
-        fields='__all__'
+        fields = [
+                'device', 'sig_strength', 'db_level', 'last_rec', 'last_upl',
+                'panel_voltage', 'battery_voltage', 'data_balance', 'time_uploaded'
+            ]
+        read_only_fields = ['time_uploaded']
