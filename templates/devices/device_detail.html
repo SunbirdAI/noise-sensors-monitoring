@@ -24,7 +24,7 @@
                                 <span class="btn btn-light btn-outline-secondary btn-sm">{{ tag }}</span>
                             {% endfor %}
                         </p>
-                        <p><strong>Location</strong>: {{ device.location }}</p>
+                        <p><strong>Location:</strong> {{ device.location_set.all }}</p>
                     </div>
                 </div>
                 <div class="card">
@@ -43,6 +43,8 @@
             <a href="{{ device.metrics_url }}" class="btn btn-primary mx-3 my-1" target="_blank">View Metrics</a>
             <a href="{% url 'edit_config' device.id %}" class="btn btn-primary mx-3 my-1 pull-right">Edit
                 Configuration</a>
+            <a href="{% url 'edit_location' device.id %}" class="btn btn-primary mx-3 my-1 pull-right">Edit
+                Location</a>
             <div class="card m-3">
                 <div class="card-body">
                     <div class="card-title"><h4>{{ device.device_id }} Recordings (Latest 10 or less)</h4></div>
