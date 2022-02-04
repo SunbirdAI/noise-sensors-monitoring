@@ -3,11 +3,11 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import UpdateView, CreateView
-from .models import Device
-from .serializers import DeviceConfigSerializer
+from .models import Device, Location
+from .serializers import DeviceConfigSerializer, LocationSerializer
 from rest_framework import viewsets
 
-from .forms import DeviceForm, DeviceConfigurationForm
+from .forms import DeviceForm, DeviceConfigurationForm, LocationForm
 
 
 class DeviceListView(ListView):
@@ -34,6 +34,20 @@ class DeviceUpdateView(UpdateView):
     form_class = DeviceForm
     success_url = '/devices/'
     template_name = 'devices/edit_device.html'
+
+
+class LocationViewSet(viewsets.ModelViewSet):
+    serializer_class = LocationSerializer
+    queryset = Location.objects.all()
+
+
+class LocationUpdateView(UpdateView):
+    model = Device
+    form_class = LocationForm
+    template_name = 'devices/edit_location.html'
+
+    def get_success_url(self):
+        return reverse('device_detail', kwargs={'pk': self.object.pk})
 
 
 class DeviceConfigurationUpdateView(UpdateView):

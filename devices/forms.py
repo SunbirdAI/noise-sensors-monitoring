@@ -1,5 +1,5 @@
 from django.forms import ModelForm, ValidationError
-from .models import Device
+from .models import Device, Location
 import re
 
 
@@ -8,8 +8,6 @@ class DeviceForm(ModelForm):
         model = Device
         fields = ['device_id', 'imei', 'device_name', 'phone_number', 'version_number',
                   'production_stage', 'tags', 'metrics_url'] 
-                  # temporarily removed 'location' field form these form fields,
-                  # pending a `create/edit form` task
 
     def clean_imei(self, *args, **kwargs):
         imei = self.cleaned_data.get('imei')
@@ -24,6 +22,12 @@ class DeviceForm(ModelForm):
         if not re.match(pattern, phone_number):
             raise ValidationError('Please enter a valid phone number')
         return phone_number
+
+
+class LocationForm(ModelForm):
+    class Meta:
+        model = Location
+        fields = ['longitude', 'latitude', 'city', 'place_name']
 
 
 class DeviceConfigurationForm(ModelForm):
