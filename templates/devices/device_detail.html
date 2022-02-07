@@ -24,7 +24,13 @@
                                 <span class="btn btn-light btn-outline-secondary btn-sm">{{ tag }}</span>
                             {% endfor %}
                         </p>
-                        <p><strong>Location:</strong> {{ device.location.city }}, {{device.location.place_name }}</p>
+                        <p><strong>Location:</strong>
+                            {% if device.location %} 
+                                {{ device.location.city }}, {{device.location.place_name }}
+                            {% else %}
+                                None
+                            {% endif %}
+                        </p>
                     </div>
                 </div>
                 <div class="card">
@@ -39,10 +45,15 @@
                     </div>
                 </div>
             </div>
-            <a href="{% url 'edit_device' device.id %}" class="btn btn-primary mx-3 my-1">Edit</a>
-            <a href="{{ device.metrics_url }}" class="btn btn-primary mx-3 my-1" target="_blank">View Metrics</a>
-            <a href="{% url 'edit_config' device.id %}" class="btn btn-primary mx-3 my-1 pull-right">Edit
+            <a href="{% url 'edit_device' device.id %}" class="btn btn-primary mx-3 my-1">Edit Device</a>
+            <a href="{% url 'edit_config' device.id %}" class="btn btn-primary mx-3 my-1">Edit
                 Configuration</a>
+            {% if device.location %}
+                <a href="{% url 'edit_location' device.location.id %}" class="btn btn-primary mx-3 my-1">Edit Location</a>
+            {% else %}
+                <a href="{% url 'create_location' %}" class="btn btn-primary mx-3 my-1">Add Location</a>
+            {% endif %}
+            <a href="{{ device.metrics_url }}" class="btn btn-primary mx-3 my-1  pull-right" target="_blank">View Metrics</a>
             <div class="card m-3">
                 <div class="card-body">
                     <div class="card-title"><h4>{{ device.device_id }} Recordings (Latest 10 or less)</h4></div>

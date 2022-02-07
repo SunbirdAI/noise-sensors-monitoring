@@ -77,8 +77,8 @@ class Location(models.Model):
         default=uuid.uuid4,
         editable=False
     )
-    longitude = models.FloatField()
     latitude = models.FloatField()
+    longitude = models.FloatField()
     city = models.CharField(max_length=200)
     place_name = models.CharField(max_length=200)
     device = models.OneToOneField(Device, on_delete=models.CASCADE, null=True)
