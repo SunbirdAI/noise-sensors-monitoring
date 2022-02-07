@@ -2,7 +2,7 @@
 
 {% load crispy_forms_filters %}
 
-{% block title %}Edit Location{% endblock title %}
+{% block title %}Update Device Location{% endblock title %}
 
 {% block content %}
     {% include "sidebar.html" %}
@@ -10,7 +10,7 @@
         <div class="container-fluid">
             {% include "navbar.html" %}
             <div class="mt-4 mx-3">
-                <h4 class="my-3">Edit Device Location</h4>
+                <h4 class="my-3">Update Device Location</h4>
                 <form method="post">
                     {% csrf_token %}
                     {{ form|crispy }}
