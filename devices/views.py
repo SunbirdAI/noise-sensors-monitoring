@@ -39,7 +39,15 @@ class LocationCreateView(CreateView):
     model = Location
     fields = '__all__'
     success_url = '/devices/'
-    template_name = 'devices/create_location.html'
+    template_name = 'devices/update_location.html'
+
+
+class LocationUpdateView(UpdateView):
+    model = Location
+    fields = ['latitude', 'longitude', 'city', 'place_name']
+    success_url = '/devices/'
+    template_name = 'devices/update_location.html'
+
 
 class DeviceConfigurationUpdateView(UpdateView):
     model = Device
