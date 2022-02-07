@@ -14,17 +14,6 @@ class UUIDTaggedItem(GenericUUIDTaggedItemBase, TaggedItemBase):
         verbose_name = _("Tag")
         verbose_name_plural = _("Tags")
 
-class Location(models.Model):
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False
-    )
-    longitude = models.FloatField()
-    latitude = models.FloatField()
-    city = models.CharField(max_length=200)
-    place_name = models.CharField(max_length=200)
-
 class Device(models.Model):
     class ProductionStage(models.TextChoices):
         DEPLOYED = 'Deployed', _('Deployed')
@@ -58,7 +47,6 @@ class Device(models.Model):
     )
     tags = TaggableManager(through=UUIDTaggedItem)
     metrics_url = models.URLField(max_length=255, default="http://localhost:3000/")
-    location = models.OneToOneField(Location, on_delete=models.CASCADE, null=True)
 
     # Configuration fields
     configured = models.IntegerField(choices=Configured.choices, default=Configured.NOT_CONFIGURED)
@@ -83,3 +71,14 @@ class Device(models.Model):
         return reverse('device_detail', args=[str(self.id)])
 
 
+class Location(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
+    longitude = models.FloatField()
+    latitude = models.FloatField()
+    city = models.CharField(max_length=200)
+    place_name = models.CharField(max_length=200)
+    device = models.OneToOneField(Device, on_delete=models.CASCADE, null=True)
