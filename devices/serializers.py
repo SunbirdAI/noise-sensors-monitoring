@@ -13,7 +13,7 @@ class LocationSerializer(serializers.ModelField):
 
     class Meta:
         model = Location
-        fields = ['longitude', 'latitude', 'city', 'place_name']
+        fields = ['latitude', 'longitude', 'city', 'division', 'parish', 'village']
 
 
 class DeviceConfigSerializer(serializers.ModelSerializer):
