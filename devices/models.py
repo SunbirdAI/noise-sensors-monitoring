@@ -1,3 +1,4 @@
+from __future__ import division
 import uuid
 from django.db.models.fields.related import OneToOneField
 from django.utils.translation import gettext_lazy as _
@@ -79,6 +80,8 @@ class Location(models.Model):
     )
     latitude = models.FloatField()
     longitude = models.FloatField()
-    city = models.CharField(max_length=200)
-    place_name = models.CharField(max_length=200)
+    city = models.CharField(max_length=200, blank=True)
+    division = models.CharField(max_length=200, blank=True)
+    parish = models.CharField(max_length=200, blank=True)
+    village = models.CharField(max_length=200, blank=True)
     device = models.OneToOneField(Device, on_delete=models.CASCADE, null=True)

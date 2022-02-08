@@ -26,7 +26,10 @@
                         </p>
                         <p><strong>Location:</strong>
                             {% if device.location %} 
-                                {{ device.location.city }}, {{device.location.place_name }}
+                                <strong>City</strong>: {{ device.location.city }}, 
+                                <strong>Division</strong>: {{device.location.division }},
+                                <strong>Parish/Ward</strong>: {{device.location.parish }},
+                                <strong>Village/Sub-Ward</strong>: {{device.location.village }},
                             {% else %}
                                 None
                             {% endif %}
