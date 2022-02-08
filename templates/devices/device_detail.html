@@ -24,16 +24,18 @@
                                 <span class="btn btn-light btn-outline-secondary btn-sm">{{ tag }}</span>
                             {% endfor %}
                         </p>
-                        <p><strong>Location:</strong>
-                            {% if device.location %} 
+                        <p><strong>Location:</strong></p>
+                        {% if device.location %}
+                            <p class="ml-3">
                                 <strong>City</strong>: {{ device.location.city }}, 
-                                <strong>Division</strong>: {{device.location.division }},
+                                <strong>Division</strong>: {{device.location.division }}
                                 <strong>Parish/Ward</strong>: {{device.location.parish }},
-                                <strong>Village/Sub-Ward</strong>: {{device.location.village }},
-                            {% else %}
-                                None
-                            {% endif %}
-                        </p>
+                                <strong>Village/Sub-Ward</strong>: {{device.location.village }}
+                            </p>
+                        {% else %}
+                            <p class="ml-3">N/A</p>
+                        {% endif %}
+                    </p>
                     </div>
                 </div>
                 <div class="card">

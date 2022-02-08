@@ -55,21 +55,21 @@ class Device(models.Model):
     dbLevel = models.IntegerField(default=50)
     recLength = models.IntegerField(default=10)
     recInterval = models.IntegerField(default=10)
-    uploadAddr = models.CharField(default='http://localhost:8000/audio/', max_length=100)
+    uploadAddr = models.CharField(default="http://localhost:8000/audio/", max_length=100)
 
     def __str__(self):
         return self.device_id
 
     @property
     def get_recordings(self):
-        return self.recording_set.order_by('-time_recorded')[:10]
+        return self.recording_set.order_by("-time_recorded")[:10]
 
     @property
     def get_metrics(self):
-        return self.devicemetrics_set.order_by('-time_uploaded')[:10]
+        return self.devicemetrics_set.order_by("-time_uploaded")[:10]
 
     def get_absolute_url(self):
-        return reverse('device_detail', args=[str(self.id)])
+        return reverse("device_detail", args=[str(self.id)])
 
 
 class Location(models.Model):
@@ -80,8 +80,8 @@ class Location(models.Model):
     )
     latitude = models.FloatField()
     longitude = models.FloatField()
-    city = models.CharField(max_length=200, blank=True)
-    division = models.CharField(max_length=200, blank=True)
-    parish = models.CharField(max_length=200, blank=True)
-    village = models.CharField(max_length=200, blank=True)
+    city = models.CharField(max_length=200)
+    division = models.CharField(max_length=200, blank=True, default="N/A")
+    parish = models.CharField(max_length=200, blank=True, default="N/A")
+    village = models.CharField(max_length=200, blank=True, default="N/A")
     device = models.OneToOneField(Device, on_delete=models.CASCADE, null=True)
