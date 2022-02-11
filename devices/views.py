@@ -4,8 +4,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import UpdateView, CreateView
 from .models import Device, Location
-from .serializers import DeviceConfigSerializer
+from .serializers import DeviceSerializer, DeviceConfigSerializer
 from rest_framework import viewsets
+from rest_framework.generics import ListAPIView
 
 from .forms import DeviceForm, DeviceConfigurationForm
 
@@ -14,6 +15,11 @@ class DeviceListView(ListView):
     model = Device
     context_object_name = 'device_list'
     template_name = 'devices/device_list.html'
+
+
+class DeviceListAPIView(ListAPIView):
+    queryset = Device.objects.all()
+    serializer_class = DeviceSerializer
 
 
 class DeviceDetailView(DetailView):
