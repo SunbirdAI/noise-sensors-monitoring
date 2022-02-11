@@ -2,7 +2,7 @@ from django.urls import path, include
 
 from .views import (
     DeviceListView, DeviceDetailView, DeviceCreateView, DeviceUpdateView,
-    DeviceConfigurationUpdateView, DeviceConfigurationViewSet, 
+    DeviceListAPIView, DeviceConfigurationUpdateView, DeviceConfigurationViewSet, 
     LocationCreateView, LocationUpdateView
 )
 
@@ -13,6 +13,7 @@ router.register('config', DeviceConfigurationViewSet)
 
 urlpatterns = [
     path('', DeviceListView.as_view(), name='device_list'),
+    path('list/', DeviceListAPIView.as_view(), name='list_devices'),
     path('<uuid:pk>', DeviceDetailView.as_view(), name='device_detail'),
     path('create_device/', DeviceCreateView.as_view(), name='create_device'),
     path('<uuid:pk>/edit/', DeviceUpdateView.as_view(), name='edit_device'),
