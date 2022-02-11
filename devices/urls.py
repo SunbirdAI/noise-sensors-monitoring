@@ -2,8 +2,8 @@ from django.urls import path, include
 
 from .views import (
     DeviceListView, DeviceDetailView, DeviceCreateView, DeviceUpdateView,
-    DeviceListAPIView, DeviceConfigurationUpdateView, DeviceConfigurationViewSet, 
-    LocationCreateView, LocationUpdateView
+    DeviceLocationListAPIView, DeviceConfigurationUpdateView, 
+    DeviceConfigurationViewSet, LocationCreateView, LocationUpdateView
 )
 
 from rest_framework.routers import SimpleRouter
@@ -13,7 +13,7 @@ router.register('config', DeviceConfigurationViewSet)
 
 urlpatterns = [
     path('', DeviceListView.as_view(), name='device_list'),
-    path('list/', DeviceListAPIView.as_view(), name='list_devices'),
+    path('locations/', DeviceLocationListAPIView.as_view(), name='device_locations'),
     path('<uuid:pk>', DeviceDetailView.as_view(), name='device_detail'),
     path('create_device/', DeviceCreateView.as_view(), name='create_device'),
     path('<uuid:pk>/edit/', DeviceUpdateView.as_view(), name='edit_device'),

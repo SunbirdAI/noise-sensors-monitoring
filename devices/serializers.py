@@ -9,11 +9,14 @@ class DeviceSerializer(serializers.ModelSerializer):
         fields = ['device_id']
 
 
-class LocationSerializer(serializers.ModelField):
+class LocationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Location
-        fields = ['latitude', 'longitude', 'city', 'division', 'parish', 'village']
+        fields = [
+            'device', 'latitude', 'longitude', 'city', 
+            'division', 'parish', 'village'
+        ]
 
 
 class DeviceConfigSerializer(serializers.ModelSerializer):
