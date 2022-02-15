@@ -5,7 +5,7 @@ from devices.serializers import DeviceSerializer
 
 
 class DeviceMetricsSerializer(serializers.ModelSerializer):
-    device = serializers.PrimaryKeyRelatedField(queryset=Device.objects.all())                                      
+    device = serializers.PrimaryKeyRelatedField(queryset=Device.objects.all())
 
     class Meta:
         model = DeviceMetrics
