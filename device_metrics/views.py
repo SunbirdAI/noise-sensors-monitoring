@@ -16,5 +16,5 @@ class ListDeviceMetrics(ListAPIView):
 
     def get_queryset(self):
         return self.queryset.filter(
-            device__device_id=self.kwargs['device_id']
+            device__id=self.kwargs['pk']
         )

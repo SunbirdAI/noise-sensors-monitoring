@@ -8,6 +8,6 @@ router = SimpleRouter()
 router.register('', ReceiveDeviceMetricsViewSet)
 
 urlpatterns = [
-    path('<slug:device_id>', ListDeviceMetrics.as_view(), name='device_device_metrics'),
+    path('device/<uuid:pk>', ListDeviceMetrics.as_view(), name='device_device_metrics'),
     path('', include(router.urls))
 ]
