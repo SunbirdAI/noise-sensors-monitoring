@@ -1,7 +1,6 @@
 import uuid
 
 from django.db import models
-from django.db.models.fields import PositiveIntegerField, PositiveSmallIntegerField
 from django.core.validators import MaxValueValidator
 
 from devices.models import Device
@@ -16,7 +15,10 @@ class DeviceMetrics(models.Model):
     sig_strength = models.PositiveSmallIntegerField(
         validators = [MaxValueValidator(31)]
     )
-    db_level = models.PositiveIntegerField()
+    db_level = models.FloatField()
+    avg_db_level = models.FloatField(null=True)
+    max_db_level = models.FloatField(null=True)
+    no_of_exceedances = models.PositiveIntegerField(null=True)
     last_rec = models.PositiveIntegerField()
     last_upl = models.PositiveIntegerField()
     panel_voltage = models.PositiveIntegerField()

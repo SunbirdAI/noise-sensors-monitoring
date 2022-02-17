@@ -101,6 +101,9 @@
                         <tr>
                             <th scope="col">Signal strength</th>
                             <th scope="col">DB Level</th>
+                            <th scope="col">Average DB Level</th>
+                            <th scope="col">Max DB Level</th>
+                            <th scope="col">No. of Exceedances</th>
                             <th scope="col">Last Recorded</th>
                             <th scope="col">Last Uploaded</th>
                             <th scope="col">Panel Voltage</th>
@@ -114,6 +117,9 @@
                             <tr>
                                 <td>{{ metric.sig_strength }}</td>
                                 <td>{{ metric.db_level }}</td>
+                                <td>{{ metric.avg_db_level }}</td>
+                                <td>{{ metric.max_db_level }}</td>
+                                <td>{{ metric.no_of_exceedances}}</td>
                                 <td>{{ metric.last_rec }}</td>
                                 <td>{{ metric.last_upl }}</td>
                                 <td>{{ metric.panel_voltage }}</td>
