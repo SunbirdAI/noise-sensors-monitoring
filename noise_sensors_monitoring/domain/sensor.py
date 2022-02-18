@@ -28,6 +28,9 @@ class Sensor:
 class AggregateSensorMetric:
     device: str
     db_level: int
+    avg_db_level: int
+    max_db_level: int
+    no_of_exceedances: int
     # minDbLevel: float TODO: Add these later, when they're implemented in the API
     # maxDbLevel: float
     sig_strength: int
