@@ -7,11 +7,12 @@ from noise_sensors_monitoring.responses import (
 )
 
 
-def add_new_sensor_reading(request: Request, repo: SensorReadingRepo):
+def add_new_sensor_reading(request: Request, repo: SensorReadingRepo, in_memory_repo: SensorReadingRepo):
     if not request:
         return build_response_from_invalid_request(request)
     try:
         repo.add_new_sensor_reading(request.request_dict)
+        in_memory_repo.add_new_sensor_reading(request.request_dict)
         return ResponseSuccess("Successfully added the new sensor reading")
     except Exception as exc:
         return ResponseFailure(ResponseTypes.SYSTEM_ERROR, exc)
