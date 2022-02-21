@@ -44,7 +44,7 @@ def test_new_sensor_reading(sensor_repo):
 
     request = build_sensor_reading_request(sensor_reading.to_dict())
 
-    response = add_new_sensor_reading(request, repo)
+    response = add_new_sensor_reading(request, repo, repo)
 
     latest_sensor = get_latest_sensor_reading(repo)
 
