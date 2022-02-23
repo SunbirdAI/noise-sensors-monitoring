@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Third-party
+    'django_crontab',
     'crispy_forms',
     'taggit',
     'rest_framework',
@@ -63,6 +64,10 @@ INSTALLED_APPS = [
     'recordings.apps.RecordingsConfig',
     'device_metrics.apps.DeviceMetricsConfig',
     'analysis.apps.AnalysisConfig'
+]
+
+CRONJOBS = [
+    ('0 0 * * *', 'analysis.cron.aggregate_daily_metrics')
 ]
 
 # django-crispy-forms
