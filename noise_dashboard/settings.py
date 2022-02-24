@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'taggit',
     'rest_framework',
-    'cors-headers'
+    'corsheaders',
 
     # Local
     'users.apps.UsersConfig',
