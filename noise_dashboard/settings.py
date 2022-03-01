@@ -66,9 +66,9 @@ INSTALLED_APPS = [
     'analysis.apps.AnalysisConfig'
 ]
 
-CRONJOBS = [
-    ('0 0 * * *', 'analysis.cron.aggregate_daily_metrics')
-]
+# CRONJOBS = [
+#     ('0 0 * * *', 'analysis.cron.aggregate_daily_metrics')
+# ]
 
 # django-crispy-forms
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
