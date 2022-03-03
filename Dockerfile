@@ -8,9 +8,9 @@ ENV PYTHONUNBUFFERED 1
 # Set working directory
 WORKDIR /code
 
-# Install cron
-RUN apt-get update
-RUN apt-get install -y cron
+# # Install cron
+# RUN apt-get update
+# RUN apt-get install -y cron
 
 # Install dependencies
 COPY requirements.txt /code/
