@@ -1,6 +1,4 @@
-from __future__ import division
 import uuid
-from django.db.models.fields.related import OneToOneField
 from django.utils.translation import gettext_lazy as _
 
 from django.db import models
