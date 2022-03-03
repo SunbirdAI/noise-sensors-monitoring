@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'analysis.apps.AnalysisConfig'
 ]
 
+# Daily metrics aggregation job
 # CRONJOBS = [
 #     ('0 0 * * *', 'analysis.cron.aggregate_daily_metrics')
 # ]
