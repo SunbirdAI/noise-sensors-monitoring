@@ -85,3 +85,7 @@ class Location(models.Model):
     parish = models.CharField(max_length=200, blank=True, default="N/A")
     village = models.CharField(max_length=200, blank=True, default="N/A")
     device = models.OneToOneField(Device, on_delete=models.CASCADE, null=True)
+
+    @property
+    def latest_metric(self):
+        return self.device.devicemetrics_set.order_by("-time_uploaded")[0]
