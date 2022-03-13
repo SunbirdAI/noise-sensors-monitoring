@@ -11,3 +11,4 @@ coverage.xml
 audio/
 staticfiles
 **/.DS_Store
+app.log
