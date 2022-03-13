@@ -89,3 +89,7 @@ class Location(models.Model):
     @property
     def latest_metric(self):
         return self.device.devicemetrics_set.order_by("-time_uploaded")[0]
+
+    @property
+    def location_metrics(self):
+        return self.device.devicemetrics_set.order_by("-time_uploaded")

@@ -23,6 +23,17 @@ class DeviceLocationSerializer(serializers.ModelSerializer):
         ]
 
 
+class LocationMetricsSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='device_id')
+    location_metrics = DeviceMetricsSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = Location
+        fields = [
+            'id', 'location_metrics'
+        ]
+
+
 class DeviceConfigSerializer(serializers.ModelSerializer):
 
     class Meta:

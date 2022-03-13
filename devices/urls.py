@@ -2,14 +2,15 @@ from django.urls import path, include
 
 from .views import (
     DeviceListView, DeviceDetailView, DeviceCreateView, DeviceUpdateView,
-    DeviceLocationListAPIView, DeviceConfigurationUpdateView, 
-    DeviceConfigurationViewSet, LocationCreateView, LocationUpdateView
+    DeviceLocationListAPIView, DeviceConfigurationUpdateView,
+    DeviceConfigurationViewSet, LocationCreateView, LocationUpdateView, LocationMetricsViewSet
 )
 
 from rest_framework.routers import SimpleRouter
 
 router = SimpleRouter()
 router.register('config', DeviceConfigurationViewSet)
+router.register('location_metrics', LocationMetricsViewSet)
 
 urlpatterns = [
     path('', DeviceListView.as_view(), name='device_list'),
