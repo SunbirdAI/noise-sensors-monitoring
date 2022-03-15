@@ -1,8 +1,8 @@
-from django.test import SimpleTestCase
+from django.test import TestCase
 from django.urls import reverse, resolve
 from .views import HomePageView
 
-class HomepageTests(SimpleTestCase):
+class HomepageTests(TestCase):
     def setUp(self):
         url = reverse('home')
         self.response = self.client.get(url)

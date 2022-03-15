@@ -8,11 +8,8 @@
         <div class="card">
           <h5 class="card-header">Sensors</h5>
           <div class="card-body">
-            <h5 class="card-title">50</h5>
-            <p class="card-text">Deployed: 30</p>
-            <p class="card-text text-success">
-              9.4% increase since last month
-            </p>
+            <h3 class="card-title">{{ view.devices_count }}</h3>
+            <h6 class="card-text">Deployed: {{ view.deployed_devices_count }}</h6>
           </div>
         </div>
       </div>
@@ -20,9 +17,8 @@
         <div class="card">
           <h5 class="card-header">Noise samples</h5>
           <div class="card-body">
-            <h5 class="card-title">1349</h5>
-            <p class="card-text">Sucessful: 30</p>
-            <p class="card-text text-success">15.8% increase since last month</p>
+            <h3 class="card-title">{{ view.recordings_count }}</h3>
+            <h6 class="card-text">Recorded today: {{ view.recordings_count_today }}</h6>
           </div>
         </div>
       </div>

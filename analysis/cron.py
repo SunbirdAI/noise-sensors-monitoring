@@ -1,9 +1,10 @@
 import logging
 import pytz
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from django.db.models import Avg, Max, Sum
 
+from noise_dashboard.settings import TIME_ZONE
 from .models import DailyAnalysis
 from devices.models import Device
 from device_metrics.models import DeviceMetrics
@@ -16,7 +17,7 @@ logging.basicConfig(filename="app.log",
 
 
 def aggregate_daily_metrics():
-    timezone = pytz.timezone("Africa/Kampala")
+    timezone = pytz.timezone(TIME_ZONE)
     today = datetime.today()
     today = timezone.localize(today)
     devices = Device.objects.all()
