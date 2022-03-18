@@ -27,7 +27,7 @@ class DeviceForm(ModelForm):
 class LocationForm(ModelForm):
     class Meta:
         model = Location
-        fields = ['latitude', 'longitude', 'city', 'division', 'parish', 'village']
+        fields = ['latitude', 'longitude', 'city', 'division', 'parish', 'village', 'category']
 
 
 class DeviceConfigurationForm(ModelForm):

@@ -56,7 +56,7 @@ class LocationCreateView(CreateView):
 
 class LocationUpdateView(UpdateView):
     model = Location
-    fields = ['latitude', 'longitude', 'city', 'division', 'parish', 'village']
+    fields = ['latitude', 'longitude', 'city', 'division', 'parish', 'village', 'category']
     success_url = '/devices/'
     template_name = 'devices/update_location.html'
 
