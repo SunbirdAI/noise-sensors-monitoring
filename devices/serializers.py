@@ -19,7 +19,7 @@ class DeviceLocationSerializer(serializers.ModelSerializer):
         model = Location
         fields = [
             'id', 'latitude', 'longitude', 'city',
-            'division', 'parish', 'village', 'latest_metric'
+            'division', 'parish', 'village', 'latest_metric', 'location_description', 'day_limit', 'night_limit',
         ]
 
 
