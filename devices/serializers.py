@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from device_metrics.serializers import DeviceMetricsSerializer
+from recordings.models import Recording
 from .models import Device, Location
 
 
@@ -31,6 +32,27 @@ class LocationMetricsSerializer(serializers.ModelSerializer):
         model = Location
         fields = [
             'id', 'location_metrics'
+        ]
+
+
+class RecordingSerializer(serializers.ModelSerializer):
+    device = serializers.SlugRelatedField(queryset=Device.objects.all(),
+                                          slug_field='device_id')
+
+    class Meta:
+        model = Recording
+        fields = ['id', 'time_recorded', 'audio', 'device', 'triggering_threshold']
+        read_only_fields = ['time_uploaded']
+
+
+class DeviceRecordingsSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='device_id')
+    device_recordings = RecordingSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = Device
+        fields = [
+            'id', 'device_recordings'
         ]
 
 
