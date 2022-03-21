@@ -143,3 +143,7 @@ class Location(models.Model):
     @property
     def location_metrics(self):
         return self.device.devicemetrics_set.order_by("-time_uploaded")
+
+    @property
+    def device_recordings(self):
+        return self.device.recordings_set.order_by("-time_uploaded")

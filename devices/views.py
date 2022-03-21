@@ -4,7 +4,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import UpdateView, CreateView
 from .models import Device, Location
-from .serializers import DeviceLocationSerializer, DeviceConfigSerializer, LocationMetricsSerializer
+from .serializers import (
+    DeviceLocationSerializer, DeviceConfigSerializer,
+    LocationMetricsSerializer, DeviceRecordingsSerializer
+    )
 from rest_framework import viewsets
 from rest_framework.generics import ListAPIView
 
@@ -26,6 +29,12 @@ class LocationMetricsViewSet(viewsets.ModelViewSet):
     serializer_class = LocationMetricsSerializer
     queryset = Location.objects.all()
     lookup_field = 'device'
+
+
+class DeviceRecordingsViewSet(viewsets.ModelViewSet):
+    serializer_class = DeviceRecordingsSerializer
+    queryset = Device.objects.all()
+    lookup_field = 'device_id'
 
 
 class DeviceDetailView(DetailView):

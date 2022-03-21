@@ -4,7 +4,7 @@ from devices.models import Device
 from devices.serializers import DeviceSerializer
 
 
-class RecordingSerializer(serializers.ModelSerializer):
+class UploadRecordingSerializer(serializers.ModelSerializer):
     device = serializers.SlugRelatedField(queryset=Device.objects.all(),
                                           slug_field='device_id')
 
