@@ -1,3 +1,5 @@
+import uuid
+
 from django.utils import timezone
 from django.core.files.storage import get_storage_class
 from django.core.validators import (
