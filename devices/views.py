@@ -6,7 +6,7 @@ from django.views.generic.edit import UpdateView, CreateView
 from .models import Device, Location
 from .serializers import (
     DeviceLocationSerializer, DeviceConfigSerializer,
-    LocationMetricsSerializer, DeviceRecordingsSerializer
+    LocationMetricsSerializer, LocationRecordingsSerializer
     )
 from rest_framework import viewsets
 from rest_framework.generics import ListAPIView
@@ -31,10 +31,10 @@ class LocationMetricsViewSet(viewsets.ModelViewSet):
     lookup_field = 'device'
 
 
-class DeviceRecordingsViewSet(viewsets.ModelViewSet):
-    serializer_class = DeviceRecordingsSerializer
-    queryset = Device.objects.all()
-    lookup_field = 'device_id'
+class LocationRecordingsViewSet(viewsets.ModelViewSet):
+    serializer_class = LocationRecordingsSerializer
+    queryset = Location.objects.all()
+    lookup_field = 'id'
 
 
 class DeviceDetailView(DetailView):

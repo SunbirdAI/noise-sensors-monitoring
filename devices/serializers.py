@@ -36,23 +36,20 @@ class LocationMetricsSerializer(serializers.ModelSerializer):
 
 
 class RecordingSerializer(serializers.ModelSerializer):
-    device = serializers.SlugRelatedField(queryset=Device.objects.all(),
-                                          slug_field='device_id')
 
     class Meta:
         model = Recording
-        fields = ['id', 'time_recorded', 'audio', 'device', 'triggering_threshold']
+        fields = ['id', 'time_recorded', 'category', 'audio', 'triggering_threshold']
         read_only_fields = ['time_uploaded']
 
 
-class DeviceRecordingsSerializer(serializers.ModelSerializer):
-    id = serializers.CharField(source='device_id')
-    device_recordings = RecordingSerializer(read_only=True, many=True)
+class LocationRecordingsSerializer(serializers.ModelSerializer):
+    location_recordings = RecordingSerializer(read_only=True, many=True)
 
     class Meta:
-        model = Device
+        model = Location
         fields = [
-            'id', 'device_recordings'
+            'id', 'location_recordings'
         ]
 
 
