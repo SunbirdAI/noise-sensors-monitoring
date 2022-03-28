@@ -1,3 +1,9 @@
-from django.shortcuts import render
+from django.http import JsonResponse
 
-# Create your views here.
+from query_influx import InfluxClient
+
+def analysis(request):
+    client = InfluxClient()
+    client.query_data()
+    results = client.aggregate_results()
+    return JsonResponse(results)
