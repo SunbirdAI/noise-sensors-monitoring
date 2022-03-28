@@ -1,9 +1,12 @@
-from django.http import JsonResponse
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from query_influx import InfluxClient
+from .query_influx import InfluxClient
 
-def analysis(request):
-    client = InfluxClient()
-    client.query_data()
-    results = client.aggregate_results()
-    return JsonResponse(results)
+class AnalysisView(APIView):
+
+    def get(self, request):
+        client = InfluxClient()
+        client.query_data()
+        results = client.aggregate_results()
+        return Response(results)
