@@ -19,8 +19,10 @@ idna==3.3
 influxdb-client==1.18.0
 iniconfig==1.1.1
 jmespath==0.10.0
+numpy==1.22.3
 packaging==20.9
 paho-mqtt==1.5.1
+pandas==1.4.1
 pluggy==0.13.1
 psycopg2-binary==2.9.1
 py==1.10.0

@@ -1,4 +1,5 @@
 import os
+import json
 import pandas as pd
 
 from dotenv import load_dotenv
@@ -39,12 +40,11 @@ class InfluxClient:
 
     def aggregate_results(self):
         df = pd.DataFrame(self.results)
-        df.rename(columns={0: "time", 1: "db_level",
-                  2: "device_id"}, inplace=True)
-        aggregated = df.groupby("device_id", as_index=False).agg(
-            ["max", "mean", "median"])
-        aggregated.columns = aggregated.columns.map("_".join)
-        result = aggregated.to_json(orient="index")
+        df.rename(columns={0: "datetime", 1: "db_level", 2: "device_id"}, inplace=True)
+        df.set_index("datetime", inplace=True)
+        df = df.groupby("device_id", as_index=True).agg(["max", "mean", "median"])
+        df.columns = df.columns.map("_".join)
+        result = json.loads(df.to_json(orient="index"))
         print(result)
         return result
 
