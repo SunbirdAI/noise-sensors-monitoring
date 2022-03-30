@@ -15,7 +15,7 @@ org = os.environ["INFLUX_ORG"]
 bucket = os.environ["INFLUX_BUCKET"]
 query = f'''
         from(bucket: "{bucket}")
-        |> range(start: -1h)
+        |> range(start: -24h)
         |> filter(fn: (r) => r["_measurement"] == "DB_LEVEL")
         |> filter(fn: (r) => r["_field"] == "db_level")
 '''
@@ -30,23 +30,30 @@ class InfluxClient:
 
     def query_data(self, query=query):
         query_api = self._client.query_api()
-        result = query_api.query(org=self._org, query=query)
-        results = []
-        for table in result:
+        query_result = query_api.query(org=self._org, query=query)
+        data = []
+        for table in query_result:
             for record in table.records:
-                results.append(
+                data.append(
                     (record.get_time(), record.get_value(), record.values.get("deviceId")))
-        self.results = results
+        self.data = data
 
     def aggregate_results(self):
-        df = pd.DataFrame(self.results)
+        df = pd.DataFrame(self.data)
         df.rename(columns={0: "datetime", 1: "db_level", 2: "device_id"}, inplace=True)
-        df.set_index("datetime", inplace=True)
-        df = df.groupby("device_id", as_index=True).agg(["max", "mean", "median"])
-        df.columns = df.columns.map("_".join)
-        result = json.loads(df.to_json(orient="index"))
-        print(result)
-        return result
+        grp = df.groupby("device_id", sort=False)
+        results = []
+        for name, group in grp:
+            final = {
+                "device_id": name,
+                "noise_analysis": {
+                    "average": group["db_level"].mean(),
+                    "median": group["db_level"].median(),
+                    "max": group["db_level"].max()
+                }
+            }
+            results.append(final)
+        return results
 
 
 if __name__ == "__main__":
