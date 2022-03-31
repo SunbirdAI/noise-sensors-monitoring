@@ -7,6 +7,5 @@ class AnalysisView(APIView):
 
     def get(self, request):
         client = InfluxClient()
-        client.query_data()
         results = client.aggregate_results()
         return Response(results)

@@ -9,10 +9,10 @@ from django.http import JsonResponse
 
 load_dotenv()
 
-url = os.environ["INFLUX_DB_URL"]
-token = os.environ["INFLUX_DB_TOKEN"]
-org = os.environ["INFLUX_ORG"]
-bucket = os.environ["INFLUX_BUCKET"]
+url = os.getenv("INFLUX_DB_URL")
+token = os.getenv("INFLUX_DB_TOKEN")
+org = os.getenv("INFLUX_ORG")
+bucket = os.getenv("INFLUX_BUCKET")
 query = f'''
         from(bucket: "{bucket}")
         |> range(start: -24h)
@@ -30,13 +30,12 @@ class InfluxClient:
 
     def query_data(self, query=query):
         query_api = self._client.query_api()
-        query_result = []
         try:
             query_result = query_api.query(org=self._org, query=query)
         except Exception as exc:
             print(f"Error fetching data: {exc}")
         if not query_result:
-            return None
+            self.data = []
         else:
             data = []
             for table in query_result:
@@ -45,36 +44,32 @@ class InfluxClient:
                         (record.get_time(), record.get_value(), record.values.get("deviceId")))
             self.data = data
 
-    def aggregate_results(self):
+    def prepare_data(self):
         df = pd.DataFrame(self.data)
         df.rename(columns={0: "datetime", 1: "db_level", 2: "device_id"}, inplace=True)
         df.set_index("datetime", inplace=True)
         df.sort_index(inplace=True, ascending=True)
-        df_day = df.between_time("6:00", "22:00")
-        df_night = df.between_time("22:00", "6:00")
-        df_day.name = "day"
-        df_night.name = "night"
-        day = self.calculate_metrics(df_day)
-        night = self.calculate_metrics(df_night)
-        return [day, night]
+        self.df = df
 
-    def calculate_metrics(self, df):
-        grp = df.groupby("device_id", sort=False)
-        results = []
-        for name, group in grp:
+    def aggregate_results(self):
+        self.query_data()
+        self.prepare_data()
+        grouped_data = self.df.groupby("device_id", sort=False)
+        aggregated_data = []
+        for name, group in grouped_data:
+            day = group.between_time("6:00", "22:00", inclusive="left")
+            night = group.between_time("22:00", "6:00", inclusive="left")
             final = {
                 "device_id": name,
                 "noise_analysis": {
-                    f"{df.name}_time_average": group["db_level"].mean(),
-                    f"{df.name}_time_median": group["db_level"].median(),
-                    f"highest_{df.name}_noise": group["db_level"].max(),
+                    "day_time_average": day["db_level"].mean(),
+                    "day_time_median": day["db_level"].median(),
+                    "highest_day_noise": day["db_level"].max(),
+                    "night_time_average": night["db_level"].mean(),
+                    "night_time_median": night["db_level"].median(),
+                    "highest_night_noise": night["db_level"].max(),
                     "night_time_quiet_hours": ""
                 }
             }
-            results.append(final)
-        return results
-
-if __name__ == "__main__":
-    client = InfluxClient()
-    client.query_data()
-    client.aggregate_results()
+            aggregated_data.append(final)
+        return aggregated_data
