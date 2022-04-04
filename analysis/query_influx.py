@@ -1,11 +1,10 @@
 import os
-import json
 import pandas as pd
 
 from dotenv import load_dotenv
 from influxdb_client import InfluxDBClient
 
-from django.http import JsonResponse
+from devices.models import Device
 
 load_dotenv()
 
@@ -15,7 +14,7 @@ org = os.getenv("INFLUX_ORG")
 bucket = os.getenv("INFLUX_BUCKET")
 query = f'''
         from(bucket: "{bucket}")
-        |> range(start: -24h)
+        |> range(start: -3d)
         |> filter(fn: (r) => r["_measurement"] == "DB_LEVEL")
         |> filter(fn: (r) => r["_field"] == "db_level")
 '''
@@ -30,6 +29,7 @@ class InfluxClient:
 
     def query_data(self, query=query):
         query_api = self._client.query_api()
+        query_result = []
         try:
             query_result = query_api.query(org=self._org, query=query)
         except Exception as exc:
@@ -51,24 +51,37 @@ class InfluxClient:
         df.sort_index(inplace=True, ascending=True)
         self.df = df
 
+    def get_device_locations(self):
+        devices = Device.objects.all()
+        locations = {}
+        for device in devices:
+            locations[device.device_id] = device.location
+        self.locations = locations
+
     def aggregate_results(self):
         self.query_data()
         self.prepare_data()
+        self.get_device_locations()
         grouped_data = self.df.groupby("device_id", sort=False)
         aggregated_data = []
         for name, group in grouped_data:
             day = group.between_time("6:00", "22:00", inclusive="left")
             night = group.between_time("22:00", "6:00", inclusive="left")
             final = {
-                "device_id": name,
-                "noise_analysis": {
-                    "day_time_average": day["db_level"].mean(),
-                    "day_time_median": day["db_level"].median(),
-                    "highest_day_noise": day["db_level"].max(),
-                    "night_time_average": night["db_level"].mean(),
-                    "night_time_median": night["db_level"].median(),
-                    "highest_night_noise": night["db_level"].max(),
-                    "night_time_quiet_hours": ""
+                "location": {
+                    "city": self.locations[name].city,
+                    "division": self.locations[name].division,
+                    "parish": self.locations[name].parish,
+                    "village": self.locations[name].village,
+                    "noise_analysis": {
+                        "day_time_average": day["db_level"].mean(),
+                        "day_time_median": day["db_level"].median(),
+                        "highest_day_noise": day["db_level"].max(),
+                        "night_time_average": night["db_level"].mean(),
+                        "night_time_median": night["db_level"].median(),
+                        "highest_night_noise": night["db_level"].max(),
+                        "night_time_quiet_hours": ""
+                    }
                 }
             }
             aggregated_data.append(final)
