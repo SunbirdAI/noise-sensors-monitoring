@@ -57,3 +57,7 @@ Below are the MQTT Topics implemented in this project.
   - Pytest tests (tests the functionality in the `noise_sensors_monitoring` package): `docker-compose exec web coverage run --source=noise_sensors_monitoring -m pytest`
   - Django tests: `docker-compose exec web coverage run -a --source=users manage.py test`
   - View coverage report `docker-compose exec web coverage report -m`
+
+## API documentation
+This project includes an API that serves our public `noise portal` front end app. <br/>
+The documentation for the API endpoints is in this repository's wiki, [here](https://github.com/SunbirdAI/noise-sensors-monitoring/wiki/Noise-sensors-monitoring-API-docs).
