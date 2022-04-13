@@ -61,3 +61,10 @@ Below are the MQTT Topics implemented in this project.
 ## API documentation
 This project includes an API that serves our public `noise portal` front end app. <br/>
 The documentation for the API endpoints is in this repository's wiki, [here](https://github.com/SunbirdAI/noise-sensors-monitoring/wiki/Noise-sensors-monitoring-API-docs).
+
+
+## Deployment Steps
+- Install Heroku CLI.
+- Connect to the `noise-sensors-monitoring` app on heroku.
+- Run the command `git push heroku main`.
+- Apply the migrations: `heroku run python manage.py migrate`.
