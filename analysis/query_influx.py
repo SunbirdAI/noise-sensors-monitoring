@@ -47,6 +47,7 @@ class InfluxClient:
     def prepare_data(self):
         df = pd.DataFrame(self.data)
         df.rename(columns={0: "datetime", 1: "db_level", 2: "device_id"}, inplace=True)
+        df["db_level"] = df["db_level"].round(3)
         df.set_index("datetime", inplace=True)
         df.sort_index(inplace=True, ascending=True)
         self.df = df
@@ -67,6 +68,16 @@ class InfluxClient:
         for name, group in grouped_data:
             day = group.between_time("6:00", "22:00", inclusive="left")
             night = group.between_time("22:00", "6:00", inclusive="left")
+            day_time_average = day_time_median = highest_day_noise = 0
+            night_time_average = night_time_median = highest_night_noise = 0
+            if not day.empty:
+                day_time_average = day["db_level"].mean()
+                day_time_median = day["db_level"].median()
+                highest_day_noise = day["db_level"].max()
+            if not night.empty:
+                night_time_average = night["db_level"].mean()
+                night_time_median = night["db_level"].median()
+                highest_night_noise = night["db_level"].max()
             final = {
                 "location": {
                     "city": self.locations[name].city,
@@ -74,12 +85,12 @@ class InfluxClient:
                     "parish": self.locations[name].parish,
                     "village": self.locations[name].village,
                     "noise_analysis": {
-                        "day_time_average": day["db_level"].mean(),
-                        "day_time_median": day["db_level"].median(),
-                        "highest_day_noise": day["db_level"].max(),
-                        "night_time_average": night["db_level"].mean(),
-                        "night_time_median": night["db_level"].median(),
-                        "highest_night_noise": night["db_level"].max(),
+                        "day_time_average": day_time_average,
+                        "day_time_median": day_time_median,
+                        "highest_day_noise": highest_day_noise,
+                        "night_time_average": night_time_average,
+                        "night_time_median": night_time_median,
+                        "highest_night_noise": highest_night_noise,
                         "night_time_quiet_hours": ""
                     }
                 }
