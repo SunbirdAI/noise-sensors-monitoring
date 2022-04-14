@@ -56,7 +56,8 @@ class InfluxClient:
         devices = Device.objects.all()
         locations = {}
         for device in devices:
-            locations[device.device_id] = device.location
+            if hasattr(device, 'location'):
+                locations[device.device_id] = device.location
         self.locations = locations
 
     def aggregate_results(self):
