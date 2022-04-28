@@ -65,15 +65,15 @@ class InfluxClient:
         self.get_device_locations()
         grouped_data = self.df.groupby("device_id", sort=False)
         aggregated_data = []
-        for name, group in grouped_data:
-            if name not in self.locations:
+        for device_name, device_df in grouped_data:
+            if device_name not in self.locations:
                 continue
-            day = group.between_time("6:00", "22:00", inclusive="left")
-            night = group.between_time("22:00", "6:00", inclusive="left")
+            day = device_df.between_time("6:00", "22:00", inclusive="left")
+            night = device_df.between_time("22:00", "6:00", inclusive="left")
             day_time_average = day_time_median = highest_day_noise = day_time_exceedances = 0
             night_time_average = night_time_median = highest_night_noise = night_time_exceedances = 0
-            day_threshold = location_category_information[self.locations[name].category]["day_limit"]
-            night_threshold = location_category_information[self.locations[name].category]["night_limit"]
+            day_threshold = location_category_information[self.locations[device_name].category]["day_limit"]
+            night_threshold = location_category_information[self.locations[device_name].category]["night_limit"]
             if not day.empty:
                 day_time_average = day["db_level"].mean()
                 day_time_median = day["db_level"].median()
@@ -86,10 +86,10 @@ class InfluxClient:
                 night_time_exceedances = len(night[night["db_level"] > night_threshold])
             final = {
                 "location": {
-                    "city": self.locations[name].city,
-                    "division": self.locations[name].division,
-                    "parish": self.locations[name].parish,
-                    "village": self.locations[name].village,
+                    "city": self.locations[device_name].city,
+                    "division": self.locations[device_name].division,
+                    "parish": self.locations[device_name].parish,
+                    "village": self.locations[device_name].village,
                     "noise_analysis": {
                         "day_time_average": day_time_average,
                         "day_time_median": day_time_median,
