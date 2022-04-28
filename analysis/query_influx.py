@@ -47,7 +47,6 @@ class InfluxClient:
     def prepare_data(self):
         df = pd.DataFrame(self.data)
         df.rename(columns={0: "datetime", 1: "db_level", 2: "device_id"}, inplace=True)
-        df["db_level"] = df["db_level"].round(3)
         df.set_index("datetime", inplace=True)
         df.sort_index(inplace=True, ascending=True)
         self.df = df
@@ -75,10 +74,12 @@ class InfluxClient:
                 day_time_average = day["db_level"].mean()
                 day_time_median = day["db_level"].median()
                 highest_day_noise = day["db_level"].max()
+                day_time_exceedances = len(day[day["db_level"] > 70])
             if not night.empty:
                 night_time_average = night["db_level"].mean()
                 night_time_median = night["db_level"].median()
                 highest_night_noise = night["db_level"].max()
+                night_time_exceedances = len(day[day["db_level"] > 70])
             final = {
                 "location": {
                     "city": self.locations[name].city,
@@ -92,6 +93,8 @@ class InfluxClient:
                         "night_time_average": night_time_average,
                         "night_time_median": night_time_median,
                         "highest_night_noise": highest_night_noise,
+                        "day_time_exceedances": day_time_exceedances,
+                        "night_time_exceedances": night_time_exceedances,
                         "night_time_quiet_hours": ""
                     }
                 }
