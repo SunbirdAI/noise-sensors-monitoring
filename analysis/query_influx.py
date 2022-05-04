@@ -44,26 +44,24 @@ class InfluxClient:
                         (record.get_time(), record.get_value(), record.values.get("deviceId")))
             self.data = data
 
-    def prepare_data(self):
-        df = pd.DataFrame(self.data)
-        df.rename(columns={0: "datetime", 1: "db_level", 2: "device_id"}, inplace=True)
-        df.set_index("datetime", inplace=True)
-        df.sort_index(inplace=True, ascending=True)
-        self.df = df
-
     def get_device_locations(self):
         devices = Device.objects.all()
         locations = {}
         for device in devices:
-            if hasattr(device, 'location'):
+            if hasattr(device, "location"):
                 locations[device.device_id] = device.location
         self.locations = locations
 
     def aggregate_results(self):
         self.query_data()
-        self.prepare_data()
+        if not self.data:
+            return "No data received"
+        df = pd.DataFrame(self.data)
+        df.rename(columns={0: "datetime", 1: "db_level", 2: "device_id"}, inplace=True)
+        df.set_index("datetime", inplace=True)
+        df.sort_index(inplace=True, ascending=True)
         self.get_device_locations()
-        grouped_data = self.df.groupby("device_id", sort=False)
+        grouped_data = df.groupby("device_id", sort=False)
         aggregated_data = []
         for device_name, device_df in grouped_data:
             if device_name not in self.locations:
