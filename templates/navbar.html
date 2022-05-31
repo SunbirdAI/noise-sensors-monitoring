@@ -25,6 +25,7 @@
     >
       {% if user.is_authenticated %}
       <div>
+        <button class="btn btn-light">Logged in as {{ user }}</button>
         <button class="btn btn-light" type="button">
           <a href="{% url 'logout' %}">Log Out</a>
         </button>
