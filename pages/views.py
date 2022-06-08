@@ -2,6 +2,7 @@ import pytz
 from datetime import datetime
 
 from django.views.generic import TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from noise_dashboard.settings import TIME_ZONE
 from devices.models import Device

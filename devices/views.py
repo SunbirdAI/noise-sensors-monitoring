@@ -10,16 +10,17 @@ from .serializers import (
     )
 from rest_framework import viewsets
 from rest_framework.generics import ListAPIView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import DeviceForm, DeviceConfigurationForm
 
 
-class DeviceLocationListAPIView(ListAPIView):
+class DeviceLocationListAPIView(LoginRequiredMixin, ListAPIView):
     queryset = Location.objects.all()
     serializer_class = DeviceLocationSerializer
 
 
-class DeviceListView(ListView):
+class DeviceListView(LoginRequiredMixin, ListView):
     model = Device
     context_object_name = 'device_list'
     template_name = 'devices/device_list.html'
@@ -37,40 +38,40 @@ class LocationRecordingsViewSet(viewsets.ModelViewSet):
     lookup_field = 'id'
 
 
-class DeviceDetailView(DetailView):
+class DeviceDetailView(LoginRequiredMixin, DetailView):
     model = Device
     context_object_name = 'device'
     template_name = 'devices/device_detail.html'
 
 
-class DeviceCreateView(CreateView):
+class DeviceCreateView(LoginRequiredMixin, CreateView):
     model = Device
     form_class = DeviceForm
     success_url = '/devices/'
     template_name = 'devices/create_device.html'
 
 
-class DeviceUpdateView(UpdateView):
+class DeviceUpdateView(LoginRequiredMixin, UpdateView):
     model = Device
     form_class = DeviceForm
     success_url = '/devices/'
     template_name = 'devices/edit_device.html'
 
-class LocationCreateView(CreateView):
+class LocationCreateView(LoginRequiredMixin, CreateView):
     model = Location
     fields = '__all__'
     success_url = '/devices/'
     template_name = 'devices/update_location.html'
 
 
-class LocationUpdateView(UpdateView):
+class LocationUpdateView(LoginRequiredMixin, UpdateView):
     model = Location
     fields = ['latitude', 'longitude', 'city', 'division', 'parish', 'village', 'category']
     success_url = '/devices/'
     template_name = 'devices/update_location.html'
 
 
-class DeviceConfigurationUpdateView(UpdateView):
+class DeviceConfigurationUpdateView(LoginRequiredMixin, UpdateView):
     model = Device
     form_class = DeviceConfigurationForm
     template_name = 'devices/edit_configuration.html'
