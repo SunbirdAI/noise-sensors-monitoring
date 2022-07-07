@@ -4,7 +4,9 @@ import boto3
 from noise_sensors_monitoring.domain.sensor import Sensor
 from noise_sensors_monitoring.repository.time_series_repo_interface import SensorReadingRepo
 from dotenv import load_dotenv
+from decimal import Decimal
 import os
+import json
 
 load_dotenv()
 
@@ -33,7 +35,7 @@ class DynamodbRepo(SensorReadingRepo):
             'lastUploaded': sensor.LastUpl,
             'date': str(datetime.now())
         }
-        table.put_item(Item=data)
+        table.put_item(Item=json.loads(json.dumps(data), parse_float=Decimal))
 
     def get_latest_sensor_reading(self) -> Sensor:
         pass
