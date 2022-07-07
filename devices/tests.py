@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
+from django.contrib.auth import get_user_model
 
 from .models import Device
 
@@ -7,6 +8,12 @@ from .models import Device
 class DeviceTests(TestCase):
 
     def setUp(self) -> None:
+        self.user = get_user_model().objects.create_user(
+            username='lsanyu',
+            email='lsanyu@email.com',
+            password='pass123'
+        )
+        self.client.force_login(self.user)
         self.metrics_url = 'http://localhost:3000/d/Fmi1Q1qGk/sensor-metrics-dashboard?orgId=1&refresh=30s'
         self.device = Device.objects.create(
             device_id='SB1001',
