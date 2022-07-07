@@ -3,8 +3,14 @@ from typing import Dict
 import boto3
 from noise_sensors_monitoring.domain.sensor import Sensor
 from noise_sensors_monitoring.repository.time_series_repo_interface import SensorReadingRepo
+from dotenv import load_dotenv
+import os
 
-dynamodb = boto3.resource('dynamodb')
+load_dotenv()
+
+ACCESS_KEY_ID = os.getenv('DYNAMO_ACCESS_KEY_ID')
+SECRET_ACCESS_KEY = os.getenv('DYNAMO_SECRET_ACCESS_KEY')
+dynamodb = boto3.resource('dynamodb', aws_access_key_id=ACCESS_KEY_ID, aws_secret_access_key=SECRET_ACCESS_KEY)
 table = dynamodb.Table('sensor-metrics')
 
 
