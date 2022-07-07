@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 from json import JSONDecodeError
 
-from noise_sensors_monitoring.repository.influx_db_repo import InfluxDBRepo
+from noise_sensors_monitoring.repository.dynamodbrepo import DynamodbRepo
 from noise_sensors_monitoring.use_cases.sensor_reading import add_new_sensor_reading
 from noise_sensors_monitoring.requests.sensor_reading import build_sensor_reading_request
 
@@ -18,12 +18,13 @@ from mqtt.publish import publish_device_configuration
 
 load_dotenv()
 
-repo = InfluxDBRepo({
-    "influx_url": os.environ["INFLUX_DB_URL"],
-    "influx_token": os.environ["INFLUX_DB_TOKEN"],
-    "influx_org": os.environ["INFLUX_ORG"],
-    "influx_bucket": os.environ["INFLUX_BUCKET"]
-})
+# repo = InfluxDBRepo({
+#     "influx_url": os.environ["INFLUX_DB_URL"],
+#     "influx_token": os.environ["INFLUX_DB_TOKEN"],
+#     "influx_org": os.environ["INFLUX_ORG"],
+#     "influx_bucket": os.environ["INFLUX_BUCKET"]
+# })
+repo = DynamodbRepo()
 devices_repo = DevicesRepo()
 in_memory_repo = InMemoryRepo()
 
