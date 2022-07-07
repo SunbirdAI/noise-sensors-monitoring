@@ -10,7 +10,8 @@ load_dotenv()
 
 ACCESS_KEY_ID = os.getenv('DYNAMO_ACCESS_KEY_ID')
 SECRET_ACCESS_KEY = os.getenv('DYNAMO_SECRET_ACCESS_KEY')
-dynamodb = boto3.resource('dynamodb', aws_access_key_id=ACCESS_KEY_ID, aws_secret_access_key=SECRET_ACCESS_KEY)
+dynamodb = boto3.resource('dynamodb', aws_access_key_id=ACCESS_KEY_ID, aws_secret_access_key=SECRET_ACCESS_KEY,
+                          region='eu-west-1')
 table = dynamodb.Table('sensor-metrics')
 
 
