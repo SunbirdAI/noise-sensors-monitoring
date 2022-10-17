@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .query_influx import InfluxClient
+from .aggregate_influx_data import InfluxClient
 
 class AnalysisView(APIView):
 
