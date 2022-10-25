@@ -7,11 +7,11 @@ class HourlyAggregateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = HourlyAggregate
-        fields = ['device_id']
+        fields = "__all__"
 
 
 class DailyAggregateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DailyAggregate
-        fields = ['device_id']
+        fields = "__all__"

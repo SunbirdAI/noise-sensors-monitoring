@@ -7,6 +7,6 @@ from .views import (
 
 urlpatterns = [
     path('', AnalysisView.as_view(), name='analysis'),
-    path('aggregates/', HourlyAggregateCreateView.as_view(), name='hourly'),
+    path('hourly_aggregates/', HourlyAggregateCreateView.as_view(), name='hourly'),
     path('daily_aggregates/', DailyAggregateCreateView.as_view(), name='daily')
 ]
