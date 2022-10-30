@@ -7,13 +7,18 @@ from .serializers import (
     HourlyAggregateSerializer,
     DailyAggregateSerializer
 )
-from .aggregate_influx_data import InfluxClient
+# from .aggregate_influx_data import InfluxClient
+from .aggregate_aws_data import aggregate_results
 
 class AnalysisView(APIView):
 
+    # def get(self, request):
+    #     client = InfluxClient()
+    #     results = client.aggregate_results()
+    #     return Response(results)
+
     def get(self, request):
-        client = InfluxClient()
-        results = client.aggregate_results()
+        results = aggregate_results()
         return Response(results)
 
 
