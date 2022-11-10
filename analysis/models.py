@@ -18,7 +18,7 @@ class HourlyAggregate(models.Model):
     hourly_max_db_level = models.FloatField(null=True)
     hourly_no_of_exceedances = models.PositiveIntegerField(null=True)
     device_name = models.CharField(max_length=255, null=True)
-    # device = models.OneToOneField(Device, on_delete=models.CASCADE)
+    device = models.ForeignKey(Device, on_delete=models.CASCADE)
 
 
 class DailyAggregate(models.Model):
@@ -33,4 +33,4 @@ class DailyAggregate(models.Model):
     daily_max_db_level = models.FloatField(null=True)
     daily_no_of_exceedances = models.PositiveIntegerField(null=True)
     device_name = models.CharField(max_length=255, null=True)
-    # device = models.OneToOneField(Device, on_delete=models.CASCADE)
+    device = models.ForeignKey(Device, on_delete=models.CASCADE)
