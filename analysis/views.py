@@ -6,7 +6,7 @@ from .models import HourlyAggregate, DailyAggregate
 
 from .serializers import ReceiveIoTMetricsSerializer
 
-from .aggregate_iot_data import aggregate_hourly, aggregate_daily
+from .aggregate_iot_data import Aggregate
 
 class AnalysisView(APIView):
 
@@ -17,15 +17,16 @@ class AnalysisView(APIView):
 class ReceiveIoTDataView(APIView):
 
     def post(self, request):
-        kind = request.data["type"]
-        if kind == "hourly":
-            aggregation = aggregate_hourly(request.data["data"])
-        elif kind == "daytime" or kind == "nighttime":
-            aggregation = aggregate_daily(request.data["data"], kind)
+        kind_of_data = request.data["type"]
+        agg = Aggregate(request.data["data"])
+        if kind_of_data == "hourly":
+            agg.aggregate_hourly()
+        elif kind_of_data == "daytime" or kind_of_data == "nighttime":
+            agg.aggregate_daily(kind_of_data)
         else:
             return Response(
-                {"Error": "Invlaid request: Please add a type to the data object"},
+                {"Error": "Invalid request: Please add a proper type (hourly, daytime or nighttime) to the data object"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        return Response(aggregation, status=status.HTTP_201_CREATED)
+        return Response("Success", status=status.HTTP_201_CREATED)
