@@ -14,14 +14,14 @@ class AnalysisView(APIView):
         pass
 
 
-class ReceiveHourlyDataView(APIView):
+class ReceiveIoTDataView(APIView):
 
     def post(self, request):
         kind = request.data["type"]
-        if request.data["type"] == "hourly":
-            aggregation = aggregate_hourly(request.data)
+        if kind == "hourly":
+            aggregation = aggregate_hourly(request.data["data"])
         elif kind == "daytime" or kind == "nighttime":
-            aggregation = aggregate_daily(request.data, kind)
+            aggregation = aggregate_daily(request.data["data"], kind)
         else:
             return Response(
                 {"Error": "Invlaid request: Please add a type to the data object"},
@@ -29,10 +29,3 @@ class ReceiveHourlyDataView(APIView):
             )
 
         return Response(aggregation, status=status.HTTP_201_CREATED)
-
-
-class ReceiveDailyDataView(APIView):
-
-    def post(self, request):
-        
-        return  Response(daily_aggregation, status=status.HTTP_201_CREATED)
