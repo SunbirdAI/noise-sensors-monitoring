@@ -1,12 +1,12 @@
 from django.urls import path
 from .views import (
     AnalysisView,
-    HourlyAggregateCreateView,
-    DailyAggregateCreateView
+    ReceiveHourlyDataView,
+    ReceiveDailyDataView
 )
 
 urlpatterns = [
     path('', AnalysisView.as_view(), name='analysis'),
-    path('hourly_aggregates/', HourlyAggregateCreateView.as_view(), name='hourly'),
-    path('daily_aggregates/', DailyAggregateCreateView.as_view(), name='daily')
+    path('hourly_data/', ReceiveHourlyDataView.as_view(), name='hourly'),
+    path('daily_data/', ReceiveDailyDataView.as_view(), name='daily')
 ]

@@ -3,15 +3,7 @@ from rest_framework import serializers
 from .models import HourlyAggregate, DailyAggregate
 
 
-class HourlyAggregateSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = HourlyAggregate
-        fields = "__all__"
-
-
-class DailyAggregateSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = DailyAggregate
-        fields = "__all__"
+class ReceiveIoTMetricsSerializer(serializers.ListSerializer):
+    date = serializers.DateField()
+    device_id = serializers.CharField(max_length=200)
+    db_level = serializers.FloatField()
