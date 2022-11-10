@@ -1,12 +1,10 @@
 from django.urls import path
 from .views import (
     AnalysisView,
-    ReceiveHourlyDataView,
-    ReceiveDailyDataView
+    ReceiveIoTDataView
 )
 
 urlpatterns = [
     path('', AnalysisView.as_view(), name='analysis'),
-    path('hourly_data/', ReceiveHourlyDataView.as_view(), name='hourly'),
-    path('daily_data/', ReceiveDailyDataView.as_view(), name='daily')
+    path('receive_iot_data/', ReceiveIoTDataView.as_view(), name='iot_data'),
 ]

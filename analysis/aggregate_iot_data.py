@@ -12,6 +12,7 @@ devices = Device.objects.all()
 
 
 def aggregate_hourly(data):
+
     return "Hourly"
 
 
