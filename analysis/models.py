@@ -21,12 +21,18 @@ class HourlyAggregate(models.Model):
 
 
 class DailyAggregate(models.Model):
+
+    class TimePeriod(models.TextChoices):
+        DAYTIME = 'daytime'
+        NIGHTTIME = 'nighttime'
+
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
         editable=False
     )
     date = models.DateTimeField(default=timezone.now)
+    time_period = models.CharField(max_length=10, choices=TimePeriod.choices)
     daily_avg_db_level = models.FloatField(null=True)
     daily_median_db_level = models.FloatField(null=True)
     daily_max_db_level = models.FloatField(null=True)
