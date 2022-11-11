@@ -51,12 +51,12 @@ class Aggregate:
         return None
 
 
-    def aggregate_daily(self, kind_of_data):
+    def aggregate_daily(self, time_period):
         df = self.prepare_data()
         threshold = None
         grouped_data = df.groupby("device_id", sort=False)
         for device_name, device_df in grouped_data:
-            if kind_of_data == "daytime":
+            if time_period == "daytime":
                 threshold = location_category_information[self.locations[device_name].category]["day_limit"]
             else:
                 threshold = location_category_information[self.locations[device_name].category]["night_limit"]
@@ -64,6 +64,7 @@ class Aggregate:
             DailyAggregate.objects.create(
                 device = Device.objects.get(device_id=device_name),
                 date = device_df["date"][0],
+                time_period = time_period,
                 daily_avg_db_level = device_df["db_level"].mean(),
                 daily_median_db_level = device_df["db_level"].median(),
                 daily_max_db_level = device_df["db_level"].max(),
