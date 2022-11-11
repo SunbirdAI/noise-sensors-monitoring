@@ -24,24 +24,24 @@ today = timezone.localize(today)
 
 
 class HourlyAnalysisView(ListAPIView):
-    # today = datetime.today()
-    # queryset = HourlyAggregate.objects.filter(
-    #     date__year=today.year,
-    #     date__month=today.month,
-    #     date__day=today.day
-    # )
-    queryset = HourlyAggregate.objects.all()
+    today = datetime.today()
+    queryset = HourlyAggregate.objects.filter(
+        date__year=today.year,
+        date__month=today.month,
+        date__day=today.day
+    )
+    # queryset = HourlyAggregate.objects.all()
     serializer_class = HourlyAnalysisSerializer
 
 
 class DailyAnalysisView(ListAPIView):
-    # today = datetime.today()
-    # queryset = DailyAggregate.objects.filter(
-    #     date__year=today.year,
-    #     date__month=today.month,
-    #     date__day=today.day
-    # )
-    queryset = DailyAggregate.objects.all()
+    today = datetime.today()
+    queryset = DailyAggregate.objects.filter(
+        date__year=today.year,
+        date__month=today.month,
+        date__day=today.day
+    )
+    # queryset = DailyAggregate.objects.all()
     serializer_class = DailyAnalysisSerializer
 
 
