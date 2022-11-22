@@ -1,8 +1,4 @@
 import pandas as pd
-import pytz
-from datetime import datetime
-
-from noise_dashboard.settings import TIME_ZONE
 from .models import DailyAggregate, HourlyAggregate
 from devices.models import Device, location_category_information
 
@@ -13,7 +9,8 @@ class Aggregate:
         self.data = data
         self.locations = self.get_device_locations()
 
-    def get_device_locations(self):
+    @staticmethod
+    def get_device_locations():
         devices = Device.objects.all()
         locations = {}
         for device in devices:
@@ -30,17 +27,15 @@ class Aggregate:
         df = self.prepare_data()
         df["hour"] = df["date"].dt.hour
         hour = df["hour"][0]
-        threshold = None
         grouped_data = df.groupby("device_id", sort=False)
         for device_name, device_df in grouped_data:
-            if hour >= 6 and hour < 22:
+            if 6 <= hour < 22:
                 threshold = location_category_information[self.locations[device_name].category]["day_limit"]
             else:
                 threshold = location_category_information[self.locations[device_name].category]["night_limit"]
 
             HourlyAggregate.objects.create(
                 device = Device.objects.get(device_id=device_name),
-                date = device_df["date"][0],
                 hour = hour,
                 hourly_avg_db_level = device_df["db_level"].mean(),
                 hourly_median_db_level = device_df["db_level"].median(),
@@ -53,7 +48,6 @@ class Aggregate:
 
     def aggregate_daily(self, time_period):
         df = self.prepare_data()
-        threshold = None
         grouped_data = df.groupby("device_id", sort=False)
         for device_name, device_df in grouped_data:
             if time_period == "daytime":
@@ -63,7 +57,6 @@ class Aggregate:
 
             DailyAggregate.objects.create(
                 device = Device.objects.get(device_id=device_name),
-                date = device_df["date"][0],
                 time_period = time_period,
                 daily_avg_db_level = device_df["db_level"].mean(),
                 daily_median_db_level = device_df["db_level"].median(),
