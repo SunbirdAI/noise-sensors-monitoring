@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from device_metrics.serializers import DeviceMetricsSerializer
+from analysis.serializers import HourlyAnalysisSerializer, DailyAnalysisSerializer
 from recordings.models import Recording
 from .models import Device, Location
 
@@ -14,7 +14,7 @@ class DeviceSerializer(serializers.ModelSerializer):
 
 class DeviceLocationSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='device_id')
-    latest_metric = DeviceMetricsSerializer(read_only=True)
+    latest_metric = HourlyAnalysisSerializer(read_only=True)
 
     class Meta:
         model = Location
@@ -26,12 +26,12 @@ class DeviceLocationSerializer(serializers.ModelSerializer):
 
 class LocationMetricsSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='device_id')
-    location_metrics = DeviceMetricsSerializer(read_only=True, many=True)
-
+    location_hourly_metrics = HourlyAnalysisSerializer(read_only=True, many=True)
+    location_daily_metrics = DailyAnalysisSerializer(read_only=True, many=True)
     class Meta:
         model = Location
         fields = [
-            'id', 'location_metrics'
+            'id', 'location_hourly_metrics', 'location_daily_metrics'
         ]
 
 

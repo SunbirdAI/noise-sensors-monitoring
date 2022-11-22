@@ -138,11 +138,15 @@ class Location(models.Model):
 
     @property
     def latest_metric(self):
-        return self.device.devicemetrics_set.order_by("-time_uploaded")[0]
+        return self.device.hourlyaggregate_set.order_by("-date")[0]
 
     @property
-    def location_metrics(self):
-        return self.device.devicemetrics_set.order_by("-time_uploaded")
+    def location_hourly_metrics(self):
+        return self.device.hourlyaggregate_set.order_by("-date")
+
+    @property
+    def location_daily_metrics(self):
+        return self.device.dailyaggregate_set.order_by("-date")
 
     @property
     def location_recordings(self):
