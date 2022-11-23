@@ -14,13 +14,13 @@ class DeviceSerializer(serializers.ModelSerializer):
 
 class DeviceLocationSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='device_id')
-    latest_metric = HourlyAnalysisSerializer(read_only=True)
+    # latest_metric = HourlyAnalysisSerializer(read_only=True)
 
     class Meta:
         model = Location
         fields = [
             'id', 'latitude', 'longitude', 'city',
-            'division', 'parish', 'village', 'latest_metric', 'location_description', 'day_limit', 'night_limit',
+            'division', 'parish', 'village', 'location_description', 'day_limit', 'night_limit',
         ]
 
 

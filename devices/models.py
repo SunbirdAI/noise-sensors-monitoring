@@ -136,9 +136,9 @@ class Location(models.Model):
     def day_limit(self):
         return location_category_information[self.category]['day_limit']
 
-    @property
-    def latest_metric(self):
-        return self.device.hourlyaggregate_set.order_by("-date")[0]
+    # @property
+    # def latest_metric(self):
+    #     return self.device.hourlyaggregate_set.order_by("-date")[0]
 
     @property
     def location_hourly_metrics(self):
