@@ -15,7 +15,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import DeviceForm, DeviceConfigurationForm
 
 
-class DeviceLocationListAPIView(LoginRequiredMixin, ListAPIView):
+class DeviceLocationListAPIView(ListAPIView):
     queryset = Location.objects.all()
     serializer_class = DeviceLocationSerializer
 
