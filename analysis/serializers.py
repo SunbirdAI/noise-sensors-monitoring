@@ -1,6 +1,23 @@
 from rest_framework import serializers
+from devices.models import Device
+import devices.serializers
+from .models import HourlyAggregate, DailyAggregate, MetricsTextFile
 
-from .models import HourlyAggregate, DailyAggregate
+class UploadMetricsTextFileSerializer(serializers.ModelSerializer):
+    device = serializers.SlugRelatedField(queryset=Device.objects.all(), slug_field='device_id')
+
+    class Meta:
+        model = MetricsTextFile
+        fields = [
+            'id', 'metrics_file', 'device'
+        ]
+        read_only_fields = ['time_uploaded']
+
+    def to_representation(self, instance):
+        self.fields['device'] = devices.serializers.DeviceSerializer(read_only=True)
+        return {
+            "result": "success"
+        }
 
 
 class HourlyAnalysisSerializer(serializers.ModelSerializer):

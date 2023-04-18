@@ -1,8 +1,30 @@
 import uuid
 from django.db import models
 from django.utils import timezone
+from django.core.files.storage import get_storage_class
 
 from devices.models import Device
+
+
+media_storage = get_storage_class()()
+
+
+def recording_directory(instance, filename):
+    time_uploaded = instance.time_uploaded.strftime("%Y-%m-%dT%H:%M:%S")
+    return f'metrics/{instance.device.device_id}/{instance.device.device_id}-{time_uploaded}-{filename}'
+
+class MetricsTextFile(models.Model):
+    time_uploaded = models.DateTimeField(auto_now_add=True)
+    device = models.ForeignKey(Device, on_delete=models.CASCADE)
+    metrics_file = models.FileField(upload_to=recording_directory)
+
+    @property
+    def text_file_url(self):
+        return media_storage.url(self.metrics_file.name)
+
+    @property
+    def filename(self):
+        return self.metrics_file.file.name
 
 
 class HourlyAggregate(models.Model):

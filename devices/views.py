@@ -1,6 +1,4 @@
-from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
-from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import UpdateView, CreateView
 from .models import Device, Location

@@ -27,10 +27,10 @@
                         <p><strong>Location:</strong></p>
                         {% if device.location %}
                             <p class="ml-3">
-                                <strong>City</strong>: {{ device.location.city }}, 
-                                <strong>Division</strong>: {{device.location.division }}
-                                <strong>Parish/Ward</strong>: {{device.location.parish }},
-                                <strong>Village/Sub-Ward</strong>: {{device.location.village }}
+                                <strong>City</strong>: {{ device.location.city }},
+                                <strong>Division</strong>: {{ device.location.division }}
+                                <strong>Parish/Ward</strong>: {{ device.location.parish }},
+                                <strong>Village/Sub-Ward</strong>: {{ device.location.village }}
                                 <strong>Location Category: </strong> {{ device.location.location_description }}
                             </p>
                         {% else %}
@@ -54,11 +54,13 @@
             <a href="{% url 'edit_config' device.id %}" class="btn btn-primary mx-3 my-1">Edit
                 Configuration</a>
             {% if device.location %}
-                <a href="{% url 'edit_location' device.location.id %}" class="btn btn-primary mx-3 my-1">Edit Location</a>
+                <a href="{% url 'edit_location' device.location.id %}" class="btn btn-primary mx-3 my-1">Edit
+                    Location</a>
             {% else %}
                 <a href="{% url 'create_location' %}" class="btn btn-primary mx-3 my-1">Add Location</a>
             {% endif %}
-            <a href="{{ device.metrics_url }}" class="btn btn-primary mx-3 my-1  pull-right" target="_blank">View Metrics</a>
+            <a href="{{ device.metrics_url }}" class="btn btn-primary mx-3 my-1  pull-right" target="_blank">View
+                Metrics</a>
             <div class="card m-3">
                 <div class="card-body">
                     <div class="card-title"><h4>{{ device.device_id }} Recordings (Latest 10 or less)</h4></div>
@@ -95,41 +97,45 @@
             </div>
             <div class="card m-3">
                 <div class="card-body">
-                    <div class="card-title"><h4>{{ device.device_id }} Metrics (Latest 10 or less)</h4></div>
-                    <table class="table table-hover">
-                        <thead>
-                        <tr>
-                            <th scope="col">Signal strength</th>
-                            <th scope="col">DB Level</th>
-                            <th scope="col">Average DB Level</th>
-                            <th scope="col">Max DB Level</th>
-                            <th scope="col">No. of Exceedances</th>
-                            <th scope="col">Last Recorded</th>
-                            <th scope="col">Last Uploaded</th>
-                            <th scope="col">Panel Voltage</th>
-                            <th scope="col">Battery Voltage</th>
-                            <th scope="col">Data Balance</th>
-                            <th scope="col">Time Uploaded</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for metric in device.get_metrics %}
-                            <tr>
-                                <td>{{ metric.sig_strength }}</td>
-                                <td>{{ metric.db_level }}</td>
-                                <td>{{ metric.avg_db_level }}</td>
-                                <td>{{ metric.max_db_level }}</td>
-                                <td>{{ metric.no_of_exceedances}}</td>
-                                <td>{{ metric.last_rec }}</td>
-                                <td>{{ metric.last_upl }}</td>
-                                <td>{{ metric.panel_voltage }}</td>
-                                <td>{{ metric.battery_voltage }}</td>
-                                <td>{{ metric.data_balance }}</td>
-                                <td>{{ metric.time_uploaded }}</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
+                    <div class="card-title"><h4>Metric Files</h4></div>
+                    {% for metric_file in device.get_metric_files %}
+                        <ul><a href="{{ metric_file.text_file_url }}" target="_blank">{{ metric_file.filename }}</a></ul>
+                    {% endfor %}
+                    {#                    <div class="card-title"><h4>{{ device.device_id }} Metrics (Latest 10 or less)</h4></div>#}
+                    {#                    <table class="table table-hover">#}
+                    {#                        <thead>#}
+                    {#                        <tr>#}
+                    {#                            <th scope="col">Signal strength</th>#}
+                    {#                            <th scope="col">DB Level</th>#}
+                    {#                            <th scope="col">Average DB Level</th>#}
+                    {#                            <th scope="col">Max DB Level</th>#}
+                    {#                            <th scope="col">No. of Exceedances</th>#}
+                    {#                            <th scope="col">Last Recorded</th>#}
+                    {#                            <th scope="col">Last Uploaded</th>#}
+                    {#                            <th scope="col">Panel Voltage</th>#}
+                    {#                            <th scope="col">Battery Voltage</th>#}
+                    {#                            <th scope="col">Data Balance</th>#}
+                    {#                            <th scope="col">Time Uploaded</th>#}
+                    {#                        </tr>#}
+                    {#                        </thead>#}
+                    {#                        <tbody>#}
+                    {#                        {% for metric in device.get_metrics %}#}
+                    {#                            <tr>#}
+                    {#                                <td>{{ metric.sig_strength }}</td>#}
+                    {#                                <td>{{ metric.db_level }}</td>#}
+                    {#                                <td>{{ metric.avg_db_level }}</td>#}
+                    {#                                <td>{{ metric.max_db_level }}</td>#}
+                    {#                                <td>{{ metric.no_of_exceedances}}</td>#}
+                    {#                                <td>{{ metric.last_rec }}</td>#}
+                    {#                                <td>{{ metric.last_upl }}</td>#}
+                    {#                                <td>{{ metric.panel_voltage }}</td>#}
+                    {#                                <td>{{ metric.battery_voltage }}</td>#}
+                    {#                                <td>{{ metric.data_balance }}</td>#}
+                    {#                                <td>{{ metric.time_uploaded }}</td>#}
+                    {#                            </tr>#}
+                    {#                        {% endfor %}#}
+                    {#                        </tbody>#}
+                    {#                    </table>#}
                 </div>
             </div>
         </div>
