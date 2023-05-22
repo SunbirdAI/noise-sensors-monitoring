@@ -69,7 +69,7 @@ class Device(models.Model):
 
     @property
     def get_metric_files(self):
-        return self.metricstextfile_set.order_by("-time_uploaded")
+        return self.metricstextfile_set.order_by("-time_uploaded")[:20]
 
 
     def get_absolute_url(self):
