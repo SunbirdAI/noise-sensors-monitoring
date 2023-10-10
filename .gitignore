@@ -14,3 +14,5 @@ audio/
 staticfiles
 **/.DS_Store
 app.log
+dblog.txt
+*:Zone.Identifier
