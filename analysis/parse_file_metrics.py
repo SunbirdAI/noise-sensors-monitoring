@@ -1,6 +1,4 @@
-import os
-
-def parse_file(file):
+def parse_file(file, device_id):
     """
     Read in the file, parse it and return a list of the relevant metrics
     """
@@ -14,11 +12,5 @@ def parse_file(file):
             time_uploaded_string = metrics_list[1]
             decibel = float(decibel_string.split(":")[1])
             time_uploaded = time_uploaded_string[3:]
-            metrics.append((decibel, time_uploaded))
+            metrics.append({'device_id': device_id, 'db_level': decibel, 'date': time_uploaded})
     return metrics
-
-if __name__ == '__main__':
-    # print(os.getcwd())
-    file = os.getcwd() + "/dblog.txt"
-    metrics = parse_file(file)
-    print(metrics)
