@@ -22,7 +22,7 @@ class Aggregate:
         df["date"] = pd.to_datetime(df["date"])
         return df
 
-    def aggregate_hourly(self):
+    def aggregate_hourly(self, time_uploaded=None):
         df = self.prepare_data()
         df["hour"] = df["date"].dt.hour
         hour = df["hour"][0]
@@ -33,22 +33,15 @@ class Aggregate:
             else:
                 threshold = location_category_information[self.locations[device_name].category]["night_limit"]
 
-            # HourlyAggregate.objects.create(
-            #     device = Device.objects.get(device_id=device_name),
-            #     hour = hour,
-            #     hourly_avg_db_level = device_df["db_level"].mean(),
-            #     hourly_median_db_level = device_df["db_level"].median(),
-            #     hourly_max_db_level = device_df["db_level"].max(),
-            #     hourly_no_of_exceedances = len(device_df[device_df["db_level"] > threshold])
-            # )
-            hourly_aggregate = {
-                'hour': hour,
-                'hourly_avg_db_level': device_df["db_level"].mean(),
-                'hourly_median_db_level': device_df["db_level"].median(),
-                'hourly_max_db_level': device_df["db_level"].max(),
-                'hourly_no_of_exceedances': len(device_df[device_df["db_level"] > threshold])
-            }
-            print(hourly_aggregate)
+            HourlyAggregate.objects.create(
+                device = Device.objects.get(device_id=device_name),
+                date=time_uploaded,
+                hour = hour,
+                hourly_avg_db_level = device_df["db_level"].mean(),
+                hourly_median_db_level = device_df["db_level"].median(),
+                hourly_max_db_level = device_df["db_level"].max(),
+                hourly_no_of_exceedances = len(device_df[device_df["db_level"] > threshold])
+            )
 
         return None
 

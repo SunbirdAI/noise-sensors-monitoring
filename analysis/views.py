@@ -2,21 +2,21 @@ import pytz
 
 from datetime import datetime
 
-from rest_framework import status, viewsets, parsers
+from rest_framework import viewsets, parsers
 from rest_framework.response import Response
-from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
+from .aggregate_data import Aggregate
 
-from .models import HourlyAggregate, DailyAggregate, MetricsTextFile
+from .models import MetricsTextFile
 
 from .serializers import (
-    HourlyAnalysisSerializer, DailyAnalysisSerializer, UploadMetricsTextFileSerializer
+    UploadMetricsTextFileSerializer
 )
 
-# from .aggregate_iot_data import Aggregate
+from devices.models import Device
+from .parse_file_metrics import parse_file
 
 from noise_dashboard.settings import TIME_ZONE
-
 
 timezone = pytz.timezone(TIME_ZONE)
 today = datetime.today()
@@ -28,6 +28,25 @@ class ReceiveMetricsFileViewSet(viewsets.ModelViewSet):
     serializer_class = UploadMetricsTextFileSerializer
     parser_classes = [parsers.MultiPartParser]
     http_method_names = ['post']
+
+
+class AggregateMetricsView(APIView):
+
+    def post(self, request):
+        device_id = request.data["device_id"]
+        device = Device.objects.get(device_id=device_id)
+        metric_files = device.metricstextfile_set.all()
+        for metric_file in metric_files:
+            metrics_data = parse_file(metric_file.metrics_file.file, device_id)
+            agg = Aggregate(metrics_data)
+            agg.aggregate_hourly(time_uploaded=metric_file.time_uploaded)
+        metric_files_dict = [
+            {'time_uploaded': metric_file.time_uploaded,
+             'device': metric_file.device.device_id,
+             'filename': metric_file.filename
+             } for metric_file in metric_files
+        ]
+        return Response(metric_files_dict)
 
 #
 # class HourlyAnalysisView(ListAPIView):

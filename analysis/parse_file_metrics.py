@@ -3,11 +3,11 @@ def parse_file(file, device_id):
     Read in the file, parse it and return a list of the relevant metrics
     """
     metrics = []
-    with open(file, 'r') as f:
+    with file.open('r') as f:
         lines = f.readlines()
         for line in lines:
             line.strip()
-            metrics_list = line.split(",")
+            metrics_list = str(line).split(",")
             decibel_string = metrics_list[0]
             time_uploaded_string = metrics_list[1]
             decibel = float(decibel_string.split(":")[1])
