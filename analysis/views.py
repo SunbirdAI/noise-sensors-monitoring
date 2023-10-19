@@ -34,6 +34,20 @@ class ReceiveMetricsFileViewSet(viewsets.ModelViewSet):
     parser_classes = [parsers.MultiPartParser]
     http_method_names = ['post']
 
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        # TODO: The code below writes the aggregate of the file received. This should probably be done asynchronously, since it makes the request take a long time.
+        device_id = request.data.get('device')
+        device = Device.objects.get(device_id=device_id)
+        now = datetime.now()
+        metric_files = device.metricstextfile_set.filter(time_uploaded__range=[now - timedelta(minutes=30), now])
+        for metric_file in metric_files:
+            metrics_data = parse_file(metric_file.metrics_file.file, device_id)
+            if len(metrics_data) > 0:
+                agg = Aggregate(metrics_data)
+                agg.aggregate_hourly(time_uploaded=metric_file.time_uploaded)
+        return response
+
 
 class ListMetricsFilesView(ListAPIView):
     serializer_class = ListMetricsTextFileSerializer
@@ -103,7 +117,6 @@ class HourlyAnalysisView(ListAPIView):
 
     def get_queryset(self):
         return get_analysis_queryset(self, True)
-
 
 
 class DailyAnalysisView(ListAPIView):
