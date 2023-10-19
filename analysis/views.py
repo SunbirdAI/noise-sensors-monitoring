@@ -1,6 +1,6 @@
 import pytz
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from rest_framework import viewsets, parsers
 from rest_framework.response import Response
@@ -21,6 +21,7 @@ from noise_dashboard.settings import TIME_ZONE
 timezone = pytz.timezone(TIME_ZONE)
 today = datetime.today()
 today = timezone.localize(today)
+four_weeks = timedelta(weeks=4)
 
 
 class ReceiveMetricsFileViewSet(viewsets.ModelViewSet):
@@ -37,6 +38,8 @@ class AggregateMetricsView(APIView):
         device = Device.objects.get(device_id=device_id)
         metric_files = device.metricstextfile_set.all()
         for metric_file in metric_files:
+            if metric_file.time_uploaded <= (today - four_weeks):
+                continue
             metrics_data = parse_file(metric_file.metrics_file.file, device_id)
             if len(metrics_data) == 0:
                 continue
