@@ -35,22 +35,31 @@ class AggregateMetricsView(APIView):
 
     def post(self, request):
         device_id = request.data["device_id"]
+        start = int(request.data["start"])
+        end = int(request.data["end"])
+        start_days = timedelta(days=start)
+        end_days = timedelta(days=end)
         device = Device.objects.get(device_id=device_id)
         metric_files = device.metricstextfile_set.all()
+        processed_files = []
         for metric_file in metric_files:
-            if metric_file.time_uploaded <= (today - four_weeks):
+            if not ((today - end_days) <= metric_file.time_uploaded <= (today - start_days)):
                 continue
             metrics_data = parse_file(metric_file.metrics_file.file, device_id)
             if len(metrics_data) == 0:
                 continue
             agg = Aggregate(metrics_data)
             agg.aggregate_hourly(time_uploaded=metric_file.time_uploaded)
-        metric_files_dict = [
-            {'time_uploaded': metric_file.time_uploaded,
-             'device': metric_file.device.device_id,
-             'filename': metric_file.filename
-             } for metric_file in metric_files
-        ]
+            processed_files.append(metric_file)
+        metric_files_dict = {
+            "number_of_files": len(processed_files),
+            "files": [
+                {'time_uploaded': metric_file.time_uploaded,
+                 'device': metric_file.device.device_id,
+                 'filename': metric_file.filename
+                 } for metric_file in processed_files
+            ]
+        }
         return Response(metric_files_dict)
 
 #
