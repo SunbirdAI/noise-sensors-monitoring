@@ -62,10 +62,10 @@ class AggregateMetricsView(APIView):
         device_id = request.data["device_id"]
         start = int(request.data["start"])
         end = int(request.data["end"])
-        start_days = timedelta(days=start)
-        end_days = timedelta(days=end)
+        start_hours = timedelta(hours=start)
+        end_hours = timedelta(hours=end)
         device = Device.objects.get(device_id=device_id)
-        metric_files = device.metricstextfile_set.filter(time_uploaded__range=[today - end_days, today - start_days])
+        metric_files = device.metricstextfile_set.filter(time_uploaded__range=[today - end_hours, today - start_hours])
         processed_files = []
         for metric_file in metric_files:
             metrics_data = parse_file(metric_file.metrics_file.file, device_id)
