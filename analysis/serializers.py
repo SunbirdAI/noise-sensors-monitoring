@@ -20,6 +20,16 @@ class UploadMetricsTextFileSerializer(serializers.ModelSerializer):
         }
 
 
+class ListMetricsTextFileSerializer(serializers.ModelSerializer):
+    device = serializers.SlugRelatedField(queryset=Device.objects.all(), slug_field='device_id')
+
+    class Meta:
+        model = MetricsTextFile
+        fields = [
+            'id', 'time_uploaded', 'device', 'filename'
+        ]
+
+
 class HourlyAnalysisSerializer(serializers.ModelSerializer):
 
     class Meta:

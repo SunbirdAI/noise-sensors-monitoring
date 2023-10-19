@@ -3,6 +3,7 @@ import pytz
 from datetime import datetime, timedelta
 
 from rest_framework import viewsets, parsers
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .aggregate_data import Aggregate
@@ -10,7 +11,8 @@ from .aggregate_data import Aggregate
 from .models import MetricsTextFile
 
 from .serializers import (
-    UploadMetricsTextFileSerializer
+    UploadMetricsTextFileSerializer,
+    ListMetricsTextFileSerializer
 )
 
 from devices.models import Device
@@ -30,6 +32,26 @@ class ReceiveMetricsFileViewSet(viewsets.ModelViewSet):
     parser_classes = [parsers.MultiPartParser]
     http_method_names = ['post']
 
+class ListMetricsFilesView(ListAPIView):
+    serializer_class = ListMetricsTextFileSerializer
+
+    def list(self, request, *args, **kwargs):
+        past_days = request.query_params.get('past_days', None)
+        queryset = self.get_queryset() if past_days is None else self.get_queryset(int(past_days))
+        serializer = self.get_serializer(queryset, many=True)
+        num_files = len(serializer.data)
+        result = {
+            "number_of_files": num_files,
+            "metric_files": serializer.data
+        }
+        return Response(result)
+
+    def get_queryset(self, past_days=1):
+        device_id = self.kwargs['device_id']
+        queryset = MetricsTextFile.objects.filter(device__device_id=device_id)
+        queryset = queryset.filter(time_uploaded__range=[today - timedelta(days=past_days), today])
+        return queryset
+
 
 class AggregateMetricsView(APIView):
 
@@ -43,7 +65,7 @@ class AggregateMetricsView(APIView):
         metric_files = device.metricstextfile_set.all()
         processed_files = []
         for metric_file in metric_files:
-            if not ((today - end_days) <= metric_file.time_uploaded <= (today - start_days)):
+            if not ((today - end_days) <= metric_file.time_uploaded <= (today - start_days)): # TODO: Should do this filtering when getting the metricstextfile_set
                 continue
             metrics_data = parse_file(metric_file.metrics_file.file, device_id)
             if len(metrics_data) == 0:

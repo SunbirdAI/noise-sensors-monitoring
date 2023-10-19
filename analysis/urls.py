@@ -4,7 +4,8 @@ from .views import (
     # DailyAnalysisView,
     # ReceiveIoTDataView,
     ReceiveMetricsFileViewSet,
-    AggregateMetricsView
+    AggregateMetricsView,
+    ListMetricsFilesView
 )
 from rest_framework.routers import SimpleRouter
 
@@ -18,5 +19,6 @@ router.register('metrics-file', ReceiveMetricsFileViewSet)
 # ]
 urlpatterns = [
     path('aggregate-metrics/', AggregateMetricsView.as_view(), name='aggregate_metrics'),
+    path('list-metrics/<str:device_id>', ListMetricsFilesView.as_view(), name='list_metric_files'),
     path('', include(router.urls))
 ]
