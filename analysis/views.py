@@ -8,12 +8,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .aggregate_data import Aggregate
 
-from .models import MetricsTextFile, HourlyAggregate
+from .models import MetricsTextFile, HourlyAggregate, DailyAggregate
 
 from .serializers import (
     UploadMetricsTextFileSerializer,
     ListMetricsTextFileSerializer,
-    HourlyAnalysisSerializer
+    HourlyAnalysisSerializer,
+    DailyAnalysisSerializer
 )
 
 from devices.models import Device
@@ -85,28 +86,31 @@ class AggregateMetricsView(APIView):
         return Response(metric_files_dict)
 
 
-#
+def get_analysis_queryset(api_view_object: ListAPIView, hourly=True):
+    device_id = api_view_object.kwargs["device_id"]
+    past_days = int(api_view_object.request.query_params.get('past_days', 1))
+    if hourly:
+        queryset = HourlyAggregate.objects.filter(device__device_id=device_id)
+    else:
+        queryset = DailyAggregate.objects.filter(device__device_id=device_id)
+
+    queryset = queryset.filter(date__range=[today - timedelta(past_days), today])
+    return queryset.order_by('-date')
+
+
 class HourlyAnalysisView(ListAPIView):
     serializer_class = HourlyAnalysisSerializer
 
     def get_queryset(self):
-        device_id = self.kwargs["device_id"]
-        past_days = int(self.request.query_params.get('past_days', 1))
-        queryset = HourlyAggregate.objects.filter(device__device_id=device_id)
-        queryset = queryset.filter(date__range=[today - timedelta(past_days), today])
-        return queryset.order_by('-date')
+        return get_analysis_queryset(self, True)
 
-#
-#
-# class DailyAnalysisView(ListAPIView):
-#     # today = datetime.today()
-#     # queryset = DailyAggregate.objects.filter(
-#     #     date__year=today.year,
-#     #     date__month=today.month,
-#     #     date__day=today.day
-#     # )
-#     queryset = DailyAggregate.objects.all()
-#     serializer_class = DailyAnalysisSerializer
+
+
+class DailyAnalysisView(ListAPIView):
+    serializer_class = DailyAnalysisSerializer
+
+    def get_queryset(self):
+        return get_analysis_queryset(self, False)
 #
 #
 # class ReceiveIoTDataView(APIView):
