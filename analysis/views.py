@@ -38,6 +38,8 @@ class AggregateMetricsView(APIView):
         metric_files = device.metricstextfile_set.all()
         for metric_file in metric_files:
             metrics_data = parse_file(metric_file.metrics_file.file, device_id)
+            if len(metrics_data) == 0:
+                continue
             agg = Aggregate(metrics_data)
             agg.aggregate_hourly(time_uploaded=metric_file.time_uploaded)
         metric_files_dict = [
