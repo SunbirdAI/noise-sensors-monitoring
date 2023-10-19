@@ -9,7 +9,7 @@ class UploadMetricsTextFileSerializer(serializers.ModelSerializer):
     class Meta:
         model = MetricsTextFile
         fields = [
-            'id', 'device', 'text_file_url'
+            'id', 'metrics_file', 'device'
         ]
         read_only_fields = ['time_uploaded']
 
@@ -26,7 +26,7 @@ class ListMetricsTextFileSerializer(serializers.ModelSerializer):
     class Meta:
         model = MetricsTextFile
         fields = [
-            'id', 'time_uploaded', 'device', 'filename'
+            'id', 'time_uploaded', 'device', 'text_file_url'
         ]
 
 
