@@ -52,7 +52,7 @@ class ListMetricsFilesView(ListAPIView):
         device_id = self.kwargs['device_id']
         queryset = MetricsTextFile.objects.filter(device__device_id=device_id)
         queryset = queryset.filter(time_uploaded__range=[today - timedelta(days=past_days), today])
-        return queryset
+        return queryset.order_by('-time_uploaded')
 
 
 class AggregateMetricsView(APIView):
@@ -94,7 +94,7 @@ class HourlyAnalysisView(ListAPIView):
         past_days = int(self.request.query_params.get('past_days', 1))
         queryset = HourlyAggregate.objects.filter(device__device_id=device_id)
         queryset = queryset.filter(date__range=[today - timedelta(past_days), today])
-        return queryset
+        return queryset.order_by('-date')
 
 #
 #
