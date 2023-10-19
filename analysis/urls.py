@@ -1,6 +1,6 @@
 from django.urls import path, include
 from .views import (
-    # HourlyAnalysisView,
+    HourlyAnalysisView,
     # DailyAnalysisView,
     # ReceiveIoTDataView,
     ReceiveMetricsFileViewSet,
@@ -20,5 +20,6 @@ router.register('metrics-file', ReceiveMetricsFileViewSet)
 urlpatterns = [
     path('aggregate-metrics/', AggregateMetricsView.as_view(), name='aggregate_metrics'),
     path('list-metrics/<str:device_id>', ListMetricsFilesView.as_view(), name='list_metric_files'),
+    path('hourly/<str:device_id>', HourlyAnalysisView.as_view(), name='hourly_analysis'),
     path('', include(router.urls))
 ]

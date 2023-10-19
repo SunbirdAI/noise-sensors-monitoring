@@ -8,11 +8,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .aggregate_data import Aggregate
 
-from .models import MetricsTextFile
+from .models import MetricsTextFile, HourlyAggregate
 
 from .serializers import (
     UploadMetricsTextFileSerializer,
-    ListMetricsTextFileSerializer
+    ListMetricsTextFileSerializer,
+    HourlyAnalysisSerializer
 )
 
 from devices.models import Device
@@ -32,12 +33,13 @@ class ReceiveMetricsFileViewSet(viewsets.ModelViewSet):
     parser_classes = [parsers.MultiPartParser]
     http_method_names = ['post']
 
+
 class ListMetricsFilesView(ListAPIView):
     serializer_class = ListMetricsTextFileSerializer
 
     def list(self, request, *args, **kwargs):
-        past_days = request.query_params.get('past_days', None)
-        queryset = self.get_queryset() if past_days is None else self.get_queryset(int(past_days))
+        past_days = request.query_params.get('past_days', 1)
+        queryset = self.get_queryset(int(past_days))
         serializer = self.get_serializer(queryset, many=True)
         num_files = len(serializer.data)
         result = {
@@ -62,11 +64,9 @@ class AggregateMetricsView(APIView):
         start_days = timedelta(days=start)
         end_days = timedelta(days=end)
         device = Device.objects.get(device_id=device_id)
-        metric_files = device.metricstextfile_set.all()
+        metric_files = device.metricstextfile_set.filter(time_uploaded__range=[today - end_days, today - start_days])
         processed_files = []
         for metric_file in metric_files:
-            if not ((today - end_days) <= metric_file.time_uploaded <= (today - start_days)): # TODO: Should do this filtering when getting the metricstextfile_set
-                continue
             metrics_data = parse_file(metric_file.metrics_file.file, device_id)
             if len(metrics_data) == 0:
                 continue
@@ -84,16 +84,18 @@ class AggregateMetricsView(APIView):
         }
         return Response(metric_files_dict)
 
+
 #
-# class HourlyAnalysisView(ListAPIView):
-#     # today = datetime.today()
-#     # queryset = HourlyAggregate.objects.filter(
-#     #     date__year=today.year,
-#     #     date__month=today.month,
-#     #     date__day=today.day
-#     # )
-#     queryset = HourlyAggregate.objects.all()
-#     serializer_class = HourlyAnalysisSerializer
+class HourlyAnalysisView(ListAPIView):
+    serializer_class = HourlyAnalysisSerializer
+
+    def get_queryset(self):
+        device_id = self.kwargs["device_id"]
+        past_days = int(self.request.query_params.get('past_days', 1))
+        queryset = HourlyAggregate.objects.filter(device__device_id=device_id)
+        queryset = queryset.filter(date__range=[today - timedelta(past_days), today])
+        return queryset
+
 #
 #
 # class DailyAnalysisView(ListAPIView):
