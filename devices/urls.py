@@ -4,7 +4,7 @@ from .views import (
     DeviceListView, DeviceDetailView, DeviceCreateView, DeviceUpdateView,
     DeviceLocationListAPIView, DeviceConfigurationUpdateView,
     DeviceConfigurationViewSet, LocationCreateView, LocationUpdateView,
-    LocationMetricsViewSet, LocationRecordingsViewSet
+    LocationMetricsViewSet, LocationRecordingsViewSet, UptimeAPIView
 )
 
 from rest_framework.routers import SimpleRouter
@@ -23,5 +23,6 @@ urlpatterns = [
     path('<uuid:pk>/config_edit', DeviceConfigurationUpdateView.as_view(), name='edit_config'),
     path('create_location', LocationCreateView.as_view(), name='create_location'),
     path('<uuid:pk>/edit_location', LocationUpdateView.as_view(), name='edit_location'),
+    path('uptime/<str:device_id>', UptimeAPIView.as_view(), name='uptime_info'),
     path('', include(router.urls))
 ]

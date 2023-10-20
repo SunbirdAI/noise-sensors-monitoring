@@ -2,12 +2,15 @@ from django.urls import reverse
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import UpdateView, CreateView
 from .models import Device, Location
+from .uptime_calculation import calculate_uptime
 from .serializers import (
     DeviceLocationSerializer, DeviceConfigSerializer,
     LocationMetricsSerializer, LocationRecordingsSerializer
     )
 from rest_framework import viewsets
 from rest_framework.generics import ListAPIView
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import DeviceForm, DeviceConfigurationForm
@@ -82,3 +85,17 @@ class DeviceConfigurationViewSet(viewsets.ModelViewSet):
     serializer_class = DeviceConfigSerializer
     queryset = Device.objects.all()
     lookup_field = 'imei'
+
+
+class UptimeAPIView(APIView):
+
+    def get(self, request, *args, **kwargs):
+        device_id = self.kwargs['device_id']
+        past_weeks = request.query_params.get('past_weeks', 4)
+        uptime_based_on_audio_uploads = calculate_uptime(device_id, past_weeks, True)
+        uptime_based_on_metrics_uploads = calculate_uptime(device_id, past_weeks, False)
+        return Response({
+            'uptime_based_on_audio_uploads': uptime_based_on_audio_uploads,
+            'uptime_based_on_metrics_uploads': uptime_based_on_metrics_uploads
+        })
+
