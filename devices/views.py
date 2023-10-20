@@ -91,7 +91,7 @@ class UptimeAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         device_id = self.kwargs['device_id']
-        past_weeks = request.query_params.get('past_weeks', 4)
+        past_weeks = int(request.query_params.get('past_weeks', 4))
         uptime_based_on_audio_uploads = calculate_uptime(device_id, past_weeks, True)
         uptime_based_on_metrics_uploads = calculate_uptime(device_id, past_weeks, False)
         return Response({
