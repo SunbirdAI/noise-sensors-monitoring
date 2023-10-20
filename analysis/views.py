@@ -108,7 +108,7 @@ def get_analysis_queryset(api_view_object: ListAPIView, hourly=True):
     else:
         queryset = DailyAggregate.objects.filter(device__device_id=device_id)
 
-    queryset = queryset.filter(date__range=[today - timedelta(past_days), today])
+    queryset = queryset.filter(date__range=[datetime.now() - timedelta(days=past_days), datetime.now()])
     return queryset.order_by('-date')
 
 
@@ -124,8 +124,9 @@ class DailyAnalysisView(ListAPIView):
 
     def get_queryset(self):
         return get_analysis_queryset(self, False)
-#
-#
+
+
+# TODO: Change this to receive the daily/nightly metrics from an endpoint.
 # class ReceiveIoTDataView(APIView):
 #
 #     def post(self, request):
