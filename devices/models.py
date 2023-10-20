@@ -7,6 +7,8 @@ from django.urls import reverse
 from taggit.managers import TaggableManager
 from taggit.models import GenericUUIDTaggedItemBase, TaggedItemBase
 
+from datetime import datetime, timedelta
+
 
 class UUIDTaggedItem(GenericUUIDTaggedItemBase, TaggedItemBase):
     class Meta:
@@ -71,7 +73,6 @@ class Device(models.Model):
     def get_metric_files(self):
         return self.metricstextfile_set.order_by("-time_uploaded")[:20]
 
-
     def get_absolute_url(self):
         return reverse("device_detail", args=[str(self.id)])
 
@@ -130,6 +131,10 @@ class Location(models.Model):
     category = models.CharField(max_length=50, choices=Category.choices, default=Category.E)
 
     @property
+    def device_name(self):
+        return self.device.device_id
+
+    @property
     def location_description(self):
         return location_category_information[self.category]['description']
 
@@ -147,11 +152,15 @@ class Location(models.Model):
 
     @property
     def location_hourly_metrics(self):
-        return self.device.hourlyaggregate_set.order_by("-date")
+        return (self.device.hourlyaggregate_set
+                .filter(date__range=[datetime.today() - timedelta(days=2), datetime.today()])
+                .order_by("-date"))
 
     @property
     def location_daily_metrics(self):
-        return self.device.dailyaggregate_set.order_by("-date")
+        return (self.device.dailyaggregate_set
+                .filter(date__range=[datetime.today() - timedelta(weeks=4), datetime.today()])
+                .order_by("-date"))
 
     @property
     def location_recordings(self):

@@ -31,7 +31,7 @@ class LocationMetricsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = [
-            'id', 'location_hourly_metrics', 'location_daily_metrics'
+            'id', 'device_name', 'location_hourly_metrics', 'location_daily_metrics'
         ]
 
 
