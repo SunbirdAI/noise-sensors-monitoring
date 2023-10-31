@@ -1,0 +1,313 @@
+{
+	"info": {
+		"_postman_id": "9540abef-e6f5-45dc-b6b1-619b0abef030",
+		"name": "Noise Platform endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "4658303",
+		"_collection_link": "https://gold-flare-566269.postman.co/workspace/Sunbird-Work~04345c69-c6be-497b-ba83-f863743e4ca3/collection/4658303-9540abef-e6f5-45dc-b6b1-619b0abef030?action=share&source=collection_link&creator=4658303"
+	},
+	"item": [
+		{
+			"name": "location metrics (deployed)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://noise-sensors-dashboard.herokuapp.com/devices/location_metrics",
+					"protocol": "https",
+					"host": [
+						"noise-sensors-dashboard",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"devices",
+						"location_metrics"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "location metrics (local)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/devices/location_metrics",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"devices",
+						"location_metrics"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "upload metrics file",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "device",
+							"value": "LOCAL_TESTING_DEVICE",
+							"type": "text"
+						},
+						{
+							"key": "metrics_file",
+							"type": "file",
+							"src": "/C:/Users/hp/Downloads/dblog2.txt"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:8000/analysis/metrics-file/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"analysis",
+						"metrics-file",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "aggregate metrics",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"device_id\": \"LOCAL_TESTING_DEVICE\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/analysis/aggregate-metrics/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"analysis",
+						"aggregate-metrics",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "device metrics (deployed)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://noise-sensors-dashboard.herokuapp.com/device_metrics/device/c2f1db3a-3af2-4b91-8af9-d4666a42bce3",
+					"protocol": "https",
+					"host": [
+						"noise-sensors-dashboard",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"device_metrics",
+						"device",
+						"c2f1db3a-3af2-4b91-8af9-d4666a42bce3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get locations (deployed)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://noise-sensors-dashboard.herokuapp.com/devices/locations",
+					"protocol": "https",
+					"host": [
+						"noise-sensors-dashboard",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"devices",
+						"locations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "aggregate metrics (deployed)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"device_id\": \"SB1001\",\r\n    \"start\": 25,\r\n    \"end\": 30\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://noise-sensors-dashboard.herokuapp.com/analysis/aggregate-metrics/",
+					"protocol": "https",
+					"host": [
+						"noise-sensors-dashboard",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"aggregate-metrics",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list_metrics_files",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/analysis/list-metrics/LOCAL_TESTING_DEVICE?past_days=14",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"analysis",
+						"list-metrics",
+						"LOCAL_TESTING_DEVICE"
+					],
+					"query": [
+						{
+							"key": "past_days",
+							"value": "14"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list metrics files (deployed)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://noise-sensors-dashboard.herokuapp.com/analysis/list-metrics/SB1001?past_days=5",
+					"protocol": "https",
+					"host": [
+						"noise-sensors-dashboard",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"list-metrics",
+						"SB1001"
+					],
+					"query": [
+						{
+							"key": "past_days",
+							"value": "5"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list hourly metrics",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/analysis/hourly/LOCAL_TESTING_DEVICE?past_days=14",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"analysis",
+						"hourly",
+						"LOCAL_TESTING_DEVICE"
+					],
+					"query": [
+						{
+							"key": "past_days",
+							"value": "14"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list hourly metrics (deployed)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://noise-sensors-dashboard.herokuapp.com/analysis/hourly/SB1001?past_days=2",
+					"protocol": "https",
+					"host": [
+						"noise-sensors-dashboard",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"analysis",
+						"hourly",
+						"SB1001"
+					],
+					"query": [
+						{
+							"key": "past_days",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "uptime",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "uptime (deployed)",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}
