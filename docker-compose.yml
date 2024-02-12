@@ -2,6 +2,9 @@ version: '3'
 
 services:
 
+  redis:
+    image: "redis:7.0.11-alpine"
+
   postgres_db:
     image: postgres
     volumes:
@@ -12,6 +15,8 @@ services:
       - POSTGRES_PASSWORD=postgres
     networks:
       - djangonetwork
+    depends_on:
+      - redis
 
   web:
     build: .
@@ -23,6 +28,31 @@ services:
       - 8000:8000
     depends_on:
       - postgres_db
+    links:
+      - postgres_db:postgres_db
+    networks:
+      - djangonetwork
+
+  celery:
+    build: .
+    container_name: celery
+    volumes:
+      - .:/code
+    depends_on:
+      - redis
+    links:
+      - postgres_db:postgres_db
+    networks:
+      - djangonetwork
+
+  celery-beat:
+    build: .
+    container_name: celery-beat
+    command: celery -A noise_dashboard beat -l info
+    volumes:
+      - .:/code
+    depends_on:
+      - redis
     links:
       - postgres_db:postgres_db
     networks:

@@ -36,7 +36,7 @@ if ENVIRONMENT == "production":
 SECRET_KEY = os.getenv('SECRET_KEY', default="django-insecure-xf6&3^n9d1@43akuqxnyr!%v40mg3a367#oin@z=cxngue$2m!")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG') != 'False'
+DEBUG = os.getenv('DEBUG') != 'True'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default="localhost 127.0.0.1").split(" ")
 
@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'taggit',
     'rest_framework',
     'corsheaders',
+    'django_celery_beat',
 
     # Local
     'users.apps.UsersConfig',
@@ -196,3 +197,20 @@ if 'RDS_HOSTNAME' in os.environ:
             'PORT': os.environ['RDS_PORT'],
         }
     }
+
+# Celery settings
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER',"redis://redis:6379/0")
+CELERY_RESULT_BACKEND = os.getenv('CELERY_BACKEND',"redis://redis:6379/0")
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
+
+# email settings.
+EMAIL_BACKEND = 'django.core.mail.backends.smpt.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = os.getenv("EMAIL_ADDRESS", "vigidaiz15@gmail.com")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_PASSWORD", "mfww omdz cowe ipgt")

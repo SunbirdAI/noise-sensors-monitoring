@@ -1,3 +1,5 @@
+import contextlib
+from devices.models import Device
 from rest_framework import viewsets, parsers
 from rest_framework.response import Response
 
@@ -25,6 +27,13 @@ class ReceiveAudioViewSet(viewsets.ModelViewSet):
     serializer_class = UploadRecordingSerializer
     parser_classes = [parsers.MultiPartParser]
     http_method_names = ['post']
+
+    def perform_create(self, serializer):
+        if device_id := self.request.data.get('device', None):
+            with contextlib.suppress(Device.DoesNotExist):
+                device = Device.objects.get(device_id=device_id)
+                device.update_last_seen()
+        serializer.save()
 
     # def finalize_response(self, request, response, *args, **kwargs):
     #     if response.status_code != 201:

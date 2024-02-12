@@ -5,67 +5,123 @@
 {% block title %}{{ device.device_id }}{% endblock title %}
 
 {% block content %}
-    {% include "sidebar.html" %}
-    <div class="content-container">
-        <div class="container-fluid">
-            {% include "navbar.html" %}
-            <div class="card-group m-3">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="card-title"><h4>{{ device.device_id }} Details</h4></div>
-                        <p><strong>Device ID</strong>: {{ device.device_id }}</p>
-                        <p><strong>Device Name</strong>: {{ device.device_name }}</p>
-                        <p><strong>IMEI Number</strong>: {{ device.imei }}</p>
-                        <p><strong>Phone Number</strong>: {{ device.phone_number }}</p>
-                        <p><strong>Version Number</strong>: {{ device.version_number }}</p>
-                        <p><strong>Production Stage</strong>: {{ device.production_stage }}</p>
-                        <p><strong>Tags:</strong>
-                            {% for tag in device.tags.all %}
-                                <span class="btn btn-light btn-outline-secondary btn-sm">{{ tag }}</span>
-                            {% endfor %}
-                        </p>
-                        <p><strong>Location:</strong></p>
-                        {% if device.location %}
-                            <p class="ml-3">
-                                <strong>City</strong>: {{ device.location.city }},
-                                <strong>Division</strong>: {{ device.location.division }}
-                                <strong>Parish/Ward</strong>: {{ device.location.parish }},
-                                <strong>Village/Sub-Ward</strong>: {{ device.location.village }}
-                                <strong>Location Category: </strong> {{ device.location.location_description }}
-                            </p>
-                        {% else %}
-                            <p class="ml-3">N/A</p>
-                        {% endif %}
+{% include "sidebar.html" %}
+<div class="content-container">
+    <div class="container-fluid">
+        {% include "navbar.html" %}
+        <div class="card-group m-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-title">
+                        <h4>{{ device.device_id }} Details</h4>
                     </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="card-title"><h4>{{ device.device_id }} Configuration</h4></div>
-                        <p><strong>Configured/Enabled</strong>: {{ device.get_configured_display }}</p>
-                        <p><strong>Mode</strong>: {{ device.get_mode_display }}</p>
-                        <p><strong>DB Level</strong>: {{ device.dbLevel }}</p>
-                        <p><strong>Recording Length</strong>: {{ device.recLength }}</p>
-                        <p><strong>Recording Interval</strong>: {{ device.recInterval }}</p>
-                        <p><strong>Upload Address</strong>: {{ device.uploadAddr }}</p>
-                    </div>
+                    <p><strong>Device ID</strong>: {{ device.device_id }}</p>
+                    <p><strong>Device Name</strong>: {{ device.device_name }}</p>
+                    <p><strong>IMEI Number</strong>: {{ device.imei }}</p>
+                    <p><strong>Phone Number</strong>: {{ device.phone_number }}</p>
+                    <p><strong>Version Number</strong>: {{ device.version_number }}</p>
+                    <p><strong>Production Stage</strong>: {{ device.production_stage }}</p>
+                    <p><strong>Device Last Seen:</strong>
+                        <span class="btn btn-light btn-outline-secondary btn-sm">{{ device.lastseen|default:"N/A"  }}</span>
+                    </p>
+                    <p><strong>Tags:</strong>
+                        {% for tag in device.tags.all %}
+                        <span class="btn btn-light btn-outline-secondary btn-sm">{{ tag }}</span>
+                        {% endfor %}
+                    </p>
+                    <p><strong>Location:</strong></p>
+                    {% if device.location %}
+                    <p class="ml-3">
+                        <strong>City</strong>: {{ device.location.city }},
+                        <strong>Division</strong>: {{ device.location.division }}
+                        <strong>Parish/Ward</strong>: {{ device.location.parish }},
+                        <strong>Village/Sub-Ward</strong>: {{ device.location.village }}
+                        <strong>Location Category: </strong> {{ device.location.location_description }}
+                    </p>
+                    {% else %}
+                    <p class="ml-3">N/A</p>
+                    {% endif %}
                 </div>
             </div>
-            <a href="{% url 'edit_device' device.id %}" class="btn btn-primary mx-3 my-1">Edit Device</a>
-            <a href="{% url 'edit_config' device.id %}" class="btn btn-primary mx-3 my-1">Edit
-                Configuration</a>
-            {% if device.location %}
-                <a href="{% url 'edit_location' device.location.id %}" class="btn btn-primary mx-3 my-1">Edit
-                    Location</a>
-            {% else %}
-                <a href="{% url 'create_location' %}" class="btn btn-primary mx-3 my-1">Add Location</a>
-            {% endif %}
-            <a href="{{ device.metrics_url }}" class="btn btn-primary mx-3 my-1  pull-right" target="_blank">View
-                Metrics</a>
-            <div class="card m-3">
+            <div class="card">
                 <div class="card-body">
-                    <div class="card-title"><h4>{{ device.device_id }} Recordings (Latest 10 or less)</h4></div>
-                    <table class="table table-hover">
-                        <thead>
+                    <div class="card-title">
+                        <h4>{{ device.device_id }} Configuration</h4>
+                    </div>
+                    <p><strong>Configured/Enabled</strong>: {{ device.get_configured_display }}</p>
+                    <p><strong>Mode</strong>: {{ device.get_mode_display }}</p>
+                    <p><strong>DB Level</strong>: {{ device.dbLevel }}</p>
+                    <p><strong>Recording Length</strong>: {{ device.recLength }}</p>
+                    <p><strong>Recording Interval</strong>: {{ device.recInterval }}</p>
+                    <p><strong>Upload Address</strong>: {{ device.uploadAddr }}</p>
+                </div>
+            </div>
+        </div>
+       <!-- Add this section to display uptime information -->
+        <div class="card m-3">
+            <div class="card-body">
+                <div class="card-title">
+                    <h3>Device Uptime</h3>
+                </div>
+            <div class="progress">
+              <div class="progress-bar" role="progressbar" style="width: {{ device.calculate_uptime_percentage }}%;" aria-valuenow="{{ device.calculate_uptime_percentage }}" aria-valuemin="0" aria-valuemax="100">{{ device.calculate_uptime_percentage }}%</div>
+            </div>
+            <p>The device has been online for {{ device.uptime.uptime |default:"N/A" }} hours since the last 24-hour gap.</p>
+            <h3>Upload Gaps</h3>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Gap Duration (hours)</th>
+                  <th scope="col">Gap Period</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for gap, period in device.uptime.upload_gaps %}
+                <tr>
+                  <td>{{ gap }}</td>
+                  <td>{{ period }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            <!-- <table>
+                <tr>
+                  <th>Month</th>
+                  <th>Uptime Percentage</th>
+                </tr>
+                {% for month, percentage in device.uptime.uptime_percentages %}
+                <tr>
+                  <td>{{ month }}</td>
+                  <td>{{ percentage }}%</td>
+                </tr>
+                {% endfor %}
+              </table> -->
+              
+            <p>The device had {{ upload_gaps|length }} long gaps between uploads in the past 4 weeks.</p>
+            <h3>Previous Downtime</h3>
+            <p>The device was offline for {{ device.uptime.previous_downtime }} before the current uptime.</p>
+          </div>
+        </div>
+          
+        <!-- End of uptime information section -->
+        <a href="{% url 'edit_device' device.id %}" class="btn btn-primary mx-3 my-1">Edit Device</a>
+        <a href="{% url 'edit_config' device.id %}" class="btn btn-primary mx-3 my-1">Edit
+            Configuration</a>
+        {% if device.location %}
+        <a href="{% url 'edit_location' device.location.id %}" class="btn btn-primary mx-3 my-1">Edit
+            Location</a>
+        {% else %}
+        <a href="{% url 'create_location' %}" class="btn btn-primary mx-3 my-1">Add Location</a>
+        {% endif %}
+        <a href="{{ device.metrics_url }}" class="btn btn-primary mx-3 my-1  pull-right" target="_blank">View
+            Metrics</a>
+        <div class="card m-3">
+            <div class="card-body">
+                <div class="card-title">
+                    <h4>{{ device.device_id }} Recordings (Latest 10 or less)</h4>
+                </div>
+                <table class="table table-hover">
+                    <thead>
                         <tr>
                             <th scope="col">Recording Directory</th>
                             <th scope="col">Time Recorded</th>
@@ -73,71 +129,76 @@
                             <th scope="col">Triggering Threshold</th>
                             <th scope="col">Audio</th>
                         </tr>
-                        </thead>
-                        <tbody>
+                    </thead>
+                    <tbody>
                         {% for recording in device.get_recordings %}
-                            <tr>
-                                <td>{{ recording.audio }}</td>
-                                <td>
-                                    {{ recording.time_recorded }}
-                                </td>
-                                <td>{{ recording.time_uploaded }}</td>
-                                <td>{{ recording.triggering_threshold }}</td>
-                                <td>
-                                    <audio controls>
-                                        <source src="{{ recording.audio_url }}" type="audio/wav">
-                                        {{ recording.audio_url }}
-                                    </audio>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td>{{ recording.audio }}</td>
+                            <td>
+                                {{ recording.time_recorded }}
+                            </td>
+                            <td>{{ recording.time_uploaded }}</td>
+                            <td>{{ recording.triggering_threshold }}</td>
+                            <td>
+                                <audio controls>
+                                    <source src="{{ recording.audio_url }}" type="audio/wav">
+                                    {{ recording.audio_url }}
+                                </audio>
+                            </td>
+                        </tr>
                         {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                    </tbody>
+                </table>
             </div>
-            <div class="card m-3">
-                <div class="card-body">
-                    <div class="card-title"><h4>Metric Files</h4></div>
-                    {% for metric_file in device.get_metric_files %}
-                        <ul><a href="{{ metric_file.text_file_url }}" target="_blank">{{ metric_file.filename }}</a> upload at {{ metric_file.time_uploaded }}</ul>
-                    {% endfor %}
-                    {#                    <div class="card-title"><h4>{{ device.device_id }} Metrics (Latest 10 or less)</h4></div>#}
-                    {#                    <table class="table table-hover">#}
-                    {#                        <thead>#}
-                    {#                        <tr>#}
-                    {#                            <th scope="col">Signal strength</th>#}
-                    {#                            <th scope="col">DB Level</th>#}
-                    {#                            <th scope="col">Average DB Level</th>#}
-                    {#                            <th scope="col">Max DB Level</th>#}
-                    {#                            <th scope="col">No. of Exceedances</th>#}
-                    {#                            <th scope="col">Last Recorded</th>#}
-                    {#                            <th scope="col">Last Uploaded</th>#}
-                    {#                            <th scope="col">Panel Voltage</th>#}
-                    {#                            <th scope="col">Battery Voltage</th>#}
-                    {#                            <th scope="col">Data Balance</th>#}
-                    {#                            <th scope="col">Time Uploaded</th>#}
-                    {#                        </tr>#}
-                    {#                        </thead>#}
-                    {#                        <tbody>#}
-                    {#                        {% for metric in device.get_metrics %}#}
-                    {#                            <tr>#}
-                    {#                                <td>{{ metric.sig_strength }}</td>#}
-                    {#                                <td>{{ metric.db_level }}</td>#}
-                    {#                                <td>{{ metric.avg_db_level }}</td>#}
-                    {#                                <td>{{ metric.max_db_level }}</td>#}
-                    {#                                <td>{{ metric.no_of_exceedances}}</td>#}
-                    {#                                <td>{{ metric.last_rec }}</td>#}
-                    {#                                <td>{{ metric.last_upl }}</td>#}
-                    {#                                <td>{{ metric.panel_voltage }}</td>#}
-                    {#                                <td>{{ metric.battery_voltage }}</td>#}
-                    {#                                <td>{{ metric.data_balance }}</td>#}
-                    {#                                <td>{{ metric.time_uploaded }}</td>#}
-                    {#                            </tr>#}
-                    {#                        {% endfor %}#}
-                    {#                        </tbody>#}
-                    {#                    </table>#}
+        </div>
+        <div class="card m-3">
+            <div class="card-body">
+                <div class="card-title">
+                    <h4>Metric Files</h4>
                 </div>
+                {% for metric_file in device.get_metric_files %}
+                <ul><a href="{{ metric_file.text_file_url }}" target="_blank">{{ metric_file.filename }}</a> upload at
+                    {{ metric_file.time_uploaded }}</ul>
+                {% endfor %}
+                {# <div class="card-title">
+                    <h4>{{ device.device_id }} Metrics (Latest 10 or less)</h4>
+                </div>#}
+                {# <table class="table table-hover">#}
+                    {# <thead>#}
+                        {# <tr>#}
+                            {# <th scope="col">Signal strength</th>#}
+                            {# <th scope="col">DB Level</th>#}
+                            {# <th scope="col">Average DB Level</th>#}
+                            {# <th scope="col">Max DB Level</th>#}
+                            {# <th scope="col">No. of Exceedances</th>#}
+                            {# <th scope="col">Last Recorded</th>#}
+                            {# <th scope="col">Last Uploaded</th>#}
+                            {# <th scope="col">Panel Voltage</th>#}
+                            {# <th scope="col">Battery Voltage</th>#}
+                            {# <th scope="col">Data Balance</th>#}
+                            {# <th scope="col">Time Uploaded</th>#}
+                            {# </tr>#}
+                        {# </thead>#}
+                    {# <tbody>#}
+                        {# {% for metric in device.get_metrics %}#}
+                        {# <tr>#}
+                            {# <td>{{ metric.sig_strength }}</td>#}
+                            {# <td>{{ metric.db_level }}</td>#}
+                            {# <td>{{ metric.avg_db_level }}</td>#}
+                            {# <td>{{ metric.max_db_level }}</td>#}
+                            {# <td>{{ metric.no_of_exceedances}}</td>#}
+                            {# <td>{{ metric.last_rec }}</td>#}
+                            {# <td>{{ metric.last_upl }}</td>#}
+                            {# <td>{{ metric.panel_voltage }}</td>#}
+                            {# <td>{{ metric.battery_voltage }}</td>#}
+                            {# <td>{{ metric.data_balance }}</td>#}
+                            {# <td>{{ metric.time_uploaded }}</td>#}
+                            {# </tr>#}
+                        {# {% endfor %}#}
+                        {# </tbody>#}
+                    {# </table>#}
             </div>
         </div>
     </div>
+</div>
 {% endblock content %}

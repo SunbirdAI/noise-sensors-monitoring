@@ -1,11 +1,15 @@
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import UpdateView, CreateView
+from django.template.response import TemplateResponse
+
+from recordings.models import Recording
 from .models import Device, Location
 from .uptime_calculation import calculate_uptime
 from .serializers import (
     DeviceLocationSerializer, DeviceConfigSerializer,
-    LocationMetricsSerializer, LocationRecordingsSerializer
+    LocationMetricsSerializer, LocationRecordingsSerializer, RecordingSerializer
     )
 from rest_framework import viewsets
 from rest_framework.generics import ListAPIView
@@ -92,10 +96,30 @@ class UptimeAPIView(APIView):
     def get(self, request, *args, **kwargs):
         device_id = self.kwargs['device_id']
         past_weeks = int(request.query_params.get('past_weeks', 4))
-        uptime_based_on_audio_uploads = calculate_uptime(device_id, past_weeks, True)
-        uptime_based_on_metrics_uploads = calculate_uptime(device_id, past_weeks, False)
-        return Response({
+
+        # Assuming you have a Device model, fetch the device object
+        device = get_object_or_404(Device, device_id=device_id)
+
+        # Call the calculate_uptime function with the device object
+        uptime_based_on_audio_uploads = calculate_uptime(device, past_weeks, audio=True)
+        uptime_based_on_metrics_uploads = calculate_uptime(device, past_weeks, audio=False)
+
+        context = {
+            'device': device,  # Add the device to the context if needed in the template
             'uptime_based_on_audio_uploads': uptime_based_on_audio_uploads,
             'uptime_based_on_metrics_uploads': uptime_based_on_metrics_uploads
-        })
+        }
 
+        return TemplateResponse(request, 'devices/device_detail.html', context)
+
+
+class DeviceRecordingsAPIView(APIView):
+    def get(self, request, pk):
+        try:
+            device = Device.objects.get(pk=pk)
+            recordings = device.get_recordings
+            # Assuming you have a serializer for Recording model
+            serializer = RecordingSerializer(recordings, many=True)
+            return Response(serializer.data, status=200)
+        except Device.DoesNotExist:
+            return Response({'error': 'Device not found'}, status=404)

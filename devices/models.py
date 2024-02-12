@@ -1,13 +1,17 @@
 import uuid
+import calendar
 from django.utils.translation import gettext_lazy as _
 
 from django.db import models
 from django.urls import reverse
+import pytz
+from noise_dashboard.settings import TIME_ZONE
 
 from taggit.managers import TaggableManager
 from taggit.models import GenericUUIDTaggedItemBase, TaggedItemBase
 
 from datetime import datetime, timedelta
+from django.utils import timezone
 
 
 class UUIDTaggedItem(GenericUUIDTaggedItemBase, TaggedItemBase):
@@ -58,6 +62,22 @@ class Device(models.Model):
     recInterval = models.IntegerField(default=10)
     uploadAddr = models.CharField(default="http://localhost:8000/audio/", max_length=100)
 
+    @property
+    def lastseen(self):
+        if last_metric := self.get_last_metric_text_file():
+            return last_metric.time_uploaded
+        else:
+            # Define a default value or handle this case as needed
+            return None
+
+    def get_last_metric_text_file(self):
+        try:
+            # Retrieve the last metricstextfile uploaded for this device
+            return self.metricstextfile_set.order_by('-time_uploaded').first()
+        except self.metricstextfile_set.model.DoesNotExist:
+            # Handle the case where there are no metricstextfiles
+            return None
+
     def __str__(self):
         return self.device_id
 
@@ -75,6 +95,159 @@ class Device(models.Model):
 
     def get_absolute_url(self):
         return reverse("device_detail", args=[str(self.id)])
+    
+    @property
+    def uptime(self):
+        """
+        Calculate and return the uptime of the device.
+        """
+        return self.calculate_uptime(False)
+    
+    
+    timezone = pytz.timezone(TIME_ZONE)
+
+
+    def calculate_uptime(self, audio=True):
+        """
+        Returns gaps between upload times and total uptime. Returns a dictionary with:
+        upload_gaps: Long gaps between uploads (1.5 hours or more)
+        uptime: Number of hours/days since there was a 24-hour upload gap.
+        """
+
+        big_gaps = []
+        went_online = None
+        previous_downtime = None
+
+        now = datetime.now(self.timezone)
+        delta = timedelta(weeks=4)
+        start_time = now - delta
+        uploaded_times = self.get_uploaded_times(audio, now, start_time)
+        uptime_percentages = self.calculate_monthly_uptime(uploaded_times)
+        months = self.get_next_12_months()
+
+        if not uploaded_times:
+            return {
+                'big_gaps': [],
+                'uptime': 0,
+                'previous_downtime': None,
+                'uptime_percentages': [],
+            }
+
+        for date_from, date_to in zip(uploaded_times[:-1], uploaded_times[1:]):
+            gap_time = date_to - date_from
+            gap = gap_time.total_seconds() / 3600
+
+            if gap > 3.0:
+                big_gaps.append((gap, f"From {date_from} to {date_to}"))
+
+            if gap >= 24 and not went_online:
+                went_online = date_to
+                previous_downtime = f"From {date_from} to {date_to}"
+
+        if not went_online:
+            went_online = start_time
+
+        def_time = now - went_online
+        uptime = max(0, def_time.total_seconds() / 3600)
+
+        return {
+            'upload_gaps': big_gaps,
+            'uptime': uptime,
+            'previous_downtime': previous_downtime,
+            'uptime_percentages': zip(months, uptime_percentages)
+        }
+
+    def get_uploaded_times(self, audio, now, start_time):
+        query_set = self.recording_set if audio else self.metricstextfile_set
+
+        try:
+            files_dates = (query_set.filter(time_uploaded__range=[start_time, now])
+                            .values_list('time_uploaded', flat=True)
+                            .order_by('time_uploaded'))
+            return list(files_dates)
+        except query_set.model.DoesNotExist:
+            # Handle the case where there are no metricstextfiles
+            return []
+    
+    def get_next_12_months(self):
+        current_month = datetime.now().replace(day=1)  # Get the first day of the current month
+        months = [current_month]
+
+        for _ in range(11):
+            current_month = current_month + timedelta(days=31)  # Add an arbitrary number of days to move to the next month
+            current_month = current_month.replace(day=1)  # Set the day to 1 to get the first day of the month
+            months.append(current_month)
+
+        return months
+
+    # def calculate_monthly_uptime(self, uploaded_times):
+    #     current_month = datetime.now().month
+    #     uptime_per_month = [0] * 12
+
+    #     for upload_time in uploaded_times:
+    #         month = upload_time.month - 1  # Adjust to 0-indexed
+    #         uptime_per_month[month] += 1
+
+    #     total_months = len(uptime_per_month)
+    #     current_month_index = (current_month - 1) % total_months
+
+    #     # Calculate uptime percentages
+    #     uptime_percentages = [(count / (4*7*24)) * 100 for count in uptime_per_month]
+
+    #     # Shift the list so that the current month is at the beginning
+    #     uptime_percentages = uptime_percentages[current_month_index:] + uptime_percentages[:current_month_index]
+
+    #     return uptime_percentages
+
+    # Import the calendar module
+
+
+    def calculate_monthly_uptime(self, uploaded_times):
+        current_month = datetime.now().month
+        uptime_per_month = [0] * 12
+
+        for upload_time in uploaded_times:
+            month = upload_time.month - 1  # Adjust to 0-indexed
+            uptime_per_month[month] += 1
+
+        total_months = len(uptime_per_month)
+        current_month_index = (current_month - 1) % total_months
+
+        # Calculate uptime percentages
+        uptime_percentages = [(count / (days * 24)) * 100 for count, days in zip(uptime_per_month, [calendar.monthrange(2024, i)[1] for i in range(1, 13)])]
+
+        # Shift the list so that the current month is at the beginning
+        uptime_percentages = uptime_percentages[current_month_index:] + uptime_percentages[:current_month_index]
+
+        return uptime_percentages
+
+    def filter_time_by_month_and_year(self, time_formats, month, year):
+        # Create an empty list to store the filtered time formats
+        filtered_time_formats = []
+        # Loop through each time format in the list
+        for time_format in time_formats:
+            # Parse the time format into a datetime object using the isoformat method
+            datetime_object = datetime.datetime.fromisoformat(time_format)
+            # Check if the month and year attributes of the datetime object match the given month and year
+            if datetime_object.month == month and datetime_object.year == year:
+                # If yes, append the time format to the filtered list
+                filtered_time_formats.append(time_format)
+        # Return the filtered list
+        return filtered_time_formats
+
+
+    def calculate_uptime_percentage(self, duration_weeks=4):
+        """
+        Calculate and return the uptime percentage of the device for a given duration.
+        """
+        now = datetime.now(self.timezone)
+        delta = timedelta(weeks=duration_weeks)
+        start_time = now - delta
+        uptime_data = self.calculate_uptime()
+
+        total_hours_in_duration = duration_weeks * 7 * 24
+        return (uptime_data['uptime'] / total_hours_in_duration) * 100
+
 
 
 location_category_information = {
@@ -145,6 +318,10 @@ class Location(models.Model):
     @property
     def day_limit(self):
         return location_category_information[self.category]['day_limit']
+    
+    @property
+    def latest_audio(self):
+        return self.device.location_recordings.order_by("-date")[0]
 
     # @property
     # def latest_metric(self):
