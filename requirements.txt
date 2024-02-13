@@ -34,7 +34,7 @@ kombu==4.6.11
 numpy==1.22.3
 packaging==20.9
 paho-mqtt==1.5.1
-pandas==1.4.1
+pandas>=1.4.1
 pkg_resources==0.0.0
 pluggy==0.13.1
 prompt-toolkit==3.0.43
