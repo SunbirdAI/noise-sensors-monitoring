@@ -39,7 +39,7 @@ class RecordingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recording
-        fields = ['id', 'time_recorded', 'category', 'audio', 'triggering_threshold']
+        fields = ['id', 'time_recorded','device', 'category', 'audio', 'triggering_threshold']
         read_only_fields = ['time_uploaded']
 
 

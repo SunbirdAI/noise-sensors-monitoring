@@ -1,7 +1,7 @@
 from django.urls import path, include
 
 from .views import (
-    DeviceListView, DeviceDetailView, DeviceCreateView, DeviceUpdateView,
+    DeviceListView, DeviceDetailView, DeviceCreateView, DeviceRecordingsAPIView, DeviceUpdateView,
     DeviceLocationListAPIView, DeviceConfigurationUpdateView,
     DeviceConfigurationViewSet, LocationCreateView, LocationUpdateView,
     LocationMetricsViewSet, LocationRecordingsViewSet, UptimeAPIView
@@ -24,5 +24,6 @@ urlpatterns = [
     path('create_location', LocationCreateView.as_view(), name='create_location'),
     path('<uuid:pk>/edit_location', LocationUpdateView.as_view(), name='edit_location'),
     path('uptime/<str:device_id>', UptimeAPIView.as_view(), name='uptime_info'),
+    path('device/<uuid:pk>/recordings/', DeviceRecordingsAPIView.as_view(), name='device_recordings_api'),
     path('', include(router.urls))
 ]

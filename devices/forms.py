@@ -1,3 +1,4 @@
+from django import forms
 from django.forms import ModelForm, ValidationError
 from .models import Device, Location
 import re
@@ -34,3 +35,7 @@ class DeviceConfigurationForm(ModelForm):
     class Meta:
         model = Device
         fields = ['configured', 'mode', 'dbLevel', 'recLength', 'recInterval', 'uploadAddr']
+
+
+class UptimeDurationForm(ModelForm):
+    duration_weeks = forms.IntegerField()
