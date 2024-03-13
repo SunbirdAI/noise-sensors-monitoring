@@ -66,7 +66,7 @@
             <div class="progress">
               <div class="progress-bar" role="progressbar" style="width: {{ device.calculate_uptime_percentage }}%;" aria-valuenow="{{ device.calculate_uptime_percentage }}" aria-valuemin="0" aria-valuemax="100">{{ device.calculate_uptime_percentage }}%</div>
             </div>
-            <p>The device has been online for {{ device.uptime.uptime |default:"N/A" }} hours since the last 24-hour gap.</p>
+            <p>The device has been online for {{ device.uptime.uptime |default:"0" }} hours since the last 24-hour gap.</p>
             <h3>Upload Gaps</h3>
             <table class="table">
               <thead>
@@ -99,7 +99,7 @@
               
             <p>The device had {{ upload_gaps|length }} long gaps between uploads in the past 4 weeks.</p>
             <h3>Previous Downtime</h3>
-            <p>The device was offline for {{ device.uptime.previous_downtime }} before the current uptime.</p>
+            <p>The device was offline {{ device.uptime.previous_downtime }}.</p>
           </div>
         </div>
           

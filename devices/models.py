@@ -135,20 +135,23 @@ class Device(models.Model):
 
         for date_from, date_to in zip(uploaded_times[:-1], uploaded_times[1:]):
             gap_time = date_to - date_from
-            gap = gap_time.total_seconds() / 3600
+            gap = round(gap_time.total_seconds() / 3600,2)
+
+            formatted_date_from = date_from.strftime("%Y-%m-%d %H:%M")
+            formatted_date_to = date_to.strftime("%Y-%m-%d %H:%M")
 
             if gap > 3.0:
-                big_gaps.append((gap, f"From {date_from} to {date_to}"))
+                big_gaps.append((gap, f"From {formatted_date_from} to {formatted_date_to}"))
 
             if gap >= 24 and not went_online:
                 went_online = date_to
-                previous_downtime = f"From {date_from} to {date_to}"
+                previous_downtime = f"From {formatted_date_from} to {formatted_date_to}"
 
         if not went_online:
-            went_online = start_time
+            went_online = start_time 
 
         def_time = now - went_online
-        uptime = max(0, def_time.total_seconds() / 3600)
+        uptime = round(max(0, def_time.total_seconds() / 3600),2)
 
         return {
             'upload_gaps': big_gaps,
@@ -246,7 +249,7 @@ class Device(models.Model):
         uptime_data = self.calculate_uptime()
 
         total_hours_in_duration = duration_weeks * 7 * 24
-        return (uptime_data['uptime'] / total_hours_in_duration) * 100
+        return round((uptime_data['uptime'] / total_hours_in_duration) * 100, 2)
 
 
 
