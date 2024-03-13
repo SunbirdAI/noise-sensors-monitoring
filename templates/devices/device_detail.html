@@ -140,9 +140,9 @@
                             <td>{{ recording.time_uploaded }}</td>
                             <td>{{ recording.triggering_threshold }}</td>
                             <td>
-                                <audio controls>
+                                <audio controls class="audio-player">
                                     <source src="{{ recording.audio_url }}" type="audio/wav">
-                                    {{ recording.audio_url }}
+                                    Your browser does not support the audio element.
                                 </audio>
                             </td>
                         </tr>
@@ -201,4 +201,18 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var audios = document.querySelectorAll('.audio-player');
+        audios.forEach(function(audio) {
+            audio.addEventListener('play', function() {
+                audios.forEach(function(otherAudio) {
+                    if (otherAudio !== audio) {
+                        otherAudio.pause();
+                    }
+                });
+            }, false);
+        });
+    });
+    </script>
 {% endblock content %}
