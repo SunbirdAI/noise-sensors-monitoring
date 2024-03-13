@@ -127,7 +127,8 @@ class Device(models.Model):
 
         if not uploaded_times:
             return {
-                'big_gaps': [],
+                'upload_gaps': [],
+                'upload_gaps_len': 0,
                 'uptime': 0,
                 'previous_downtime': None,
                 'uptime_percentages': [],
@@ -155,6 +156,7 @@ class Device(models.Model):
 
         return {
             'upload_gaps': big_gaps,
+            'upload_gaps_len': len(big_gaps),
             'uptime': uptime,
             'previous_downtime': previous_downtime,
             'uptime_percentages': zip(months, uptime_percentages)
@@ -182,28 +184,6 @@ class Device(models.Model):
             months.append(current_month)
 
         return months
-
-    # def calculate_monthly_uptime(self, uploaded_times):
-    #     current_month = datetime.now().month
-    #     uptime_per_month = [0] * 12
-
-    #     for upload_time in uploaded_times:
-    #         month = upload_time.month - 1  # Adjust to 0-indexed
-    #         uptime_per_month[month] += 1
-
-    #     total_months = len(uptime_per_month)
-    #     current_month_index = (current_month - 1) % total_months
-
-    #     # Calculate uptime percentages
-    #     uptime_percentages = [(count / (4*7*24)) * 100 for count in uptime_per_month]
-
-    #     # Shift the list so that the current month is at the beginning
-    #     uptime_percentages = uptime_percentages[current_month_index:] + uptime_percentages[:current_month_index]
-
-    #     return uptime_percentages
-
-    # Import the calendar module
-
 
     def calculate_monthly_uptime(self, uploaded_times):
         current_month = datetime.now().month
@@ -246,7 +226,7 @@ class Device(models.Model):
         now = datetime.now(self.timezone)
         delta = timedelta(weeks=duration_weeks)
         start_time = now - delta
-        uptime_data = self.calculate_uptime()
+        uptime_data = self.calculate_uptime(False)
 
         total_hours_in_duration = duration_weeks * 7 * 24
         return round((uptime_data['uptime'] / total_hours_in_duration) * 100, 2)
