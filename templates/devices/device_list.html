@@ -23,6 +23,7 @@
                       <th scope="col">PHONE NUMBER</th>
                       <th scope="col">VERSION NUMBER</th>
                       <th scope="col">PRODUCTION STAGE</th>
+                      <th scope="col">LAST SEEN</th>
                       <th scope="col"></th>
                     </tr>
                   </thead>
@@ -37,6 +38,7 @@
                       <td>{{ device.phone_number }}</td>
                       <td>{{ device.version_number }}</td>
                       <td>{{ device.production_stage }}</td>
+                      <td>{{ device.lastseen|default:"N/A"  }}</td>
                     </tr>
                     {% endfor %}
                   </tbody>
