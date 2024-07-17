@@ -13,23 +13,29 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib import admin
+from django.urls import include, path
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularRedocView,
+    SpectacularSwaggerView,
+)
 
 urlpatterns = [
     # Django admin
-    path('admin/', admin.site.urls),
-
+    path("admin/", admin.site.urls),
     # User Management
-    path('accounts/', include('django.contrib.auth.urls')),
-
+    path("accounts/", include("django.contrib.auth.urls")),
     # Local apps
-    path('accounts/', include('users.urls')),
-    path('', include('pages.urls')),
-    path('devices/', include('devices.urls')),
-    path('audio/', include('recordings.urls')),
-    path('device_metrics/', include('device_metrics.urls')),
-    path('analysis/', include('analysis.urls'))
+    path("accounts/", include("users.urls")),
+    path("", include("pages.urls")),
+    path("devices/", include("devices.urls")),
+    path("audio/", include("recordings.urls")),
+    path("device_metrics/", include("device_metrics.urls")),
+    path("analysis/", include("analysis.urls")),
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="docs"),
+    path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

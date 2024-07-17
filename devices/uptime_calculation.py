@@ -1,7 +1,10 @@
-from .models import Device
 from datetime import datetime, timedelta
+
 import pytz
+
 from noise_dashboard.settings import TIME_ZONE
+
+from .models import Device
 
 timezone = pytz.timezone(TIME_ZONE)
 
@@ -25,9 +28,11 @@ def timedelta_to_hours(delta: timedelta):
 
 def get_uploaded_times(device, audio, now, start_time):
     query_set = device.recording_set if audio else device.metricstextfile_set
-    files_dates = (query_set.filter(time_uploaded__range=[start_time, now])
-                   .values_list('time_uploaded', flat=True)
-                   .order_by('-time_uploaded'))
+    files_dates = (
+        query_set.filter(time_uploaded__range=[start_time, now])
+        .values_list("time_uploaded", flat=True)
+        .order_by("-time_uploaded")
+    )
     return list(files_dates)
 
 
@@ -37,11 +42,7 @@ def get_gaps(uploaded_times, now, start_time):
     previous_downtime = None
 
     if not uploaded_times:
-        return {
-            'big_gaps': [],
-            'uptime': 0,
-            'previous_downtime': None
-        }
+        return {"big_gaps": [], "uptime": 0, "previous_downtime": None}
 
     for date_from, date_to in zip(uploaded_times[:-1], uploaded_times[1:]):
         gap = timedelta_to_hours(date_to - date_from)
@@ -57,9 +58,9 @@ def get_gaps(uploaded_times, now, start_time):
         went_online = start_time
 
     uptime = max(0, timedelta_to_hours(now - went_online))
-    
+
     return {
-        'upload_gaps': big_gaps,
-        'uptime': uptime,
-        'previous_downtime': previous_downtime
+        "upload_gaps": big_gaps,
+        "uptime": uptime,
+        "previous_downtime": previous_downtime,
     }

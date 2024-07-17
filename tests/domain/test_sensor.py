@@ -13,7 +13,7 @@ def test_sensor_model_init():
         LastRec=3,
         LastUpl=2,
         sigStrength=26,
-        DataBalance=56.0
+        DataBalance=56.0,
     )
 
     assert sensor.deviceId == "SB1001"

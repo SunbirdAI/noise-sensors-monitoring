@@ -1,17 +1,18 @@
 import uuid
+
+from django.core.files.storage import get_storage_class
 from django.db import models
 from django.utils import timezone
-from django.core.files.storage import get_storage_class
 
 from devices.models import Device
-
 
 media_storage = get_storage_class()()
 
 
 def recording_directory(instance, filename):
     time_uploaded = instance.time_uploaded.strftime("%Y-%m-%dT%H:%M:%S")
-    return f'metrics/{instance.device.device_id}/{instance.device.device_id}-{time_uploaded}-{filename}'
+    return f"metrics/{instance.device.device_id}/{instance.device.device_id}-{time_uploaded}-{filename}"
+
 
 class MetricsTextFile(models.Model):
     time_uploaded = models.DateTimeField(auto_now_add=True)
@@ -28,11 +29,7 @@ class MetricsTextFile(models.Model):
 
 
 class HourlyAggregate(models.Model):
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False
-    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     date = models.DateTimeField(default=timezone.now)
     hour = models.PositiveIntegerField(null=True)
     hourly_avg_db_level = models.FloatField(null=True)
@@ -43,16 +40,11 @@ class HourlyAggregate(models.Model):
 
 
 class DailyAggregate(models.Model):
-
     class TimePeriod(models.TextChoices):
-        DAYTIME = 'daytime'
-        NIGHTTIME = 'nighttime'
+        DAYTIME = "daytime"
+        NIGHTTIME = "nighttime"
 
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False
-    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     date = models.DateTimeField(default=timezone.now)
     time_period = models.CharField(max_length=10, choices=TimePeriod.choices)
     daily_avg_db_level = models.FloatField(null=True)

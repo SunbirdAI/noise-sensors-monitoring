@@ -1,9 +1,9 @@
 from noise_sensors_monitoring.requests.generic_requests import InvalidRequest
 from noise_sensors_monitoring.responses import (
-    ResponseTypes,
-    ResponseSuccess,
     ResponseFailure,
-    build_response_from_invalid_request
+    ResponseSuccess,
+    ResponseTypes,
+    build_response_from_invalid_request,
 )
 
 SUCCESS_VALUE = {"key": ["value1", "value2"]}
@@ -31,15 +31,13 @@ def test_response_failure_is_false():
 
 
 def test_response_failure_has_type_and_message():
-    response = ResponseFailure(
-        GENERIC_RESPONSE_TYPE, GENERIC_RESPONSE_MESSAGE
-    )
+    response = ResponseFailure(GENERIC_RESPONSE_TYPE, GENERIC_RESPONSE_MESSAGE)
 
     assert response.type == GENERIC_RESPONSE_TYPE
     assert response.message == GENERIC_RESPONSE_MESSAGE
     assert response.value == {
         "type": GENERIC_RESPONSE_TYPE,
-        "message": GENERIC_RESPONSE_MESSAGE
+        "message": GENERIC_RESPONSE_MESSAGE,
     }
 
 
@@ -62,5 +60,7 @@ def test_response_failure_from_invalid_request():
 
     assert bool(response) is False
     assert response.type == ResponseTypes.INVALID_INPUT_ERROR
-    assert response.message == "invalid field: randomField is not a valid field\n" \
-                               "invalid type: connected should be boolean data type"
+    assert (
+        response.message == "invalid field: randomField is not a valid field\n"
+        "invalid type: connected should be boolean data type"
+    )

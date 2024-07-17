@@ -1,9 +1,11 @@
 import pandas as pd
-from .models import DailyAggregate, HourlyAggregate
+
 from devices.models import Device, location_category_information
 
-class Aggregate:
+from .models import DailyAggregate, HourlyAggregate
 
+
+class Aggregate:
     def __init__(self, data):
         self.data = data
         self.locations = self.get_device_locations()
@@ -29,39 +31,50 @@ class Aggregate:
         grouped_data = df.groupby("device_id", sort=False)
         for device_name, device_df in grouped_data:
             if 6 <= hour < 22:
-                threshold = location_category_information[self.locations[device_name].category]["day_limit"]
+                threshold = location_category_information[
+                    self.locations[device_name].category
+                ]["day_limit"]
             else:
-                threshold = location_category_information[self.locations[device_name].category]["night_limit"]
+                threshold = location_category_information[
+                    self.locations[device_name].category
+                ]["night_limit"]
 
             HourlyAggregate.objects.create(
-                device = Device.objects.get(device_id=device_name),
+                device=Device.objects.get(device_id=device_name),
                 date=time_uploaded,
-                hour = hour,
-                hourly_avg_db_level = device_df["db_level"].mean(),
-                hourly_median_db_level = device_df["db_level"].median(),
-                hourly_max_db_level = device_df["db_level"].max(),
-                hourly_no_of_exceedances = len(device_df[device_df["db_level"] > threshold])
+                hour=hour,
+                hourly_avg_db_level=device_df["db_level"].mean(),
+                hourly_median_db_level=device_df["db_level"].median(),
+                hourly_max_db_level=device_df["db_level"].max(),
+                hourly_no_of_exceedances=len(
+                    device_df[device_df["db_level"] > threshold]
+                ),
             )
 
         return None
-
 
     def aggregate_daily(self, time_period):
         df = self.prepare_data()
         grouped_data = df.groupby("device_id", sort=False)
         for device_name, device_df in grouped_data:
             if time_period == "daytime":
-                threshold = location_category_information[self.locations[device_name].category]["day_limit"]
+                threshold = location_category_information[
+                    self.locations[device_name].category
+                ]["day_limit"]
             else:
-                threshold = location_category_information[self.locations[device_name].category]["night_limit"]
+                threshold = location_category_information[
+                    self.locations[device_name].category
+                ]["night_limit"]
 
             DailyAggregate.objects.create(
-                device = Device.objects.get(device_id=device_name),
-                time_period = time_period,
-                daily_avg_db_level = device_df["db_level"].mean(),
-                daily_median_db_level = device_df["db_level"].median(),
-                daily_max_db_level = device_df["db_level"].max(),
-                daily_no_of_exceedances = len(device_df[device_df["db_level"] > threshold])
+                device=Device.objects.get(device_id=device_name),
+                time_period=time_period,
+                daily_avg_db_level=device_df["db_level"].mean(),
+                daily_median_db_level=device_df["db_level"].median(),
+                daily_max_db_level=device_df["db_level"].max(),
+                daily_no_of_exceedances=len(
+                    device_df[device_df["db_level"] > threshold]
+                ),
             )
 
         return None

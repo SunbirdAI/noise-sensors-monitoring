@@ -1,16 +1,15 @@
-from django.urls import path, include
-from .views import (
-    HourlyAnalysisView,
-    # DailyAnalysisView,
-    # ReceiveIoTDataView,
-    ReceiveMetricsFileViewSet,
-    AggregateMetricsView,
-    ListMetricsFilesView
-)
+from django.urls import include, path
 from rest_framework.routers import SimpleRouter
 
+from .views import (  # DailyAnalysisView,; ReceiveIoTDataView,
+    AggregateMetricsView,
+    HourlyAnalysisView,
+    ListMetricsFilesView,
+    ReceiveMetricsFileViewSet,
+)
+
 router = SimpleRouter()
-router.register('metrics-file', ReceiveMetricsFileViewSet)
+router.register("metrics-file", ReceiveMetricsFileViewSet)
 
 # urlpatterns = [
 #     path('hourly/', HourlyAnalysisView.as_view(), name='hourly_analysis'),
@@ -18,8 +17,16 @@ router.register('metrics-file', ReceiveMetricsFileViewSet)
 #     path('receive_iot_data/', ReceiveIoTDataView.as_view(), name='iot_data'),
 # ]
 urlpatterns = [
-    path('aggregate-metrics/', AggregateMetricsView.as_view(), name='aggregate_metrics'),
-    path('list-metrics/<str:device_id>', ListMetricsFilesView.as_view(), name='list_metric_files'),
-    path('hourly/<str:device_id>', HourlyAnalysisView.as_view(), name='hourly_analysis'),
-    path('', include(router.urls))
+    path(
+        "aggregate-metrics/", AggregateMetricsView.as_view(), name="aggregate_metrics"
+    ),
+    path(
+        "list-metrics/<str:device_id>",
+        ListMetricsFilesView.as_view(),
+        name="list_metric_files",
+    ),
+    path(
+        "hourly/<str:device_id>", HourlyAnalysisView.as_view(), name="hourly_analysis"
+    ),
+    path("", include(router.urls)),
 ]

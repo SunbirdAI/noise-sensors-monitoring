@@ -1,10 +1,18 @@
-from typing import Optional, Dict
+from typing import Dict, Optional
 
 import pytest
+
 from noise_sensors_monitoring.domain.sensor import Sensor
-from noise_sensors_monitoring.repository.time_series_repo_interface import SensorReadingRepo
-from noise_sensors_monitoring.use_cases.sensor_reading import add_new_sensor_reading, get_latest_sensor_reading
-from noise_sensors_monitoring.requests.sensor_reading import build_sensor_reading_request
+from noise_sensors_monitoring.repository.time_series_repo_interface import (
+    SensorReadingRepo,
+)
+from noise_sensors_monitoring.requests.sensor_reading import (
+    build_sensor_reading_request,
+)
+from noise_sensors_monitoring.use_cases.sensor_reading import (
+    add_new_sensor_reading,
+    get_latest_sensor_reading,
+)
 
 
 class InMemorySensorDb(SensorReadingRepo):
@@ -39,7 +47,7 @@ def test_new_sensor_reading(sensor_repo):
         LastRec=3,
         LastUpl=2,
         sigStrength=26.0,
-        DataBalance=67
+        DataBalance=67,
     )
 
     request = build_sensor_reading_request(sensor_reading.to_dict())

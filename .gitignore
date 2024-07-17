@@ -1,10 +1,12 @@
 myenv/
 venv/
+env/
 __pycache__
 .coverage
 .idea
 .vscode
 .env
+.env.example
 *.csv
 *.ipynb
 data

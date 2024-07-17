@@ -13,7 +13,7 @@ WORKDIR /code
 # RUN apt-get install -y cron
 
 # Upgrade Pip
-RUN pip install --upgrade pip
+# RUN pip install --upgrade pip
 
 # Install dependencies
 COPY requirements.txt /code/

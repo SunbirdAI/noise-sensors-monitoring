@@ -1,18 +1,20 @@
-import os
 import json
+import os
+from typing import Dict, List
+
 import requests
 from dotenv import load_dotenv
 
-from noise_sensors_monitoring.domain.sensor import Sensor, AggregateSensorMetric
-from noise_sensors_monitoring.repository.time_series_repo_interface import SensorReadingRepo
-from typing import Dict, List
+from noise_sensors_monitoring.domain.sensor import AggregateSensorMetric, Sensor
+from noise_sensors_monitoring.repository.time_series_repo_interface import (
+    SensorReadingRepo,
+)
 
 load_dotenv()
-BASE_URL = os.getenv('HTTP_APP_HOST')
+BASE_URL = os.getenv("HTTP_APP_HOST")
 
 
 class InMemoryRepo(SensorReadingRepo):
-
     def __init__(self):
         self.metrics: Dict[str, List[Sensor]] = {}
 
@@ -52,27 +54,27 @@ class InMemoryRepo(SensorReadingRepo):
 
         db_avg //= len(sensor_metrics)
         last_sensor = sensor_metrics[-1]
-        return AggregateSensorMetric.from_dict({
-            "device": device_id,
-            "db_level": last_sensor.dbLevel,
-            "avg_db_level": db_avg,
-            "max_db_level": max_db_level,
-            "no_of_exceedances": exceedances,
-            "sig_strength": last_sensor.sigStrength,
-            "last_rec": last_sensor.LastRec,
-            "last_upl": last_sensor.LastUpl,
-            "panel_voltage": last_sensor.pV,
-            "battery_voltage": last_sensor.bV,
-            "data_balance": last_sensor.DataBalance
-        })
+        return AggregateSensorMetric.from_dict(
+            {
+                "device": device_id,
+                "db_level": last_sensor.dbLevel,
+                "avg_db_level": db_avg,
+                "max_db_level": max_db_level,
+                "no_of_exceedances": exceedances,
+                "sig_strength": last_sensor.sigStrength,
+                "last_rec": last_sensor.LastRec,
+                "last_upl": last_sensor.LastUpl,
+                "panel_voltage": last_sensor.pV,
+                "battery_voltage": last_sensor.bV,
+                "data_balance": last_sensor.DataBalance,
+            }
+        )
 
     @staticmethod
     def send_data(aggregate_metric: AggregateSensorMetric):
         url = f"{BASE_URL}/device_metrics/"
         payload = json.dumps(aggregate_metric.to_dict())
-        headers = {
-            'Content-Type': 'application/json'
-        }
+        headers = {"Content-Type": "application/json"}
         requests.request("POST", url, headers=headers, data=payload)
 
     def get_latest_sensor_reading(self) -> Sensor:

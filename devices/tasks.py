@@ -1,11 +1,11 @@
-
-from celery.decorators import task
 import smtplib
 from email.mime.text import MIMEText
-from devices.models import Device
-import pytz
-from noise_dashboard.settings import TIME_ZONE
 
+import pytz
+from celery.decorators import task
+
+from devices.models import Device
+from noise_dashboard.settings import TIME_ZONE
 
 
 @task(name="send_email_alert")
@@ -32,19 +32,22 @@ def send_email_alert():
 
 
 def send_critical_email(device):
-    subject = 'Critical Uptime Alert'
-    message = f'The device {device.device_name} has been offline for more than 5 days.'
+    subject = "Critical Uptime Alert"
+    message = f"The device {device.device_name} has been offline for more than 5 days."
     send_email(subject, message)
+
 
 def send_flagged_email(device):
-    subject = 'Flagged Uptime Alert'
-    message = f'The device {device.device_name} has been offline for more than 3 days.'
+    subject = "Flagged Uptime Alert"
+    message = f"The device {device.device_name} has been offline for more than 3 days."
     send_email(subject, message)
 
+
 def send_device_off_email(device):
-    subject = 'Device Offline Alert'
-    message = f'The device {device.device_name} has been offline for 24 hours.'
+    subject = "Device Offline Alert"
+    message = f"The device {device.device_name} has been offline for 24 hours."
     send_email(subject, message)
+
 
 def send_email(subject, message):
     # Modify the email sending logic based on your project's email settings
@@ -54,14 +57,14 @@ def send_email(subject, message):
     password = "mfww omdz cowe ipgt"
 
     try:
-        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server = smtplib.SMTP("smtp.gmail.com", 587)
         server.starttls()
         server.login(from_email, password)
 
         message = MIMEText(message)
-        message['From'] = from_email
-        message['To'] = to_email
-        message['Subject'] = subject
+        message["From"] = from_email
+        message["To"] = to_email
+        message["Subject"] = subject
 
         server.sendmail(from_email, to_email, message.as_string())
         server.quit()

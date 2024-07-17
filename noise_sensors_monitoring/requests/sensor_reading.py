@@ -1,8 +1,20 @@
-from typing import Optional, Dict
+from typing import Dict, Optional
 
-from noise_sensors_monitoring.requests.generic_requests import Request, InvalidRequest, ValidRequest
+from noise_sensors_monitoring.requests.generic_requests import (
+    InvalidRequest,
+    Request,
+    ValidRequest,
+)
 
-REQUIRED_FIELDS = ["deviceId", "dbLevel", "LastRec", "LastUpl", "pV", "bV", "sigStrength"]
+REQUIRED_FIELDS = [
+    "deviceId",
+    "dbLevel",
+    "LastRec",
+    "LastUpl",
+    "pV",
+    "bV",
+    "sigStrength",
+]
 OPTIONAL_FIELDS = ["latitude", "longitude", "connected", "DataBalance"]
 REQUIRED_TYPES = {
     "deviceId": str,
@@ -15,14 +27,9 @@ REQUIRED_TYPES = {
     "pV": float,
     "bV": float,
     "sigStrength": float,
-    "DataBalance": float
+    "DataBalance": float,
 }
-TYPE_TO_WORD = {
-    str: "string",
-    int: "integer",
-    bool: "boolean",
-    float: "floating point"
-}
+TYPE_TO_WORD = {str: "string", int: "integer", bool: "boolean", float: "floating point"}
 
 
 def build_sensor_reading_request(sensor_reading_dict: Optional[Dict] = None) -> Request:
@@ -39,16 +46,22 @@ def build_sensor_reading_request(sensor_reading_dict: Optional[Dict] = None) -> 
 
     for (key, value) in sensor_reading_dict.items():
         if key not in REQUIRED_FIELDS and key not in OPTIONAL_FIELDS:
-            invalid_req.add_error("Invalid field", f"{key} is not a valid field for sensor data")
+            invalid_req.add_error(
+                "Invalid field", f"{key} is not a valid field for sensor data"
+            )
         elif REQUIRED_TYPES[key] == float:
             try:
                 value = float(value)
                 cleaned_sensor_reading_dict[key] = value
             except ValueError:
-                invalid_req.add_error("Invalid type", f"Field '{key}' should have numeric data type.")
+                invalid_req.add_error(
+                    "Invalid type", f"Field '{key}' should have numeric data type."
+                )
         elif type(value) != REQUIRED_TYPES[key]:
             req_type = TYPE_TO_WORD[REQUIRED_TYPES[key]]
-            invalid_req.add_error("Invalid type", f"Field '{key}' should have {req_type} data type.")
+            invalid_req.add_error(
+                "Invalid type", f"Field '{key}' should have {req_type} data type."
+            )
         else:
             cleaned_sensor_reading_dict[key] = value
 

@@ -1,17 +1,16 @@
-import uuid
 import calendar
-from django.utils.translation import gettext_lazy as _
+import uuid
+from datetime import datetime, timedelta
 
+import pytz
 from django.db import models
 from django.urls import reverse
-import pytz
-from noise_dashboard.settings import TIME_ZONE
-
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from taggit.managers import TaggableManager
 from taggit.models import GenericUUIDTaggedItemBase, TaggedItemBase
 
-from datetime import datetime, timedelta
-from django.utils import timezone
+from noise_dashboard.settings import TIME_ZONE
 
 
 class UUIDTaggedItem(GenericUUIDTaggedItemBase, TaggedItemBase):
@@ -22,11 +21,11 @@ class UUIDTaggedItem(GenericUUIDTaggedItemBase, TaggedItemBase):
 
 class Device(models.Model):
     class ProductionStage(models.TextChoices):
-        DEPLOYED = 'Deployed', _('Deployed')
-        TESTING = 'Testing', _('Testing')
-        SHELVED = 'Shelved', _('Shelved')
-        MAINTENANCE = 'Maintenance', _('Maintenance')
-        RETIRED = 'Retired', _('Retired')
+        DEPLOYED = "Deployed", _("Deployed")
+        TESTING = "Testing", _("Testing")
+        SHELVED = "Shelved", _("Shelved")
+        MAINTENANCE = "Maintenance", _("Maintenance")
+        RETIRED = "Retired", _("Retired")
 
     class Configured(models.IntegerChoices):
         CONFIGURED = (1, _("Configured"))
@@ -36,31 +35,29 @@ class Device(models.Model):
         AUTO_MODE = (1, _("Auto"))
         MANUAL_MODE = (2, _("Manual"))
 
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False
-    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     device_id = models.CharField(max_length=200, unique=True)
     imei = models.CharField(max_length=15)
     device_name = models.CharField(max_length=200)
     phone_number = models.CharField(max_length=10)
     version_number = models.CharField(max_length=10)
     production_stage = models.CharField(
-        max_length=50,
-        choices=ProductionStage.choices,
-        default=ProductionStage.TESTING
+        max_length=50, choices=ProductionStage.choices, default=ProductionStage.TESTING
     )
     tags = TaggableManager(through=UUIDTaggedItem)
     metrics_url = models.URLField(max_length=255, default="http://localhost:3000/")
 
     # Configuration fields
-    configured = models.IntegerField(choices=Configured.choices, default=Configured.NOT_CONFIGURED)
+    configured = models.IntegerField(
+        choices=Configured.choices, default=Configured.NOT_CONFIGURED
+    )
     mode = models.IntegerField(choices=Mode.choices, default=Mode.AUTO_MODE)
     dbLevel = models.IntegerField(default=50)
     recLength = models.IntegerField(default=10)
     recInterval = models.IntegerField(default=10)
-    uploadAddr = models.CharField(default="http://localhost:8000/audio/", max_length=100)
+    uploadAddr = models.CharField(
+        default="http://localhost:8000/audio/", max_length=100
+    )
 
     @property
     def lastseen(self):
@@ -73,7 +70,7 @@ class Device(models.Model):
     def get_last_metric_text_file(self):
         try:
             # Retrieve the last metricstextfile uploaded for this device
-            return self.metricstextfile_set.order_by('-time_uploaded').first()
+            return self.metricstextfile_set.order_by("-time_uploaded").first()
         except self.metricstextfile_set.model.DoesNotExist:
             # Handle the case where there are no metricstextfiles
             return None
@@ -95,17 +92,15 @@ class Device(models.Model):
 
     def get_absolute_url(self):
         return reverse("device_detail", args=[str(self.id)])
-    
+
     @property
     def uptime(self):
         """
         Calculate and return the uptime of the device.
         """
         return self.calculate_uptime(False)
-    
-    
-    timezone = pytz.timezone(TIME_ZONE)
 
+    timezone = pytz.timezone(TIME_ZONE)
 
     def calculate_uptime(self, audio=True):
         """
@@ -127,60 +122,70 @@ class Device(models.Model):
 
         if not uploaded_times:
             return {
-                'upload_gaps': [],
-                'upload_gaps_len': 0,
-                'uptime': 0,
-                'previous_downtime': None,
-                'uptime_percentages': [],
+                "upload_gaps": [],
+                "upload_gaps_len": 0,
+                "uptime": 0,
+                "previous_downtime": None,
+                "uptime_percentages": [],
             }
 
         for date_from, date_to in zip(uploaded_times[:-1], uploaded_times[1:]):
             gap_time = date_to - date_from
-            gap = round(gap_time.total_seconds() / 3600,2)
+            gap = round(gap_time.total_seconds() / 3600, 2)
 
             formatted_date_from = date_from.strftime("%Y-%m-%d %H:%M")
             formatted_date_to = date_to.strftime("%Y-%m-%d %H:%M")
 
             if gap > 3.0:
-                big_gaps.append((gap, f"From {formatted_date_from} to {formatted_date_to}"))
+                big_gaps.append(
+                    (gap, f"From {formatted_date_from} to {formatted_date_to}")
+                )
 
             if gap >= 24 and not went_online:
                 went_online = date_to
                 previous_downtime = f"From {formatted_date_from} to {formatted_date_to}"
 
         if not went_online:
-            went_online = start_time 
+            went_online = start_time
 
         def_time = now - went_online
-        uptime = round(max(0, def_time.total_seconds() / 3600),2)
+        uptime = round(max(0, def_time.total_seconds() / 3600), 2)
 
         return {
-            'upload_gaps': big_gaps,
-            'upload_gaps_len': len(big_gaps),
-            'uptime': uptime,
-            'previous_downtime': previous_downtime,
-            'uptime_percentages': zip(months, uptime_percentages)
+            "upload_gaps": big_gaps,
+            "upload_gaps_len": len(big_gaps),
+            "uptime": uptime,
+            "previous_downtime": previous_downtime,
+            "uptime_percentages": zip(months, uptime_percentages),
         }
 
     def get_uploaded_times(self, audio, now, start_time):
         query_set = self.recording_set if audio else self.metricstextfile_set
 
         try:
-            files_dates = (query_set.filter(time_uploaded__range=[start_time, now])
-                            .values_list('time_uploaded', flat=True)
-                            .order_by('time_uploaded'))
+            files_dates = (
+                query_set.filter(time_uploaded__range=[start_time, now])
+                .values_list("time_uploaded", flat=True)
+                .order_by("time_uploaded")
+            )
             return list(files_dates)
         except query_set.model.DoesNotExist:
             # Handle the case where there are no metricstextfiles
             return []
-    
+
     def get_next_12_months(self):
-        current_month = datetime.now().replace(day=1)  # Get the first day of the current month
+        current_month = datetime.now().replace(
+            day=1
+        )  # Get the first day of the current month
         months = [current_month]
 
         for _ in range(11):
-            current_month = current_month + timedelta(days=31)  # Add an arbitrary number of days to move to the next month
-            current_month = current_month.replace(day=1)  # Set the day to 1 to get the first day of the month
+            current_month = current_month + timedelta(
+                days=31
+            )  # Add an arbitrary number of days to move to the next month
+            current_month = current_month.replace(
+                day=1
+            )  # Set the day to 1 to get the first day of the month
             months.append(current_month)
 
         return months
@@ -197,10 +202,19 @@ class Device(models.Model):
         current_month_index = (current_month - 1) % total_months
 
         # Calculate uptime percentages
-        uptime_percentages = [(count / (days * 24)) * 100 for count, days in zip(uptime_per_month, [calendar.monthrange(2024, i)[1] for i in range(1, 13)])]
+        uptime_percentages = [
+            (count / (days * 24)) * 100
+            for count, days in zip(
+                uptime_per_month,
+                [calendar.monthrange(2024, i)[1] for i in range(1, 13)],
+            )
+        ]
 
         # Shift the list so that the current month is at the beginning
-        uptime_percentages = uptime_percentages[current_month_index:] + uptime_percentages[:current_month_index]
+        uptime_percentages = (
+            uptime_percentages[current_month_index:]
+            + uptime_percentages[:current_month_index]
+        )
 
         return uptime_percentages
 
@@ -218,7 +232,6 @@ class Device(models.Model):
         # Return the filtered list
         return filtered_time_formats
 
-
     def calculate_uptime_percentage(self, duration_weeks=4):
         """
         Calculate and return the uptime percentage of the device for a given duration.
@@ -229,54 +242,45 @@ class Device(models.Model):
         uptime_data = self.calculate_uptime(False)
 
         total_hours_in_duration = duration_weeks * 7 * 24
-        return round((uptime_data['uptime'] / total_hours_in_duration) * 100, 2)
-
+        return round((uptime_data["uptime"] / total_hours_in_duration) * 100, 2)
 
 
 location_category_information = {
-    'A': {
-        'description': 'Category A: hospital, convalescence home, sanatorium, home for the aged and '
-                       'higher learning institute, conference rooms, public library, '
-                       'environmental or recreational sites',
-        'day_limit': 45,
-        'night_limit': 35
+    "A": {
+        "description": "Category A: hospital, convalescence home, sanatorium, home for the aged and "
+        "higher learning institute, conference rooms, public library, "
+        "environmental or recreational sites",
+        "day_limit": 45,
+        "night_limit": 35,
     },
-    'B': {
-        'description': 'Category B: Residential buildings',
-        'day_limit': 50,
-        'night_limit': 35
+    "B": {
+        "description": "Category B: Residential buildings",
+        "day_limit": 50,
+        "night_limit": 35,
     },
-    'C': {
-        'description': 'Category C: Mixed residential (with some commercial and entertainment)',
-        'day_limit': 55,
-        'night_limit': 45
+    "C": {
+        "description": "Category C: Mixed residential (with some commercial and entertainment)",
+        "day_limit": 55,
+        "night_limit": 45,
     },
-    'D': {
-        'description': 'Category D: Residential + industry or small-scale production + commerce',
-        'day_limit': 60,
-        'night_limit': 50
+    "D": {
+        "description": "Category D: Residential + industry or small-scale production + commerce",
+        "day_limit": 60,
+        "night_limit": 50,
     },
-    'E': {
-        'description': 'Category E: Industrial',
-        'day_limit': 70,
-        'night_limit': 60
-    }
+    "E": {"description": "Category E: Industrial", "day_limit": 70, "night_limit": 60},
 }
 
 
 class Location(models.Model):
     class Category(models.TextChoices):
-        A = 'A', _(f'{location_category_information["A"]["description"]}')
-        B = 'B', _(f'{location_category_information["B"]["description"]}')
-        C = 'C', _(f'{location_category_information["C"]["description"]}')
-        D = 'D', _(f'{location_category_information["D"]["description"]}')
-        E = 'E', _(f'{location_category_information["E"]["description"]}')
+        A = "A", _(f'{location_category_information["A"]["description"]}')
+        B = "B", _(f'{location_category_information["B"]["description"]}')
+        C = "C", _(f'{location_category_information["C"]["description"]}')
+        D = "D", _(f'{location_category_information["D"]["description"]}')
+        E = "E", _(f'{location_category_information["E"]["description"]}')
 
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False
-    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     latitude = models.FloatField()
     longitude = models.FloatField()
     city = models.CharField(max_length=200)
@@ -284,7 +288,9 @@ class Location(models.Model):
     parish = models.CharField(max_length=200, blank=True, default="N/A")
     village = models.CharField(max_length=200, blank=True, default="N/A")
     device = models.OneToOneField(Device, on_delete=models.CASCADE, null=True)
-    category = models.CharField(max_length=50, choices=Category.choices, default=Category.E)
+    category = models.CharField(
+        max_length=50, choices=Category.choices, default=Category.E
+    )
 
     @property
     def device_name(self):
@@ -292,16 +298,16 @@ class Location(models.Model):
 
     @property
     def location_description(self):
-        return location_category_information[self.category]['description']
+        return location_category_information[self.category]["description"]
 
     @property
     def night_limit(self):
-        return location_category_information[self.category]['night_limit']
+        return location_category_information[self.category]["night_limit"]
 
     @property
     def day_limit(self):
-        return location_category_information[self.category]['day_limit']
-    
+        return location_category_information[self.category]["day_limit"]
+
     @property
     def latest_audio(self):
         return self.device.location_recordings.order_by("-date")[0]
@@ -312,15 +318,15 @@ class Location(models.Model):
 
     @property
     def location_hourly_metrics(self):
-        return (self.device.hourlyaggregate_set
-                .filter(date__range=[datetime.today() - timedelta(days=2), datetime.today()])
-                .order_by("-date"))
+        return self.device.hourlyaggregate_set.filter(
+            date__range=[datetime.today() - timedelta(days=2), datetime.today()]
+        ).order_by("-date")
 
     @property
     def location_daily_metrics(self):
-        return (self.device.dailyaggregate_set
-                .filter(date__range=[datetime.today() - timedelta(weeks=4), datetime.today()])
-                .order_by("-date"))
+        return self.device.dailyaggregate_set.filter(
+            date__range=[datetime.today() - timedelta(weeks=4), datetime.today()]
+        ).order_by("-date")
 
     @property
     def location_recordings(self):
