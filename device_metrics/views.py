@@ -1,8 +1,12 @@
 from rest_framework import viewsets
 from rest_framework.generics import ListAPIView
 
-from .models import DeviceMetrics
-from .serializers import DeviceMetricsSerializer
+from .models import DeviceMetrics, EnvironmentalParameter, SoundInferenceData
+from .serializers import (
+    DeviceMetricsSerializer,
+    EnvironmentalParameterSerializer,
+    SoundInferenceDataSerializer,
+)
 
 
 class ReceiveDeviceMetricsViewSet(viewsets.ModelViewSet):
@@ -15,6 +19,14 @@ class ListDeviceMetrics(ListAPIView):
     serializer_class = DeviceMetricsSerializer
 
     def get_queryset(self):
-        return self.queryset.filter(
-            device__id=self.kwargs['pk']
-        )
+        return self.queryset.filter(device__id=self.kwargs["pk"])
+
+
+class EnvironmentalParameterViewSet(viewsets.ModelViewSet):
+    queryset = EnvironmentalParameter.objects.all()
+    serializer_class = EnvironmentalParameterSerializer
+
+
+class SoundInferenceDataViewSet(viewsets.ModelViewSet):
+    queryset = SoundInferenceData.objects.all()
+    serializer_class = SoundInferenceDataSerializer

@@ -8,7 +8,6 @@ class ResponseTypes:
 
 
 class ResponseSuccess:
-
     def __init__(self, value=None):
         self.type = ResponseTypes.SUCCESS
         self.value = value
@@ -18,7 +17,6 @@ class ResponseSuccess:
 
 
 class ResponseFailure:
-
     def __init__(self, type_, message):
         self.type = type_
         self.message = self._format_message(message)
@@ -38,9 +36,7 @@ class ResponseFailure:
 
 def build_response_from_invalid_request(invalid_request: Request):
     message = "\n".join(
-        [
-            f"{err['type']}: {err['message']}" for err in invalid_request.errors
-        ]
+        [f"{err['type']}: {err['message']}" for err in invalid_request.errors]
     )
 
     return ResponseFailure(ResponseTypes.INVALID_INPUT_ERROR, message)

@@ -1,22 +1,18 @@
 import uuid
 
-from django.utils import timezone
 from django.core.files.storage import get_storage_class
-from django.core.validators import (
-    MinValueValidator, MaxValueValidator
-)
-
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.utils import timezone
 
 from devices.models import Device
-
 
 media_storage = get_storage_class()()
 
 
 def recording_directory(instance, filename):
     time_recorded = instance.time_recorded.strftime("%Y-%m-%dT%H:%M:%S")
-    return f'audio/{instance.device.device_id}/{instance.device.device_id}-{time_recorded}-{filename}'
+    return f"audio/{instance.device.device_id}/{instance.device.device_id}-{time_recorded}-{filename}"
 
 
 class Recording(models.Model):
@@ -26,8 +22,7 @@ class Recording(models.Model):
     audio = models.FileField(upload_to=recording_directory)
     triggering_threshold = models.IntegerField(default=50)
     category = models.PositiveSmallIntegerField(
-        validators = [MinValueValidator(1), MaxValueValidator(19)],
-        null=True
+        validators=[MinValueValidator(1), MaxValueValidator(19)], null=True
     )
 
     @property

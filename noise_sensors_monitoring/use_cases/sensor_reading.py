@@ -1,13 +1,19 @@
 from noise_sensors_monitoring.domain.sensor import Sensor
-from noise_sensors_monitoring.repository.time_series_repo_interface import SensorReadingRepo
-
+from noise_sensors_monitoring.repository.time_series_repo_interface import (
+    SensorReadingRepo,
+)
 from noise_sensors_monitoring.requests.sensor_reading import Request
 from noise_sensors_monitoring.responses import (
-    ResponseSuccess, ResponseFailure, ResponseTypes, build_response_from_invalid_request
+    ResponseFailure,
+    ResponseSuccess,
+    ResponseTypes,
+    build_response_from_invalid_request,
 )
 
 
-def add_new_sensor_reading(request: Request, repo: SensorReadingRepo, in_memory_repo: SensorReadingRepo):
+def add_new_sensor_reading(
+    request: Request, repo: SensorReadingRepo, in_memory_repo: SensorReadingRepo
+):
     if not request:
         return build_response_from_invalid_request(request)
     try:

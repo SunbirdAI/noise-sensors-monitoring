@@ -1,5 +1,9 @@
 from typing import Dict, Optional
-from noise_sensors_monitoring.requests.generic_requests import InvalidRequest, ValidRequest
+
+from noise_sensors_monitoring.requests.generic_requests import (
+    InvalidRequest,
+    ValidRequest,
+)
 
 
 def build_device_config_request(config_dict: Optional[Dict] = None):
@@ -13,7 +17,9 @@ def build_device_config_request(config_dict: Optional[Dict] = None):
 
     imei = str(config_dict["imei"])
     if len(imei) != 15 or not imei.isnumeric():
-        invalid_req.add_error("Invalid value", "The imei value should be a 15-digit numeric value")
+        invalid_req.add_error(
+            "Invalid value", "The imei value should be a 15-digit numeric value"
+        )
 
     if invalid_req.has_errors():
         return invalid_req

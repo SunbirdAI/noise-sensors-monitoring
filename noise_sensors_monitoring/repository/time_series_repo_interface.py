@@ -1,7 +1,7 @@
-from abc import ABC
-from abc import abstractmethod
-from noise_sensors_monitoring.domain.sensor import Sensor
+from abc import ABC, abstractmethod
 from typing import Dict
+
+from noise_sensors_monitoring.domain.sensor import Sensor
 
 
 class SensorReadingRepo(ABC):

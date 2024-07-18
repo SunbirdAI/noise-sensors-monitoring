@@ -1,20 +1,21 @@
-from noise_sensors_monitoring.repository.time_series_repo_interface import SensorReadingRepo
-from noise_sensors_monitoring.domain.sensor import Sensor
+from datetime import datetime
+from typing import Dict
 
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import ASYNCHRONOUS, SYNCHRONOUS
 
-from datetime import datetime
-from typing import Dict
+from noise_sensors_monitoring.domain.sensor import Sensor
+from noise_sensors_monitoring.repository.time_series_repo_interface import (
+    SensorReadingRepo,
+)
 
 
 class InfluxDBRepo(SensorReadingRepo):
-
     def __init__(self, configuration):
-        self.db_url = configuration['influx_url']
-        self.db_token = configuration['influx_token']
-        self.org = configuration['influx_org']
-        self.bucket = configuration['influx_bucket']
+        self.db_url = configuration["influx_url"]
+        self.db_token = configuration["influx_token"]
+        self.org = configuration["influx_org"]
+        self.bucket = configuration["influx_bucket"]
 
         self.db_client = InfluxDBClient(url=self.db_url, token=self.db_token)
         self.write_api = self.db_client.write_api(write_options=SYNCHRONOUS)
@@ -23,8 +24,12 @@ class InfluxDBRepo(SensorReadingRepo):
         # TODO: Perhaps replace latitude and longitude with location
         point = Point(measurement).tag("deviceId", sensor_reading.deviceId)
         if sensor_reading.latitude != 0 and sensor_reading.longitude != 0:
-            point = point.tag("latitude", sensor_reading.latitude).tag("longitude", sensor_reading.longitude)
-        point = point.field(measurement.lower(), value).time(datetime.utcnow(), WritePrecision.NS)
+            point = point.tag("latitude", sensor_reading.latitude).tag(
+                "longitude", sensor_reading.longitude
+            )
+        point = point.field(measurement.lower(), value).time(
+            datetime.utcnow(), WritePrecision.NS
+        )
 
         try:
             self.write_api.write(self.bucket, self.org, point)

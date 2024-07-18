@@ -1,11 +1,11 @@
 import os
 
-from dotenv import load_dotenv
 import requests
+from dotenv import load_dotenv
 
 load_dotenv()
 
-BASE_URL = os.getenv('HTTP_APP_HOST')
+BASE_URL = os.getenv("HTTP_APP_HOST")
 
 
 class DevicesRepo:
@@ -22,6 +22,4 @@ class DevicesRepo:
         response = requests.request("GET", url)
         if response.status_code == 200:
             return response.json()
-        return {
-            "error": response.status_code
-        }
+        return {"error": response.status_code}
