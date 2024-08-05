@@ -47,6 +47,7 @@ class EnvironmentalParameterSerializer(serializers.ModelSerializer):
             "ram_value",
             "system_temperature",
             "power_usage",
+            "created_at",
         ]
 
 
@@ -63,4 +64,5 @@ class SoundInferenceDataSerializer(serializers.ModelSerializer):
             "inference_probability",
             "inference_class",
             "inferred_audio_name",
+            "created_at",
         ]
