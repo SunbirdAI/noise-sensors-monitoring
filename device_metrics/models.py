@@ -43,6 +43,11 @@ class EnvironmentalParameter(models.Model):
     power_usage = models.FloatField(
         help_text="Power utilization of the PI", default=0.0
     )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
 
     def __str__(self):
         return f"{self.device.device_id} - Temp: {self.temperature}, Pressure: {self.pressure}, Humidity: {self.humidity}"
@@ -65,9 +70,12 @@ class SoundInferenceData(models.Model):
     inferred_audio_name = models.CharField(
         max_length=255, help_text="Name of inferred sound file"
     )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name_plural = "Sound Inference Data"
+        ordering = ["-created_at"]
 
     def __str__(self):
         return f"{self.device.device_id} - {self.inference_class}: {self.inference_probability}"

@@ -23,10 +23,10 @@ class ListDeviceMetrics(ListAPIView):
 
 
 class EnvironmentalParameterViewSet(viewsets.ModelViewSet):
-    queryset = EnvironmentalParameter.objects.all()
+    queryset = EnvironmentalParameter.objects.all().order_by("-created_at")
     serializer_class = EnvironmentalParameterSerializer
 
 
 class SoundInferenceDataViewSet(viewsets.ModelViewSet):
-    queryset = SoundInferenceData.objects.all()
+    queryset = SoundInferenceData.objects.all().order_by("-created_at")
     serializer_class = SoundInferenceDataSerializer
