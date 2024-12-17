@@ -61,11 +61,27 @@ class Device(models.Model):
 
     @property
     def lastseen(self):
-        if last_metric := self.get_last_metric_text_file():
-            return last_metric.time_uploaded
+        """
+        Return the last seen time of the device. It prioritizes the last metrics file uploaded,
+        but falls back to the last device metrics uploaded if available.
+        """
+        # Check the last metric text file upload time
+        last_metric_file = self.get_last_metric_text_file()
+
+        # Check the last DeviceMetrics upload time
+        last_device_metric = self.get_metrics.first()
+
+        if last_metric_file and last_device_metric:
+            # Return the most recent of the two
+            return max(last_metric_file.time_uploaded, last_device_metric.time_uploaded)
+        elif last_metric_file:
+            return last_metric_file.time_uploaded
+        elif last_device_metric:
+            return last_device_metric.time_uploaded
         else:
             # Define a default value or handle this case as needed
             return None
+
 
     def get_last_metric_text_file(self):
         try:
