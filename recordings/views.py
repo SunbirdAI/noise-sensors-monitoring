@@ -27,17 +27,8 @@ class UpdateAudioViewSet(viewsets.ModelViewSet):
 class ReceiveAudioViewSet(viewsets.ModelViewSet):
     queryset = Recording.objects.all()
     serializer_class = UploadRecordingSerializer
-    # parser_classes = [parsers.MultiPartParser, parsers.FileUploadParser]
-    parser_classes = [parsers.FileUploadParser]
+    parser_classes = [parsers.MultiPartParser]
     http_method_names = ["post"]
-
-    def create(self, request, *args, **kwargs):
-        # FileUploadParser puts the raw file in request.data["file"].
-        # Your serializer expects 'audio', so map it:
-        if "file" in request.data and "audio" not in request.data:
-            request.data["audio"] = request.data["file"]
-        return super().create(request, *args, **kwargs)
-
 
     # def perform_create(self, serializer):
     #     if device_id := self.request.data.get('device', None):
@@ -51,3 +42,17 @@ class ReceiveAudioViewSet(viewsets.ModelViewSet):
     #         print(response.data)
     #         response.data = {"Failed"}
     #     return super(ReceiveAudioViewSet, self).finalize_response(request, response, *args, **kwargs)
+
+class ReceiveAudioViewSetV2(viewsets.ModelViewSet):
+    queryset = Recording.objects.all()
+    serializer_class = UploadRecordingSerializer
+    # parser_classes = [parsers.MultiPartParser, parsers.FileUploadParser]
+    parser_classes = [parsers.FileUploadParser]
+    http_method_names = ["post"]
+
+    def create(self, request, *args, **kwargs):
+        # FileUploadParser puts the raw file in request.data["file"].
+        # Your serializer expects 'audio', so map it:
+        if "file" in request.data and "audio" not in request.data:
+            request.data["audio"] = request.data["file"]
+        return super().create(request, *args, **kwargs)
