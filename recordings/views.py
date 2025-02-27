@@ -27,7 +27,7 @@ class UpdateAudioViewSet(viewsets.ModelViewSet):
 class ReceiveAudioViewSet(viewsets.ModelViewSet):
     queryset = Recording.objects.all()
     serializer_class = UploadRecordingSerializer
-    parser_classes = [parsers.MultiPartParser]
+    parser_classes = [parsers.MultiPartParser, parsers.FileUploadParser]
     http_method_names = ["post"]
 
     # def perform_create(self, serializer):
