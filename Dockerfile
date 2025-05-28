@@ -15,6 +15,14 @@ WORKDIR /code
 # Upgrade Pip
 # RUN pip install --upgrade pip
 
+# install a modern libpq and build deps for psycopg2
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+      libpq-dev     \
+      gcc           \
+ && rm -rf /var/lib/apt/lists/*
+
+
 # Install dependencies
 COPY requirements.txt /code/
 RUN pip install -r requirements.txt
