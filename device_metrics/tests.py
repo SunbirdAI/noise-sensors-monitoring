@@ -126,3 +126,38 @@ class EnvironmentalParameterExportCsvTest(TestCase):
         self.assertEqual(response.status_code, 200)
         content = response.content.decode()
         self.assertEqual(len(content.splitlines()), 11)  # (pages 2 and 3 = 10 rows) + 1 header
+
+    def test_export_csv_year(self):
+        # Create records for a different year
+        from datetime import datetime
+        import pytz
+        tz = pytz.UTC
+        EnvironmentalParameter.objects.create(
+            device=self.device,
+            temperature=99.0,
+            pressure=999.0,
+            humidity=99.0,
+            air_quality=9.0,
+            ram_value=999.0,
+            system_temperature=99.0,
+            power_usage=9.0,
+            created_at=tz.localize(datetime(2020, 5, 1, 12, 0, 0)),
+        )
+        # Get only current year records
+        from datetime import datetime
+        current_year = datetime.now().year
+        response = self.client.get(self.url, {"year": current_year})
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode()
+        # Should not include the 2020 record
+        self.assertNotIn(
+            "99.0,999.0,99.0,9.0,999.0,99.0,9.0", content
+        )
+        # Should include at least one of the current year records
+        self.assertIn(str(current_year), content)
+
+        # Get only 2020 records
+        response = self.client.get(self.url, {"year": 2020})
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode()
+        self.assertIn("99.0,999.0,99.0,9.0,999.0,99.0,9.0", content)

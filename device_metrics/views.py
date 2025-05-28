@@ -39,6 +39,7 @@ class EnvironmentalParameterViewSet(viewsets.ModelViewSet):
             OpenApiParameter(name="start_page", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, description="Start page for range export"),
             OpenApiParameter(name="end_page", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, description="End page for range export"),
             OpenApiParameter(name="page_size", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, description="Page size (default 25)"),
+            OpenApiParameter(name="year", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, description="Year to filter records by (created_at year)"),
         ],
         responses={200: {'content': {'text/csv': {}}}, 'description': 'CSV file download'},
         description="Export environmental parameters to CSV with flexible filtering options."
@@ -52,8 +53,11 @@ class EnvironmentalParameterViewSet(viewsets.ModelViewSet):
         start_page = request.query_params.get("start_page")
         end_page = request.query_params.get("end_page")
         page_size = int(request.query_params.get("page_size", 25))
+        year = request.query_params.get("year")
 
         queryset = self.get_queryset()
+        if year:
+            queryset = queryset.filter(created_at__year=year)
 
         # Pagination logic
         if export_all:
