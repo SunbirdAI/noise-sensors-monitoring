@@ -87,7 +87,7 @@ class EnvironmentalParameterExportCsvTest(TestCase):
                 power_usage=5.0 + i,
             )
         self.client = APIClient()
-        self.url = reverse("environmentalparameter-export-csv-list")
+        self.url = reverse("environmentalparameter-export-csv")
 
     def test_export_csv_default(self):
         response = self.client.get(self.url)
