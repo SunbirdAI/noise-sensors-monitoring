@@ -130,9 +130,9 @@ class EnvironmentalParameterExportCsvTest(TestCase):
     def test_export_csv_year(self):
         # Create records for a different year
         from datetime import datetime
-        import pytz
-        tz = pytz.UTC
-        EnvironmentalParameter.objects.create(
+        from django.utils import timezone
+
+        param = EnvironmentalParameter.objects.create(
             device=self.device,
             temperature=99.0,
             pressure=999.0,
@@ -141,11 +141,13 @@ class EnvironmentalParameterExportCsvTest(TestCase):
             ram_value=999.0,
             system_temperature=99.0,
             power_usage=9.0,
-            created_at=tz.localize(datetime(2020, 5, 1, 12, 0, 0)),
         )
+        # Set created_at to 2020
+        param.created_at = timezone.make_aware(datetime(2020, 5, 1, 12, 0, 0))
+        param.save()
+
         # Get only current year records
-        from datetime import datetime
-        current_year = datetime.now().year
+        current_year = timezone.now().year
         response = self.client.get(self.url, {"year": current_year})
         self.assertEqual(response.status_code, 200)
         content = response.content.decode()
