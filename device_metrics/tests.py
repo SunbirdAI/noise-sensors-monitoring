@@ -1,4 +1,6 @@
 from django.test import TestCase
+from django.urls import reverse
+from rest_framework.test import APIClient
 
 from devices.models import Device
 
@@ -68,3 +70,59 @@ class SoundInferenceDataModelTest(TestCase):
         self.assertEqual(
             str(SoundInferenceData._meta.verbose_name_plural), "Sound Inference Data"
         )
+
+
+class EnvironmentalParameterExportCsvTest(TestCase):
+    def setUp(self):
+        self.device = Device.objects.create(device_id="device_001")
+        for i in range(30):
+            EnvironmentalParameter.objects.create(
+                device=self.device,
+                temperature=20.0 + i,
+                pressure=1000.0 + i,
+                humidity=40.0 + i,
+                air_quality=1.0 + i,
+                ram_value=256.0 + i,
+                system_temperature=45.0 + i,
+                power_usage=5.0 + i,
+            )
+        self.client = APIClient()
+        self.url = reverse("environmentalparameter-export-csv")
+
+    def test_export_csv_default(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "text/csv")
+        content = response.content.decode()
+        self.assertIn(
+            "id,device,temperature,pressure,humidity,air_quality,ram_value,system_temperature,power_usage,created_at",
+            content,
+        )
+        self.assertTrue(len(content.splitlines()) > 1)  # header + data
+
+    def test_export_csv_all(self):
+        response = self.client.get(self.url, {"all": "true"})
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode()
+        # 30 rows + 1 header
+        self.assertEqual(len(content.splitlines()), 31)
+
+    def test_export_csv_count(self):
+        response = self.client.get(self.url, {"count": 5})
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode()
+        self.assertEqual(len(content.splitlines()), 6)  # 5 rows + 1 header
+
+    def test_export_csv_page(self):
+        response = self.client.get(self.url, {"page": 2, "page_size": 10})
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode()
+        self.assertEqual(len(content.splitlines()), 11)  # 10 rows + 1 header
+
+    def test_export_csv_page_range(self):
+        response = self.client.get(
+            self.url, {"start_page": 2, "end_page": 3, "page_size": 5}
+        )
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode()
+        self.assertEqual(len(content.splitlines()), 11)  # (pages 2 and 3 = 10 rows) + 1 header

@@ -6,7 +6,7 @@ services:
     image: "redis:7.0.11-alpine"
 
   postgres_db:
-    image: postgres
+    image: postgres:12-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
