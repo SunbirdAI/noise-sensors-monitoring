@@ -15,12 +15,12 @@ from .serializers import (
 
 
 class ReceiveDeviceMetricsViewSet(viewsets.ModelViewSet):
-    queryset = DeviceMetrics.objects.all()
+    queryset = DeviceMetrics.objects.all().order_by("-time_uploaded")
     serializer_class = DeviceMetricsSerializer
 
 
 class ListDeviceMetrics(ListAPIView):
-    queryset = DeviceMetrics.objects.all()
+    queryset = DeviceMetrics.objects.all().order_by("-time_uploaded")
     serializer_class = DeviceMetricsSerializer
 
     def get_queryset(self):
