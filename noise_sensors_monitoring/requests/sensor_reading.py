@@ -44,7 +44,7 @@ def build_sensor_reading_request(sensor_reading_dict: Optional[Dict] = None) -> 
 
     cleaned_sensor_reading_dict = dict()
 
-    for (key, value) in sensor_reading_dict.items():
+    for key, value in sensor_reading_dict.items():
         if key not in REQUIRED_FIELDS and key not in OPTIONAL_FIELDS:
             invalid_req.add_error(
                 "Invalid field", f"{key} is not a valid field for sensor data"

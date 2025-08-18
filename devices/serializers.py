@@ -7,9 +7,37 @@ from .models import Device, Location
 
 
 class DeviceSerializer(serializers.ModelSerializer):
+    lastseen = serializers.SerializerMethodField()
+    get_metrics = serializers.SerializerMethodField()
+    uptime = serializers.SerializerMethodField()
+
     class Meta:
         model = Device
-        fields = ["device_id"]
+        fields = "__all__"
+
+    def get_lastseen(self, obj):
+        return getattr(obj, "lastseen", None)
+
+    def get_get_metrics(self, obj):
+        metrics = getattr(obj, "get_metrics", None)
+        if metrics is None:
+            return None
+
+        try:
+            from device_metrics.serializers import DeviceMetricsSerializer
+        except ImportError:
+            return str(metrics)  # fallback
+
+        if hasattr(metrics, "all") or hasattr(metrics, "__iter__"):
+            return DeviceMetricsSerializer(metrics, many=True).data
+
+        if hasattr(metrics, "_meta"):
+            return DeviceMetricsSerializer(metrics).data
+
+        return metrics
+
+    def get_uptime(self, obj):
+        return getattr(obj, "uptime", None)
 
 
 class DeviceLocationSerializer(serializers.ModelSerializer):
@@ -29,6 +57,7 @@ class DeviceLocationSerializer(serializers.ModelSerializer):
             "location_description",
             "day_limit",
             "night_limit",
+            "device_name",
         ]
 
 

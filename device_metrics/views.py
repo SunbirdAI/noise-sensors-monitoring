@@ -1,10 +1,11 @@
-from rest_framework import viewsets
-from rest_framework.generics import ListAPIView
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from django.http import HttpResponse
 import csv
-from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
+
+from django.http import HttpResponse
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
+from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.generics import ListAPIView
+from rest_framework.response import Response
 
 from .models import DeviceMetrics, EnvironmentalParameter, SoundInferenceData
 from .serializers import (
@@ -33,16 +34,54 @@ class EnvironmentalParameterViewSet(viewsets.ModelViewSet):
 
     @extend_schema(
         parameters=[
-            OpenApiParameter(name="all", type=OpenApiTypes.BOOL, location=OpenApiParameter.QUERY, description="Export all items"),
-            OpenApiParameter(name="count", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, description="Number of items to export"),
-            OpenApiParameter(name="page", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, description="Page number to export"),
-            OpenApiParameter(name="start_page", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, description="Start page for range export"),
-            OpenApiParameter(name="end_page", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, description="End page for range export"),
-            OpenApiParameter(name="page_size", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, description="Page size (default 25)"),
-            OpenApiParameter(name="year", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, description="Year to filter records by (created_at year)"),
+            OpenApiParameter(
+                name="all",
+                type=OpenApiTypes.BOOL,
+                location=OpenApiParameter.QUERY,
+                description="Export all items",
+            ),
+            OpenApiParameter(
+                name="count",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description="Number of items to export",
+            ),
+            OpenApiParameter(
+                name="page",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description="Page number to export",
+            ),
+            OpenApiParameter(
+                name="start_page",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description="Start page for range export",
+            ),
+            OpenApiParameter(
+                name="end_page",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description="End page for range export",
+            ),
+            OpenApiParameter(
+                name="page_size",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description="Page size (default 25)",
+            ),
+            OpenApiParameter(
+                name="year",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description="Year to filter records by (created_at year)",
+            ),
         ],
-        responses={200: {'content': {'text/csv': {}}}, 'description': 'CSV file download'},
-        description="Export environmental parameters to CSV with flexible filtering options."
+        responses={
+            200: {"content": {"text/csv": {}}},
+            "description": "CSV file download",
+        },
+        description="Export environmental parameters to CSV with flexible filtering options.",
     )
     @action(detail=False, methods=["get"], url_path="export-csv")
     def export_csv(self, request):
@@ -63,7 +102,7 @@ class EnvironmentalParameterViewSet(viewsets.ModelViewSet):
         if export_all:
             data = queryset
         elif count:
-            data = queryset[:int(count)]
+            data = queryset[: int(count)]
         elif page:
             page = int(page)
             start = (page - 1) * page_size
@@ -80,30 +119,97 @@ class EnvironmentalParameterViewSet(viewsets.ModelViewSet):
             data = queryset[:page_size]
 
         # Prepare CSV
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="environmental_parameters.csv"'
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = (
+            'attachment; filename="environmental_parameters.csv"'
+        )
         writer = csv.writer(response)
         # Write header
-        writer.writerow([
-            "id", "device", "temperature", "pressure", "humidity", "air_quality", "ram_value", "system_temperature", "power_usage", "created_at"
-        ])
+        writer.writerow(
+            [
+                "id",
+                "device",
+                "temperature",
+                "pressure",
+                "humidity",
+                "air_quality",
+                "ram_value",
+                "system_temperature",
+                "power_usage",
+                "created_at",
+            ]
+        )
         # Write data
         for obj in data:
-            writer.writerow([
-                obj.id,
-                getattr(obj.device, 'device_id', obj.device),
-                obj.temperature,
-                obj.pressure,
-                obj.humidity,
-                obj.air_quality,
-                obj.ram_value,
-                obj.system_temperature,
-                obj.power_usage,
-                obj.created_at,
-            ])
+            writer.writerow(
+                [
+                    obj.id,
+                    getattr(obj.device, "device_id", obj.device),
+                    obj.temperature,
+                    obj.pressure,
+                    obj.humidity,
+                    obj.air_quality,
+                    obj.ram_value,
+                    obj.system_temperature,
+                    obj.power_usage,
+                    obj.created_at,
+                ]
+            )
         return response
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="device_id",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+                description="Device ID (string, not UUID)",
+            ),
+        ],
+        responses={200: EnvironmentalParameterSerializer},
+        description="Get the most recent environmental parameter for a device by device_id (string).",
+    )
+    @action(
+        detail=False, methods=["get"], url_path="by-device-id/(?P<device_id>[^/.]+)"
+    )
+    def by_device_id(self, request, device_id=None):
+        obj = (
+            EnvironmentalParameter.objects.filter(device__device_id=device_id)
+            .order_by("-created_at")
+            .first()
+        )
+        if not obj:
+            return Response({"detail": "Not found."}, status=404)
+        serializer = self.get_serializer(obj)
+        return Response(serializer.data)
 
 
 class SoundInferenceDataViewSet(viewsets.ModelViewSet):
     queryset = SoundInferenceData.objects.all().order_by("-created_at")
     serializer_class = SoundInferenceDataSerializer
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="device_id",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+                description="Device ID (string, not UUID)",
+            ),
+        ],
+        responses={200: SoundInferenceDataSerializer},
+        description="Get the most recent sound inference data for a device by device_id (string).",
+    )
+    @action(
+        detail=False, methods=["get"], url_path="by-device-id/(?P<device_id>[^/.]+)"
+    )
+    def by_device_id(self, request, device_id=None):
+        obj = (
+            SoundInferenceData.objects.filter(device__device_id=device_id)
+            .order_by("-created_at")
+            .first()
+        )
+        if not obj:
+            return Response({"detail": "Not found."}, status=404)
+        serializer = self.get_serializer(obj)
+        return Response(serializer.data)
