@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, UpdateView
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -16,6 +17,7 @@ from .models import Device, Location
 from .serializers import (
     DeviceConfigSerializer,
     DeviceLocationSerializer,
+    DeviceSerializer,
     LocationMetricsSerializer,
     LocationRecordingsSerializer,
     RecordingSerializer,
@@ -136,3 +138,30 @@ class DeviceRecordingsAPIView(APIView):
             return Response(serializer.data, status=200)
         except Device.DoesNotExist:
             return Response({"error": "Device not found"}, status=404)
+
+
+class DeviceViewSet(viewsets.ModelViewSet):
+    queryset = Device.objects.all().order_by("-device_id")
+    serializer_class = DeviceSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        lookup_value = kwargs.get("pk")
+        # Try to get by UUID (id) first
+        device = Device.objects.filter(pk=lookup_value).first()
+        if not device:
+            # Try to get by device_id if not found by pk
+            device = Device.objects.filter(device_id=lookup_value).first()
+        if not device:
+            return Response({"detail": "Not found."}, status=404)
+        serializer = self.get_serializer(device)
+        return Response(serializer.data)
+
+    @action(
+        detail=False, methods=["get"], url_path="by-device-id/(?P<device_id>[^/.]+)"
+    )
+    def by_device_id(self, request, device_id=None):
+        device = Device.objects.filter(device_id=device_id).first()
+        if not device:
+            return Response({"detail": "Not found."}, status=404)
+        serializer = self.get_serializer(device)
+        return Response(serializer.data)

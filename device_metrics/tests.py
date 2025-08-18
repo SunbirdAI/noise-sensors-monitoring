@@ -125,11 +125,14 @@ class EnvironmentalParameterExportCsvTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         content = response.content.decode()
-        self.assertEqual(len(content.splitlines()), 11)  # (pages 2 and 3 = 10 rows) + 1 header
+        self.assertEqual(
+            len(content.splitlines()), 11
+        )  # (pages 2 and 3 = 10 rows) + 1 header
 
     def test_export_csv_year(self):
         # Create records for a different year
         from datetime import datetime
+
         from django.utils import timezone
 
         param = EnvironmentalParameter.objects.create(
@@ -152,9 +155,7 @@ class EnvironmentalParameterExportCsvTest(TestCase):
         self.assertEqual(response.status_code, 200)
         content = response.content.decode()
         # Should not include the 2020 record
-        self.assertNotIn(
-            "99.0,999.0,99.0,9.0,999.0,99.0,9.0", content
-        )
+        self.assertNotIn("99.0,999.0,99.0,9.0,999.0,99.0,9.0", content)
         # Should include at least one of the current year records
         self.assertIn(str(current_year), content)
 

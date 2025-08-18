@@ -10,6 +10,7 @@ from .views import (
     DeviceLocationListAPIView,
     DeviceRecordingsAPIView,
     DeviceUpdateView,
+    DeviceViewSet,
     LocationCreateView,
     LocationMetricsViewSet,
     LocationRecordingsViewSet,
@@ -21,6 +22,7 @@ router = SimpleRouter()
 router.register("config", DeviceConfigurationViewSet)
 router.register("location_metrics", LocationMetricsViewSet)
 router.register("location_recordings", LocationRecordingsViewSet)
+router.register(r"devices", DeviceViewSet, basename="device")
 
 urlpatterns = [
     path("", DeviceListView.as_view(), name="device_list"),

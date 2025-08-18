@@ -14,6 +14,7 @@ class DeviceMetricsSerializer(serializers.ModelSerializer):
     class Meta:
         model = DeviceMetrics
         fields = [
+            "id",
             "device",
             "sig_strength",
             "db_level",

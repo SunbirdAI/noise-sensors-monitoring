@@ -80,7 +80,7 @@ class Device(models.Model):
         timestamps = [
             last_metric_file.time_uploaded if last_metric_file else None,
             last_device_metric.time_uploaded if last_device_metric else None,
-            last_recording.time_uploaded if last_recording else None
+            last_recording.time_uploaded if last_recording else None,
         ]
 
         # Filter out None values and return the latest timestamp

@@ -43,6 +43,7 @@ class ReceiveAudioViewSet(viewsets.ModelViewSet):
     #         response.data = {"Failed"}
     #     return super(ReceiveAudioViewSet, self).finalize_response(request, response, *args, **kwargs)
 
+
 class ReceiveAudioViewSetV2(viewsets.ModelViewSet):
     queryset = Recording.objects.all()
     serializer_class = UploadRecordingSerializer
