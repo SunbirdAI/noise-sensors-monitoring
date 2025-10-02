@@ -136,6 +136,7 @@ class EnvironmentalParameterViewSet(viewsets.ModelViewSet):
                 "ram_value",
                 "system_temperature",
                 "power_usage",
+                "db_level",
                 "created_at",
             ]
         )
@@ -152,6 +153,7 @@ class EnvironmentalParameterViewSet(viewsets.ModelViewSet):
                     obj.ram_value,
                     obj.system_temperature,
                     obj.power_usage,
+                    obj.db_level,
                     obj.created_at,
                 ]
             )

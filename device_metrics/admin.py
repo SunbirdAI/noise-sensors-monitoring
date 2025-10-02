@@ -16,6 +16,7 @@ class EnvironmentalParameterAdmin(admin.ModelAdmin):
         "ram_value",
         "system_temperature",
         "power_usage",
+        "db_level",
     )
     search_fields = ("device__device_id",)
 
