@@ -8,5 +8,6 @@ release:
   image: web
   command:
     - python manage.py collectstatic --noinput
+    - python manage.py migrate --noinput
 run:
   web: gunicorn noise_dashboard.wsgi --workers=4 --threads=2 --timeout 300
