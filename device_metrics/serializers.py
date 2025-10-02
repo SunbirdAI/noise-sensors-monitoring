@@ -48,6 +48,7 @@ class EnvironmentalParameterSerializer(serializers.ModelSerializer):
             "ram_value",
             "system_temperature",
             "power_usage",
+            "db_level",
             "created_at",
         ]
 

@@ -43,6 +43,7 @@ class EnvironmentalParameter(models.Model):
     power_usage = models.FloatField(
         help_text="Power utilization of the PI", default=0.0
     )
+    db_level = models.FloatField(help_text="Decibel level", default=0.0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
