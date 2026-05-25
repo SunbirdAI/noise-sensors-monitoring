@@ -16,6 +16,7 @@ class DeviceForm(ModelForm):
             "phone_number",
             "version_number",
             "production_stage",
+            "device_type",
             "tags",
             "metrics_url",
         ]

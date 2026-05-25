@@ -1,39 +1,19 @@
-from datetime import datetime
-
-import pytz
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 
-from devices.models import Device
-from noise_dashboard.settings import TIME_ZONE
-from recordings.models import Recording
+from devices.dashboard import (
+    build_dashboard_summary,
+    build_device_health_rows,
+    get_dashboard_queryset,
+    sort_rows,
+)
 
 
 class HomePageView(TemplateView):
     template_name = "home.html"
 
-    def devices_count(self):
-        """Count of all devices"""
-        return Device.objects.count()
-
-    def deployed_devices_count(self):
-        """
-        Count of all devices with
-        production_stage as 'Deployed'
-        """
-        return Device.objects.filter(production_stage="Deployed").count()
-
-    def recordings_count(self):
-        """Count of all recordings"""
-        return Recording.objects.count()
-
-    def recordings_count_today(self):
-        """Count of all recordings"""
-        timezone = pytz.timezone(TIME_ZONE)
-        today = datetime.today()
-        today = timezone.localize(today)
-        return Recording.objects.filter(
-            time_recorded__year=today.year,
-            time_recorded__month=today.month,
-            time_recorded__day=today.day,
-        ).count()
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        rows = sort_rows(build_device_health_rows(get_dashboard_queryset()))
+        context["summary"] = build_dashboard_summary(rows)
+        context["device_rows"] = rows[:10]
+        return context

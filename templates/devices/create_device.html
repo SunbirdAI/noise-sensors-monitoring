@@ -1,22 +1,45 @@
 {% extends '_base.html' %}
-
 {% load crispy_forms_filters %}
 
-{% block title %}Create Device{% endblock title %}
+{% block title %}Add Device | Sunbird Noise Dashboard{% endblock title %}
 
 {% block content %}
-    {% include "sidebar.html" %}
-    <div class="content-container">
-        <div class="container-fluid">
-            {% include "navbar.html" %}
-            <div class="mt-4 mx-3">
-                <h4 class="my-3">Create New Device</h4>
-                <form method="post">
-                    {% csrf_token %}
-                    {{ form|crispy }}
-                    <button class="btn btn-primary mt-2" type="submit">Create Device</button>
-                </form>
-            </div>
+{% include "sidebar.html" %}
+<div class="content-container">
+  {% include "navbar.html" %}
+
+  <main class="dashboard-page">
+    <section class="dashboard-hero">
+      <div>
+        <p class="eyebrow">Fleet management</p>
+        <h1>Add new device</h1>
+        <p class="page-subtitle">Register a sensor in the fleet.</p>
+      </div>
+      <div class="page-actions">
+        <a href="{% url 'device_list' %}" class="btn btn-light">
+          <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to fleet
+        </a>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>Device details</h2>
+          <p>Fill in the fields below, then click Create device.</p>
         </div>
-    </div>
+      </div>
+      <div class="form-body">
+        <form method="post">
+          {% csrf_token %}
+          {{ form|crispy }}
+          <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Create device</button>
+            <a href="{% url 'device_list' %}" class="btn btn-light">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+</div>
 {% endblock content %}

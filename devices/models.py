@@ -35,6 +35,10 @@ class Device(models.Model):
         AUTO_MODE = (1, _("Auto"))
         MANUAL_MODE = (2, _("Manual"))
 
+    class DeviceType(models.TextChoices):
+        MCU = "MCU", _("MCU")
+        MPU = "MPU", _("MPU")
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     device_id = models.CharField(max_length=200, unique=True)
     imei = models.CharField(max_length=15)
@@ -46,6 +50,9 @@ class Device(models.Model):
     )
     tags = TaggableManager(through=UUIDTaggedItem)
     metrics_url = models.URLField(max_length=255, default="http://localhost:3000/")
+    device_type = models.CharField(
+        max_length=10, choices=DeviceType.choices, blank=True, default=""
+    )
 
     # Configuration fields
     configured = models.IntegerField(
