@@ -14,7 +14,6 @@ try_broker_publish.py
 try_influx_db.py
 coverage.xml
 audio/
-staticfiles
 **/.DS_Store
 app.log
 dblog.txt
