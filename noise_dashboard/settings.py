@@ -26,9 +26,14 @@ ENVIRONMENT = os.getenv("ENVIRONMENT", default="development")
 if ENVIRONMENT == "production":
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
     # SECURE_SSL_REDIRECT = True
     # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# S3 static-file storage is opt-in: set USE_S3_STATIC=True in .env for deployed
+# environments.  When running locally, leave it unset so {% static %} generates
+# /static/... URLs that WhiteNoise can serve from your local disk.
+if os.getenv("USE_S3_STATIC") == "True":
+    STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -81,6 +86,8 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    # WhiteNoise serves static files in all environments (must be right after SecurityMiddleware)
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -122,8 +129,8 @@ DATABASES = {
         "NAME": os.environ.get("POSTGRES_DB", "postgres"),
         "USER": os.environ.get("POSTGRES_USER", "postgres"),
         "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "postgres"),
-        "HOST": "postgres_db",
-        "PORT": 5432,
+        "HOST": os.environ.get("POSTGRES_HOST", "postgres_db"),
+        "PORT": os.environ.get("POSTGRES_PORT", 5432),
     }
 }
 

@@ -19,26 +19,135 @@ and using prebuilt containers.
 ### Key python packages used
 - [Paho MQTT](https://pypi.org/project/paho-mqtt/) an MQTT Python client library.
 
-## Set this project up locally
-- Clone this repository and cd into this project's directory.
-- (Optional) Add your mosquitto configuration in the file `./docker/mosquitto/config/mosquitto.conf`
-- Make sure you have [docker](https://www.docker.com/) and [docker-compose](https://docs.docker.com/compose/) installed
-- Create an external docker network named `djangonetwork`. `docker network create -d bridge djangonetwork`. This allows easy communication between the different containers that will be running.
-- Run the command `docker-compose up -d --build` to run the containers.
-- To view logs (in case something fails to work): `docker-compose logs`
-  (**TODO**: create docker build file for the mqtt_client step) 
-- Visit `http:\\localhost:8086` to setup influx db.
-    - You'll need to setup a username, an organization and a bucket. Refer to the influx db docs.
-- Visit `http:\\localhost:3001` to view grafana and setup your dashboard.
-    - Refer to the grafana docs for setting up an admin user
-- Create `.env` file with the following info (Refer to the influxdb tutorial for how to get some of these):
-```
+## Run this project locally
+
+The recommended local setup is Docker Compose. The Django app expects Postgres,
+Redis, Mosquitto, InfluxDB, and Grafana to be available using the service names
+defined in `docker-compose.yml`.
+
+### 1. Prerequisites
+
+- Install [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+- Clone this repository and `cd` into the project directory.
+- Make sure Docker Desktop is running before starting the services.
+
+### 2. Create a local `.env`
+
+The project loads `.env` automatically. For local development, use local values
+and do not include production-only `RDS_*` variables, otherwise Django will try to
+connect to the remote RDS database instead of the local `postgres_db` container.
+
+Example local `.env`:
+
+```env
+ENVIRONMENT=development
+DEBUG=False
+SECRET_KEY=local-dev-secret-key
+ALLOWED_HOSTS=localhost 127.0.0.1
+
+MQTT_CLIENT_NAME=local_noise_monitor
+MOSQUITTO_URL=Mosquitto
+HTTP_APP_HOST=http://HTTPCLIENT:8000
+
 INFLUX_DB_URL=http://localhost:8086
-INFLUX_DB_TOKEN=<INSERT TOKEN HERE>
-INFLUX_ORG=<YOUR-ORG>
-INFLUX_BUCKET=<YOUR BUCKET>
-MQTT_BROKER=localhost
+INFLUX_DB_TOKEN=<insert-local-influx-token>
+INFLUX_ORG=<insert-local-influx-org>
+INFLUX_BUCKET=<insert-local-influx-bucket>
+
+# Optional: only needed when testing audio/metrics file uploads with S3 storage.
+AWS_ACCESS_KEY_ID=<insert-aws-access-key>
+AWS_SECRET_ACCESS_KEY=<insert-aws-secret-key>
+AWS_STORAGE_BUCKET_NAME=<insert-bucket-name>
 ```
+
+For a purely local database run, do not add `RDS_DB_NAME`, `RDS_HOSTNAME`,
+`RDS_PASSWORD`, `RDS_PORT`, `RDS_USERNAME`, or `DATABASE_URL` to `.env`.
+
+### 3. Start the Docker services
+
+Create the shared Docker network once:
+
+```bash
+docker network create -d bridge djangonetwork
+```
+
+If it already exists, Docker will tell you. That is fine.
+
+Build and start the stack:
+
+```bash
+docker compose up -d --build
+```
+
+Apply database migrations:
+
+```bash
+docker compose exec web python manage.py migrate
+```
+
+Create an admin user:
+
+```bash
+docker compose exec web python manage.py createsuperuser
+```
+
+### 4. Open the local services
+
+- Internal dashboard: `http://127.0.0.1:8000/`
+- Devices dashboard: `http://127.0.0.1:8000/devices/`
+- Django admin: `http://127.0.0.1:8000/admin/`
+- API docs: `http://127.0.0.1:8000/api/docs/`
+- InfluxDB: `http://127.0.0.1:8086/`
+- Grafana: `http://127.0.0.1:3001/`
+- Mosquitto MQTT broker: `localhost:1883`
+
+### 5. Useful local commands
+
+View running containers:
+
+```bash
+docker compose ps
+```
+
+View logs:
+
+```bash
+docker compose logs -f web
+```
+
+Run tests:
+
+```bash
+docker compose exec web python manage.py test
+docker compose exec web coverage run --source=noise_sensors_monitoring,mqtt -m pytest
+docker compose exec web coverage report -m
+```
+
+Stop the stack:
+
+```bash
+docker compose down
+```
+
+Stop the stack and remove local Docker volumes:
+
+```bash
+docker compose down -v
+```
+
+Use `docker compose down -v` only when you are comfortable deleting local
+Postgres, InfluxDB, and Grafana data.
+
+### Local troubleshooting
+
+- If Django cannot connect to Postgres, confirm that `.env` does not contain
+  `RDS_*` or `DATABASE_URL` values.
+- If the MQTT container exits immediately, confirm `MQTT_CLIENT_NAME` is set in
+  `.env`.
+- If file uploads fail locally, configure AWS/S3 values or adjust storage for
+  local development.
+- If Docker reports that `djangonetwork` already exists, continue with
+  `docker compose up -d --build`.
 
 ## MQTT Topics Description
 Below are the MQTT Topics implemented in this project.
@@ -49,14 +158,22 @@ Below are the MQTT Topics implemented in this project.
 
 **TODO**: Add description of the other topics as they're implemented.
 
-## Setting up and running Django commands
-- Ensure the containers are running. Use `docker ps` to see running containers.
-- Apply the migrations using the command: `docker-compose exec web python manage.py migrate`
-- Visit the app at `http://127.0.0.1:8000/`
-- Use the following commands for running the tests:
-  - Pytest tests (tests the functionality in the `noise_sensors_monitoring` package): `docker-compose exec web coverage run --source=noise_sensors_monitoring -m pytest`
-  - Django tests: `docker-compose exec web coverage run -a --source=users manage.py test`
-  - View coverage report `docker-compose exec web coverage report -m`
+## Running Django commands
+
+Run Django commands inside the `web` container:
+
+```bash
+docker compose exec web python manage.py <command>
+```
+
+Common examples:
+
+```bash
+docker compose exec web python manage.py migrate
+docker compose exec web python manage.py createsuperuser
+docker compose exec web python manage.py test
+docker compose exec web python manage.py shell
+```
 
 ## API documentation
 This project includes an API that serves our public `noise portal` front end app. <br/>

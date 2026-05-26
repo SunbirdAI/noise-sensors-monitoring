@@ -1,24 +1,33 @@
-<div class="sidebar-container bg-light">
-  <ul class="sidebar-navigation">
-    <div class="sidebar-logo"></div>
-    <li>
-      <a href="#">
-        <i class="fa fa-search fa-2x" aria-hidden="true"></i></a>
-    </li>
-    <li>
-      <a href="{% url 'home' %}"> <i class="fa fa-home fa-2x" aria-hidden="true"></i></a>
-    </li>
-    <li>
-      <a href="{% url 'device_list' %}">
-        <i class="fa fa-tachometer fa-2x" aria-hidden="true"></i></a>
-    </li>
-    <li>
-      <a href="#">
-        <i class="fa fa-cog fa-2x" aria-hidden="true"></i></a>
-    </li>
-    <li>
-      <a href="#">
-        <i class="fa fa-users fa-2x" aria-hidden="true"></i></a>
-    </li>
-  </ul>
-</div>
+{% load static %}
+{% with url_name=request.resolver_match.url_name %}
+<aside class="sidebar-container">
+  <a class="sidebar-logo" href="{% url 'home' %}" aria-label="Sunbird dashboard home">
+    <img class="sidebar-logo-icon" src="{% static 'img/logo.png' %}" alt="Sunbird AI" />
+  </a>
+  <nav class="sidebar-navigation" aria-label="Primary">
+    <a href="{% url 'home' %}"
+       title="Dashboard"
+       {% if url_name == 'home' %}class="sidebar-nav-active"{% endif %}>
+      <i class="fa-solid fa-gauge" aria-hidden="true"></i>
+      <span>Dashboard</span>
+    </a>
+    <a href="{% url 'device_list' %}"
+       title="Devices"
+       {% if url_name == 'device_list' or url_name == 'device_detail' or url_name == 'create_device' or url_name == 'edit_device' or url_name == 'edit_config' or url_name == 'edit_location' or url_name == 'create_location' %}class="sidebar-nav-active"{% endif %}>
+      <i class="fa-solid fa-microchip" aria-hidden="true"></i>
+      <span>Devices</span>
+    </a>
+    <a href="{% url 'docs' %}"
+       title="API docs"
+       {% if url_name == 'docs' %}class="sidebar-nav-active"{% endif %}>
+      <i class="fa-solid fa-code" aria-hidden="true"></i>
+      <span>API</span>
+    </a>
+    <a href="{% url 'admin:index' %}"
+       title="Admin">
+      <i class="fa-solid fa-gear" aria-hidden="true"></i>
+      <span>Admin</span>
+    </a>
+  </nav>
+</aside>
+{% endwith %}

@@ -12,6 +12,18 @@ from rest_framework.views import APIView
 
 from recordings.models import Recording
 
+from .dashboard import (
+    DEVICE_TYPE_OPTIONS,
+    SORT_OPTIONS,
+    STATUS_OPTIONS,
+    apply_dashboard_search,
+    build_dashboard_summary,
+    build_device_health_rows,
+    filter_rows,
+    get_dashboard_queryset,
+    paginate_rows,
+    sort_rows,
+)
 from .forms import DeviceConfigurationForm, DeviceForm
 from .models import Device, Location
 from .serializers import (
@@ -34,6 +46,54 @@ class DeviceListView(LoginRequiredMixin, ListView):
     model = Device
     context_object_name = "device_list"
     template_name = "devices/device_list.html"
+
+    def get_queryset(self):
+        return apply_dashboard_search(
+            get_dashboard_queryset(), self.request.GET.get("q", "").strip()
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        selected_status = self.request.GET.get("status", "")
+        selected_device_type = self.request.GET.get("device_type", "")
+        selected_sort = self.request.GET.get("sort", "latest_reading")
+
+        status_values = [value for value, _ in STATUS_OPTIONS]
+        device_type_values = [value for value, _ in DEVICE_TYPE_OPTIONS]
+        sort_values = [value for value, _ in SORT_OPTIONS]
+        if selected_status not in status_values:
+            selected_status = ""
+        if selected_device_type not in device_type_values:
+            selected_device_type = ""
+        if selected_sort not in sort_values:
+            selected_sort = "latest_reading"
+
+        rows = build_device_health_rows(self.object_list)
+        rows = filter_rows(rows, selected_status, selected_device_type)
+        rows = sort_rows(rows, selected_sort)
+        page_obj = paginate_rows(rows, self.request.GET.get("page"), 20)
+
+        query_params = self.request.GET.copy()
+        query_params.pop("page", None)
+        context.update(
+            {
+                "device_rows": page_obj.object_list,
+                "device_list": [row["device"] for row in page_obj.object_list],
+                "page_obj": page_obj,
+                "summary": build_dashboard_summary(rows),
+                "status_options": STATUS_OPTIONS,
+                "device_type_options": DEVICE_TYPE_OPTIONS,
+                "sort_options": SORT_OPTIONS,
+                "filters": {
+                    "q": self.request.GET.get("q", "").strip(),
+                    "status": selected_status,
+                    "device_type": selected_device_type,
+                    "sort": selected_sort,
+                },
+                "filter_querystring": query_params.urlencode(),
+            }
+        )
+        return context
 
 
 class LocationMetricsViewSet(viewsets.ModelViewSet):

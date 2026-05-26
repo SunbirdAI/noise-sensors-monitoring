@@ -1,53 +1,273 @@
 {% extends '_base.html' %}
+{% load static %}
 
-{% block title %}Devices{% endblock title %}
+{% block title %}Devices | Sunbird Noise Dashboard{% endblock title %}
 
 {% block content %}
 {% include "sidebar.html" %}
 <div class="content-container">
-  <div class="container-fluid">
-    {% include "navbar.html" %}
-    <a href="{% url 'create_device' %}" class="btn btn-primary m-3">Add New Device</a>
-    <a href="{% url 'create_location' %}" class="btn btn-primary m-3">Add Location to Devices</a>
-    <div class="row">
-        <div class="col mb-4 mb-lg-0 ml-3 mr-3">
-          <div class="card">
-            <div class="card-body">
-              <div class="table-responsive">
-                <table class="table table-hover">
-                  <thead>
-                    <tr>
-                      <th scope="col">DEVICE ID</th>
-                      <th scope="col">IMEI NUMBER</th>
-                      <th scope="col">DEVICE NAME</th>
-                      <th scope="col">PHONE NUMBER</th>
-                      <th scope="col">VERSION NUMBER</th>
-                      <th scope="col">PRODUCTION STAGE</th>
-                      <th scope="col">LAST SEEN</th>
-                      <th scope="col"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for device in device_list %}
-                    <tr>
-                      <td>
-                        <a href="{{ device.get_absolute_url }}">{{ device.device_id }}</a>
-                      </td>
-                      <td>{{ device.imei }}</td>
-                      <td>{{ device.device_name }}</td>
-                      <td>{{ device.phone_number }}</td>
-                      <td>{{ device.version_number }}</td>
-                      <td>{{ device.production_stage }}</td>
-                      <td>{{ device.lastseen|default:"N/A"  }}</td>
-                    </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+  {% include "navbar.html" %}
+
+  <main class="dashboard-page">
+    <section class="dashboard-hero">
+      <div>
+        <p class="eyebrow">Fleet management</p>
+        <h1>Device fleet</h1>
+        <p class="page-subtitle">
+          Sensor health, deployment status, and latest field metrics.
+        </p>
+      </div>
+      <div class="page-actions">
+        <a href="{% url 'create_device' %}" class="btn btn-primary">Add device</a>
+        <a href="{% url 'create_location' %}" class="btn btn-outline-primary">Add location</a>
+      </div>
+    </section>
+
+    <!-- Summary cards -->
+    <section class="summary-grid summary-grid-compact">
+      <article class="summary-card">
+        <span class="summary-icon summary-icon-primary"><i class="fa-solid fa-microchip" aria-hidden="true"></i></span>
+        <div>
+          <span class="summary-label">Total sensors</span>
+          <strong>{{ summary.total_sensors }}</strong>
+        </div>
+      </article>
+      <article class="summary-card">
+        <span class="summary-icon summary-icon-success"><i class="fa-solid fa-check" aria-hidden="true"></i></span>
+        <div>
+          <span class="summary-label">Active</span>
+          <strong>{{ summary.active_sensors }}</strong>
+        </div>
+      </article>
+      <article class="summary-card">
+        <span class="summary-icon summary-icon-warning"><i class="fa-solid fa-pause" aria-hidden="true"></i></span>
+        <div>
+          <span class="summary-label">Inactive</span>
+          <strong>{{ summary.inactive_sensors }}</strong>
+        </div>
+      </article>
+      <article class="summary-card">
+        <span class="summary-icon summary-icon-danger"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></span>
+        <div>
+          <span class="summary-label">Issues</span>
+          <strong>{{ summary.issue_sensors }}</strong>
+        </div>
+      </article>
+      <article class="summary-card">
+        <span class="summary-icon summary-icon-neutral"><i class="fa-solid fa-box-archive" aria-hidden="true"></i></span>
+        <div>
+          <span class="summary-label">Decommissioned</span>
+          <strong>{{ summary.decommissioned_sensors }}</strong>
+        </div>
+      </article>
+    </section>
+
+    <!-- Filter panel -->
+    <section class="panel filter-panel">
+      <div class="panel-header">
+        <div>
+          <h2>Find devices</h2>
+          <p>Search, filter, and sort the fleet.</p>
+        </div>
+      </div>
+      <form class="filter-bar" method="get">
+        <label>
+          <span>Search</span>
+          <input
+            type="search"
+            name="q"
+            value="{{ filters.q }}"
+            placeholder="Device ID, name, IMEI, or location"
+          />
+        </label>
+        <label>
+          <span>Status</span>
+          <select name="status">
+            <option value="">All statuses</option>
+            {% for value, label in status_options %}
+            <option value="{{ value }}" {% if filters.status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>
+          <span>Type</span>
+          <select name="device_type">
+            <option value="">All types</option>
+            {% for value, label in device_type_options %}
+            <option value="{{ value }}" {% if filters.device_type == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>
+          <span>Sort by</span>
+          <select name="sort">
+            {% for value, label in sort_options %}
+            <option value="{{ value }}" {% if filters.sort == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <div class="filter-actions">
+          <button type="submit" class="btn btn-primary">Apply</button>
+          <a href="{% url 'device_list' %}" class="btn btn-light">Reset</a>
+        </div>
+      </form>
+    </section>
+
+    <!-- Device health table -->
+    <section class="panel" id="fleet-panel">
+      <div class="panel-header">
+        <div>
+          <h2>Device health</h2>
+          <p>
+            {% if page_obj.paginator.count != summary.total_sensors %}
+              Showing {{ page_obj.paginator.count }} of {{ summary.total_sensors }} devices.
+            {% else %}
+              {{ summary.total_sensors }} device{{ summary.total_sensors|pluralize }}.
+            {% endif %}
+          </p>
+        </div>
+        <!-- Column selector -->
+        <div class="col-selector-wrap" id="col-selector-fleet">
+          <button class="btn btn-light col-selector-toggle" type="button" aria-expanded="false" aria-controls="col-selector-menu-fleet">
+            <i class="fa-solid fa-table-columns" aria-hidden="true"></i> Columns
+          </button>
+          <div class="col-selector-menu" id="col-selector-menu-fleet" hidden>
+            <p class="col-selector-hint">Choose visible columns</p>
+            <!-- Core columns (always visible) -->
+            <label class="col-selector-item col-selector-locked">
+              <input type="checkbox" checked disabled /> Device
+            </label>
+            <label class="col-selector-item col-selector-locked">
+              <input type="checkbox" checked disabled /> Status
+            </label>
+            <!-- Optional columns -->
+            <label class="col-selector-item"><input type="checkbox" data-col="imei" /> IMEI</label>
+            <label class="col-selector-item"><input type="checkbox" data-col="type" /> Type</label>
+            <label class="col-selector-item"><input type="checkbox" data-col="location" /> Location</label>
+            <label class="col-selector-item"><input type="checkbox" data-col="last-reported" /> Last reported</label>
+            <label class="col-selector-item"><input type="checkbox" data-col="battery" /> Battery</label>
+            <label class="col-selector-item"><input type="checkbox" data-col="signal" /> Signal</label>
+            <label class="col-selector-item"><input type="checkbox" data-col="data" /> Data balance</label>
+            <label class="col-selector-item"><input type="checkbox" data-col="db" /> Latest dB</label>
+            <label class="col-selector-item"><input type="checkbox" data-col="actions" /> Actions</label>
           </div>
         </div>
       </div>
-  </div>
+
+      <div class="table-responsive">
+        <table class="table dashboard-table" id="fleet-table">
+          <thead>
+            <tr>
+              <th>Device</th>
+              <th>Status</th>
+              <th data-col="imei">IMEI</th>
+              <th data-col="type">Type</th>
+              <th data-col="location">Location</th>
+              <th data-col="last-reported">Last reported</th>
+              <th data-col="battery">Battery</th>
+              <th data-col="signal">Signal</th>
+              <th data-col="data">Data</th>
+              <th data-col="db">Latest dB</th>
+              <th data-col="actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in device_rows %}
+            <tr>
+              <td>
+                <a href="{{ row.device.get_absolute_url }}" class="device-link">{{ row.device_id }}</a>
+                <span class="cell-muted cell-truncate" title="{{ row.device_name|default:'N/A' }}">{{ row.device_name|default:"N/A" }}</span>
+              </td>
+              <td><span class="status-badge status-{{ row.status }}">{{ row.status_label }}</span></td>
+              <td data-col="imei">{{ row.imei|default:"N/A" }}</td>
+              <td data-col="type">{{ row.device_type }}</td>
+              <td data-col="location"><span class="cell-truncate" title="{{ row.location }}">{{ row.location }}</span></td>
+              <td data-col="last-reported">{{ row.last_reported|date:"Y-m-d H:i"|default:"N/A" }}</td>
+              <td data-col="battery">{{ row.battery_level|floatformat:2|default:"N/A" }}</td>
+              <td data-col="signal">
+                {{ row.network_status }}{% if row.signal_strength or row.signal_strength == 0 %}&nbsp;({{ row.signal_strength }}){% endif %}
+              </td>
+              <td data-col="data">{{ row.data_balance|default:"N/A" }}</td>
+              <td data-col="db">{{ row.db_level|floatformat:1|default:"N/A" }}</td>
+              <td data-col="actions">
+                <div class="row-actions">
+                  <a class="btn btn-light btn-sm" href="{{ row.device.get_absolute_url }}">Details</a>
+                  <button class="btn btn-light btn-sm metrics-toggle" type="button"
+                    data-bs-toggle="popover"
+                    data-bs-title="Health metrics — {{ row.device_id }}"
+                    data-bs-html="true"
+                    data-bs-content="
+                      <dl class='popover-metrics'>
+                        <div><dt>Temperature</dt><dd>{{ row.temperature|floatformat:1|default:'N/A' }}</dd></div>
+                        <div><dt>Pressure</dt><dd>{{ row.pressure|floatformat:1|default:'N/A' }}</dd></div>
+                        <div><dt>Humidity</dt><dd>{{ row.humidity|floatformat:1|default:'N/A' }}</dd></div>
+                        <div><dt>Air quality</dt><dd>{{ row.air_quality|floatformat:2|default:'N/A' }}</dd></div>
+                        <div><dt>RAM</dt><dd>{{ row.ram_value|floatformat:0|default:'N/A' }}</dd></div>
+                        <div><dt>System temp</dt><dd>{{ row.system_temperature|floatformat:1|default:'N/A' }}</dd></div>
+                        <div><dt>Power usage</dt><dd>{{ row.power_usage|floatformat:2|default:'N/A' }}</dd></div>
+                        <div><dt>Samples</dt><dd>{{ row.samples_count }}</dd></div>
+                      </dl>"
+                    data-bs-trigger="click"
+                    data-bs-placement="left">
+                    Metrics
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="11">
+                <div class="empty-state">No devices match the selected filters.</div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      {% if page_obj.paginator.num_pages > 1 %}
+      <nav class="pagination-bar" aria-label="Device pages">
+        <span>
+          Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+          &nbsp;&mdash;&nbsp;
+          {{ page_obj.paginator.count }} result{{ page_obj.paginator.count|pluralize }}
+        </span>
+        <div>
+          {% if page_obj.has_previous %}
+          <a class="btn btn-light" href="?page={{ page_obj.previous_page_number }}{% if filter_querystring %}&{{ filter_querystring }}{% endif %}">
+            <i class="fa-solid fa-chevron-left" aria-hidden="true"></i> Previous
+          </a>
+          {% endif %}
+          {% if page_obj.has_next %}
+          <a class="btn btn-light" href="?page={{ page_obj.next_page_number }}{% if filter_querystring %}&{{ filter_querystring }}{% endif %}">
+            Next <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+          </a>
+          {% endif %}
+        </div>
+      </nav>
+      {% endif %}
+    </section>
+  </main>
 </div>
 {% endblock content %}
+
+{% block extra_js %}
+<script src="{% static 'js/dashboard.js' %}?v=2"></script>
+<script>
+  // Initialise Bootstrap popovers
+  document.querySelectorAll('[data-bs-toggle="popover"]').forEach(function (el) {
+    new bootstrap.Popover(el, { container: 'body', sanitize: false });
+  });
+  // Close popovers when clicking elsewhere
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('[data-bs-toggle="popover"]')) {
+      document.querySelectorAll('[data-bs-toggle="popover"]').forEach(function (el) {
+        bootstrap.Popover.getInstance(el)?.hide();
+      });
+    }
+  });
+  // Initialise column selector
+  initColumnSelector('col-selector-fleet', 'fleet-table', 'fleet-cols',
+    ['location', 'last-reported', 'battery', 'signal', 'data', 'db', 'actions']);
+</script>
+{% endblock extra_js %}
