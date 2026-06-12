@@ -69,7 +69,7 @@ class DeviceTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "30.3")
         self.assertContains(response, "871.4")
-        self.assertContains(response, "Good (26)")
+        self.assertContains(response, "Good&nbsp;(26)")
         self.assertContains(response, "62.4")
 
     def test_device_list_view_filters_by_status(self):
