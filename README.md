@@ -179,6 +179,38 @@ docker compose exec web python manage.py shell
 This project includes an API that serves our public `noise portal` front end app. <br/>
 The documentation for the API endpoints is in this repository's wiki, [here](https://github.com/SunbirdAI/noise-sensors-monitoring/wiki/Noise-sensors-monitoring-API-docs).
 
+### Historical metrics for the public dashboard
+
+The public noise dashboard can request server-side date ranges for device detail
+charts. All timestamps should be sent as ISO 8601 datetimes; the API returns
+range metadata using the configured timezone, `Africa/Kampala` by default.
+
+Useful endpoints:
+
+```text
+GET /device_metrics/device/<device_uuid>/
+GET /device_metrics/device/by-device-id/<device_id>/history/
+GET /device_metrics/device/by-device-id/<device_id>/aggregates/
+GET /device_metrics/environmental-parameters/by-device-id/<device_id>/history/
+GET /device_metrics/sound-inference-data/by-device-id/<device_id>/history/
+```
+
+History endpoints support:
+
+```text
+start_date=<ISO datetime>
+end_date=<ISO datetime>
+page=<number>
+page_size=<1-500>
+ordering=-time_uploaded|time_uploaded
+```
+
+SEAS environmental and inference history endpoints use `created_at` for
+ordering. Aggregate endpoints support `granularity=raw|hourly|daily` and
+`timezone=Africa/Kampala`. There is no hard maximum date span, but callers
+should keep `page_size` at or below 500 and prefer `hourly` or `daily`
+aggregates for longer ranges such as 30 days or 3 months.
+
 
 ## Deployment Steps
 - Install Heroku CLI.
