@@ -33,6 +33,13 @@ def env_list(name, default):
     ]
 
 
+def env_bool(name, default=False):
+    raw_value = os.getenv(name)
+    if raw_value is None:
+        return default
+    return raw_value.strip().lower() in {"1", "true", "yes", "on"}
+
+
 if ENVIRONMENT == "production":
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
@@ -107,7 +114,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-CORS_ALLOW_ALL_ORIGINS = os.getenv("CORS_ALLOW_ALL_ORIGINS", "False") == "True"
+CORS_ALLOW_ALL_ORIGINS = env_bool("CORS_ALLOW_ALL_ORIGINS", False)
 CORS_ALLOWED_ORIGINS = env_list(
     "CORS_ALLOWED_ORIGINS",
     [
@@ -116,6 +123,7 @@ CORS_ALLOWED_ORIGINS = env_list(
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "https://noise.sunbird.ai",
+        "https://noise-portal.vercel.app",
         "https://sunbirdai.github.io",
     ],
 )

@@ -149,6 +149,15 @@ class DeviceMetricsHistoryAPITest(TestCase):
         self.assertEqual(response.data["results"][0]["db_level"], 45.0)
         self.assertEqual(response.data["range"]["timezone"], "Africa/Kampala")
 
+    def test_uuid_history_legacy_no_slash_route_still_works(self):
+        response = self.client.get(
+            reverse("device_device_metrics_legacy", kwargs={"pk": self.device.id}),
+            {"page_size": 1},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["count"], 3)
+
     def test_by_device_id_history_avoids_uuid_lookup(self):
         response = self.client.get(
             reverse(
@@ -230,6 +239,62 @@ class DeviceMetricsHistoryAPITest(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn("page_size", response.data)
 
+    def test_invalid_page_returns_400(self):
+        response = self.client.get(
+            reverse(
+                "device_metrics_by_device_id_history",
+                kwargs={"device_id": self.device.device_id},
+            ),
+            {"page": "abc"},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("page", response.data)
+
+    def test_invalid_page_size_returns_400(self):
+        response = self.client.get(
+            reverse(
+                "device_metrics_by_device_id_history",
+                kwargs={"device_id": self.device.device_id},
+            ),
+            {"page_size": "abc"},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("page_size", response.data)
+
+    def test_invalid_history_ordering_returns_400(self):
+        response = self.client.get(
+            reverse(
+                "device_metrics_by_device_id_history",
+                kwargs={"device_id": self.device.device_id},
+            ),
+            {"ordering": "created_at"},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("ordering", response.data)
+
+    def test_raw_aggregates_are_paginated_and_ordered(self):
+        response = self.client.get(
+            reverse(
+                "device_metrics_by_device_id_aggregates",
+                kwargs={"device_id": self.device.device_id},
+            ),
+            {
+                "granularity": "raw",
+                "ordering": "timestamp",
+                "page_size": 2,
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["count"], 3)
+        self.assertEqual(len(response.data["results"]), 2)
+        self.assertIsNotNone(response.data["next"])
+        self.assertEqual(response.data["results"][0]["db_level"], 45.0)
+        self.assertEqual(response.data["results"][0]["median_db_level"], 45.0)
+
     def test_hourly_aggregates_bucket_readings(self):
         response = self.client.get(
             reverse(
@@ -249,6 +314,50 @@ class DeviceMetricsHistoryAPITest(TestCase):
         self.assertEqual(response.data["results"][0]["avg_db_level"], 44.0)
         self.assertEqual(response.data["results"][0]["max_db_level"], 50.0)
         self.assertEqual(response.data["results"][0]["reading_count"], 1)
+
+    def test_daily_aggregates_can_page_buckets_descending(self):
+        response = self.client.get(
+            reverse(
+                "device_metrics_by_device_id_aggregates",
+                kwargs={"device_id": self.device.device_id},
+            ),
+            {
+                "granularity": "daily",
+                "ordering": "-timestamp",
+                "page_size": 1,
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["count"], 2)
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertIsNotNone(response.data["next"])
+        self.assertEqual(response.data["results"][0]["avg_db_level"], 64.0)
+        self.assertEqual(response.data["results"][0]["reading_count"], 1)
+
+    def test_invalid_aggregate_ordering_returns_400(self):
+        response = self.client.get(
+            reverse(
+                "device_metrics_by_device_id_aggregates",
+                kwargs={"device_id": self.device.device_id},
+            ),
+            {"ordering": "time_uploaded"},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("ordering", response.data)
+
+    def test_invalid_aggregate_timezone_returns_400(self):
+        response = self.client.get(
+            reverse(
+                "device_metrics_by_device_id_aggregates",
+                kwargs={"device_id": self.device.device_id},
+            ),
+            {"timezone": "Not/AZone"},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("timezone", response.data)
 
 
 class AIHistoryAPITest(TestCase):

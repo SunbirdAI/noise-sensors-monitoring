@@ -5,6 +5,7 @@ from .views import (
     DeviceMetricsByDeviceIdAggregateView,
     DeviceMetricsByDeviceIdHistoryView,
     EnvironmentalParameterViewSet,
+    LegacyListDeviceMetrics,
     ListDeviceMetrics,
     ReceiveDeviceMetricsViewSet,
     SoundInferenceDataViewSet,
@@ -30,6 +31,11 @@ urlpatterns = [
         "device/<uuid:pk>/",
         ListDeviceMetrics.as_view(),
         name="device_device_metrics",
+    ),
+    path(
+        "device/<uuid:pk>",
+        LegacyListDeviceMetrics.as_view(),
+        name="device_device_metrics_legacy",
     ),
     path("", include(router.urls)),
 ]

@@ -19,11 +19,11 @@ from devices.models import Device
 from .history import (
     AGGREGATE_QUERY_PARAMS,
     HISTORY_QUERY_PARAMS,
-    aggregate_device_metrics,
     filter_by_date_range,
     get_timezone,
-    paginated_aggregate_response,
+    paginated_bucketed_aggregate_response,
     paginated_history_response,
+    paginated_raw_aggregate_response,
     parse_date_range,
     validate_ordering,
     validate_query_params,
@@ -187,6 +187,12 @@ class ListDeviceMetrics(APIView):
         return device_metrics_history_response(request, device, queryset)
 
 
+class LegacyListDeviceMetrics(ListDeviceMetrics):
+    @extend_schema(exclude=True)
+    def get(self, request, pk):
+        return super().get(request, pk)
+
+
 class DeviceMetricsByDeviceIdHistoryView(APIView):
     @extend_schema(
         parameters=HISTORY_PARAMETERS,
@@ -238,13 +244,30 @@ class DeviceMetricsByDeviceIdAggregateView(APIView):
             "time_uploaded",
             start_date,
             end_date,
-        ).order_by("time_uploaded")
-        results = aggregate_device_metrics(queryset, granularity, tz)
-        if ordering == "-timestamp":
-            results = list(reversed(results))
+        )
 
-        return paginated_aggregate_response(
-            request, results, device, start_date, end_date, tz
+        if granularity == "raw":
+            raw_ordering = (
+                "-time_uploaded" if ordering == "-timestamp" else "time_uploaded"
+            )
+            return paginated_raw_aggregate_response(
+                request,
+                queryset.order_by(raw_ordering),
+                device,
+                start_date,
+                end_date,
+                tz,
+            )
+
+        return paginated_bucketed_aggregate_response(
+            request,
+            queryset,
+            granularity,
+            ordering,
+            device,
+            start_date,
+            end_date,
+            tz,
         )
 
 

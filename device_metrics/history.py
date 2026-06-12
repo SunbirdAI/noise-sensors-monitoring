@@ -177,9 +177,7 @@ def paginated_history_response(
     )
 
 
-def paginated_aggregate_response(request, results, device, start_date, end_date, tz):
-    paginator = HistoryPagination()
-    page = paginator.paginate_queryset(results, request)
+def aggregate_payload(request, paginator, page, device, start_date, end_date, tz):
     return Response(
         {
             "count": paginator.page.paginator.count,
@@ -192,28 +190,63 @@ def paginated_aggregate_response(request, results, device, start_date, end_date,
     )
 
 
-def aggregate_device_metrics(queryset, granularity, tz):
-    if granularity == "raw":
-        return [
-            {
-                "timestamp": metric.time_uploaded.astimezone(tz).isoformat(),
-                "db_level": metric.db_level,
-                "avg_db_level": metric.avg_db_level
-                if metric.avg_db_level is not None
-                else metric.db_level,
-                "max_db_level": metric.max_db_level
-                if metric.max_db_level is not None
-                else metric.db_level,
-                "median_db_level": None,
-                "min_db_level": metric.db_level,
-                "no_of_exceedances": metric.no_of_exceedances or 0,
-                "reading_count": 1,
-            }
-            for metric in queryset
-        ]
+def paginated_raw_aggregate_response(
+    request,
+    queryset,
+    device,
+    start_date,
+    end_date,
+    tz,
+):
+    paginator = HistoryPagination()
+    page = paginator.paginate_queryset(queryset, request)
+    results = [raw_metric_row(metric, tz) for metric in page]
+    return aggregate_payload(
+        request, paginator, results, device, start_date, end_date, tz
+    )
 
+
+def paginated_bucketed_aggregate_response(
+    request,
+    queryset,
+    granularity,
+    ordering,
+    device,
+    start_date,
+    end_date,
+    tz,
+):
+    bucketed = bucketed_metric_queryset(queryset, granularity, ordering, tz)
+    paginator = HistoryPagination()
+    page = paginator.paginate_queryset(bucketed, request)
+    results = [bucketed_metric_row(row, tz) for row in page]
+    return aggregate_payload(
+        request, paginator, results, device, start_date, end_date, tz
+    )
+
+
+def raw_metric_row(metric, tz):
+    db_level = metric.db_level
+    return {
+        "timestamp": metric.time_uploaded.astimezone(tz).isoformat(),
+        "db_level": db_level,
+        "avg_db_level": metric.avg_db_level
+        if metric.avg_db_level is not None
+        else db_level,
+        "max_db_level": metric.max_db_level
+        if metric.max_db_level is not None
+        else db_level,
+        "median_db_level": db_level,
+        "min_db_level": db_level,
+        "no_of_exceedances": metric.no_of_exceedances or 0,
+        "reading_count": 1,
+    }
+
+
+def bucketed_metric_queryset(queryset, granularity, ordering, tz):
     trunc_class = TruncHour if granularity == "hourly" else TruncDay
-    bucketed = (
+    order_by = "-bucket" if ordering == "-timestamp" else "bucket"
+    return (
         queryset.annotate(bucket=trunc_class("time_uploaded", tzinfo=tz))
         .values("bucket")
         .annotate(
@@ -229,18 +262,17 @@ def aggregate_device_metrics(queryset, granularity, tz):
             ),
             reading_count=Count("id"),
         )
-        .order_by("bucket")
+        .order_by(order_by)
     )
 
-    return [
-        {
-            "timestamp": row["bucket"].astimezone(tz).isoformat(),
-            "avg_db_level": row["avg_db_level"],
-            "max_db_level": row["max_db_level"],
-            "median_db_level": None,
-            "min_db_level": row["min_db_level"],
-            "no_of_exceedances": row["no_of_exceedances"],
-            "reading_count": row["reading_count"],
-        }
-        for row in bucketed
-    ]
+
+def bucketed_metric_row(row, tz):
+    return {
+        "timestamp": row["bucket"].astimezone(tz).isoformat(),
+        "avg_db_level": row["avg_db_level"],
+        "max_db_level": row["max_db_level"],
+        "median_db_level": None,
+        "min_db_level": row["min_db_level"],
+        "no_of_exceedances": row["no_of_exceedances"],
+        "reading_count": row["reading_count"],
+    }
