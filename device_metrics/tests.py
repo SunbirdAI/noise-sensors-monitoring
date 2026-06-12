@@ -1,10 +1,38 @@
+from datetime import datetime, timedelta
+
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework.test import APIClient
 
 from devices.models import Device
 
-from .models import EnvironmentalParameter, SoundInferenceData
+from .models import DeviceMetrics, EnvironmentalParameter, SoundInferenceData
+
+
+def set_timestamp(instance, field_name, value):
+    setattr(instance, field_name, value)
+    instance.save(update_fields=[field_name])
+
+
+def create_metric(
+    device, uploaded_at, db_level=50.0, avg_db_level=None, max_db_level=None
+):
+    metric = DeviceMetrics.objects.create(
+        device=device,
+        sig_strength=31,
+        db_level=db_level,
+        avg_db_level=avg_db_level,
+        max_db_level=max_db_level,
+        no_of_exceedances=1,
+        last_rec=0.0,
+        last_upl=0.0,
+        panel_voltage=18.0,
+        battery_voltage=3.8,
+        data_balance=300,
+    )
+    set_timestamp(metric, "time_uploaded", uploaded_at)
+    return metric
 
 
 class DeviceModelTest(TestCase):
@@ -72,6 +100,372 @@ class SoundInferenceDataModelTest(TestCase):
         )
 
 
+class DeviceMetricsHistoryAPITest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.device = Device.objects.create(
+            device_id="SB1006",
+            imei="123456789012345",
+            device_name="Naguru Summit View",
+            phone_number="0700000000",
+            version_number="1",
+            production_stage="Deployed",
+            device_type=Device.DeviceType.MCU,
+        )
+        self.other_device = Device.objects.create(
+            device_id="SB9999",
+            imei="123456789012346",
+            device_name="Other sensor",
+            phone_number="0700000001",
+            version_number="1",
+            production_stage="Deployed",
+            device_type=Device.DeviceType.MCU,
+        )
+        self.start = timezone.make_aware(datetime(2026, 6, 1, 0, 0, 0))
+        create_metric(self.device, self.start + timedelta(hours=1), 45.0, 44.0, 50.0)
+        create_metric(self.device, self.start + timedelta(hours=2), 55.0, 54.0, 60.0)
+        create_metric(self.device, self.start + timedelta(days=3), 65.0, 64.0, 70.0)
+        create_metric(
+            self.other_device, self.start + timedelta(hours=1), 99.0, 99.0, 99.0
+        )
+
+    def test_uuid_history_filters_by_date_and_pages_results(self):
+        response = self.client.get(
+            reverse("device_device_metrics", kwargs={"pk": self.device.id}),
+            {
+                "start_date": (self.start + timedelta(minutes=30)).isoformat(),
+                "end_date": (self.start + timedelta(hours=2, minutes=30)).isoformat(),
+                "page_size": 1,
+                "ordering": "time_uploaded",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["count"], 2)
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertIsNotNone(response.data["next"])
+        self.assertEqual(response.data["device"]["device_id"], "SB1006")
+        self.assertEqual(response.data["device"]["type"], "MCU")
+        self.assertEqual(response.data["results"][0]["db_level"], 45.0)
+        self.assertEqual(response.data["range"]["timezone"], "Africa/Kampala")
+
+    def test_uuid_history_legacy_no_slash_route_still_works(self):
+        response = self.client.get(
+            reverse("device_device_metrics_legacy", kwargs={"pk": self.device.id}),
+            {"page_size": 1},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["count"], 3)
+
+    def test_by_device_id_history_avoids_uuid_lookup(self):
+        response = self.client.get(
+            reverse(
+                "device_metrics_by_device_id_history",
+                kwargs={"device_id": self.device.device_id},
+            ),
+            {"page_size": 2, "ordering": "time_uploaded"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["count"], 3)
+        self.assertEqual(len(response.data["results"]), 2)
+        self.assertEqual(response.data["results"][0]["device"], "SB1006")
+
+    def test_future_date_range_returns_empty_results(self):
+        response = self.client.get(
+            reverse(
+                "device_metrics_by_device_id_history",
+                kwargs={"device_id": self.device.device_id},
+            ),
+            {
+                "start_date": "2099-01-01T00:00:00+03:00",
+                "end_date": "2099-01-02T00:00:00+03:00",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["count"], 0)
+        self.assertEqual(response.data["results"], [])
+
+    def test_invalid_date_range_returns_400(self):
+        response = self.client.get(
+            reverse(
+                "device_metrics_by_device_id_history",
+                kwargs={"device_id": self.device.device_id},
+            ),
+            {
+                "start_date": "2026-06-03T00:00:00+03:00",
+                "end_date": "2026-06-01T00:00:00+03:00",
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("start_date", str(response.data))
+
+    def test_invalid_date_format_returns_400(self):
+        response = self.client.get(
+            reverse(
+                "device_metrics_by_device_id_history",
+                kwargs={"device_id": self.device.device_id},
+            ),
+            {"start_date": "not-a-date"},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Invalid datetime", response.data["detail"])
+
+    def test_unsupported_query_param_returns_400(self):
+        response = self.client.get(
+            reverse(
+                "device_metrics_by_device_id_history",
+                kwargs={"device_id": self.device.device_id},
+            ),
+            {"days": 7},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Unsupported query parameter", response.data["detail"])
+
+    def test_page_size_max_is_enforced(self):
+        response = self.client.get(
+            reverse(
+                "device_metrics_by_device_id_history",
+                kwargs={"device_id": self.device.device_id},
+            ),
+            {"page_size": 501},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("page_size", response.data)
+
+    def test_invalid_page_returns_400(self):
+        response = self.client.get(
+            reverse(
+                "device_metrics_by_device_id_history",
+                kwargs={"device_id": self.device.device_id},
+            ),
+            {"page": "abc"},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("page", response.data)
+
+    def test_invalid_page_size_returns_400(self):
+        response = self.client.get(
+            reverse(
+                "device_metrics_by_device_id_history",
+                kwargs={"device_id": self.device.device_id},
+            ),
+            {"page_size": "abc"},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("page_size", response.data)
+
+    def test_invalid_history_ordering_returns_400(self):
+        response = self.client.get(
+            reverse(
+                "device_metrics_by_device_id_history",
+                kwargs={"device_id": self.device.device_id},
+            ),
+            {"ordering": "created_at"},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("ordering", response.data)
+
+    def test_raw_aggregates_are_paginated_and_ordered(self):
+        response = self.client.get(
+            reverse(
+                "device_metrics_by_device_id_aggregates",
+                kwargs={"device_id": self.device.device_id},
+            ),
+            {
+                "granularity": "raw",
+                "ordering": "timestamp",
+                "page_size": 2,
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["count"], 3)
+        self.assertEqual(len(response.data["results"]), 2)
+        self.assertIsNotNone(response.data["next"])
+        self.assertEqual(response.data["results"][0]["db_level"], 45.0)
+        self.assertEqual(response.data["results"][0]["median_db_level"], 45.0)
+
+    def test_hourly_aggregates_bucket_readings(self):
+        response = self.client.get(
+            reverse(
+                "device_metrics_by_device_id_aggregates",
+                kwargs={"device_id": self.device.device_id},
+            ),
+            {
+                "start_date": self.start.isoformat(),
+                "end_date": (self.start + timedelta(hours=3)).isoformat(),
+                "granularity": "hourly",
+                "ordering": "timestamp",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["count"], 2)
+        self.assertEqual(response.data["results"][0]["avg_db_level"], 44.0)
+        self.assertEqual(response.data["results"][0]["max_db_level"], 50.0)
+        self.assertEqual(response.data["results"][0]["reading_count"], 1)
+
+    def test_daily_aggregates_can_page_buckets_descending(self):
+        response = self.client.get(
+            reverse(
+                "device_metrics_by_device_id_aggregates",
+                kwargs={"device_id": self.device.device_id},
+            ),
+            {
+                "granularity": "daily",
+                "ordering": "-timestamp",
+                "page_size": 1,
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["count"], 2)
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertIsNotNone(response.data["next"])
+        self.assertEqual(response.data["results"][0]["avg_db_level"], 64.0)
+        self.assertEqual(response.data["results"][0]["reading_count"], 1)
+
+    def test_invalid_aggregate_ordering_returns_400(self):
+        response = self.client.get(
+            reverse(
+                "device_metrics_by_device_id_aggregates",
+                kwargs={"device_id": self.device.device_id},
+            ),
+            {"ordering": "time_uploaded"},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("ordering", response.data)
+
+    def test_invalid_aggregate_timezone_returns_400(self):
+        response = self.client.get(
+            reverse(
+                "device_metrics_by_device_id_aggregates",
+                kwargs={"device_id": self.device.device_id},
+            ),
+            {"timezone": "Not/AZone"},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("timezone", response.data)
+
+
+class AIHistoryAPITest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.device = Device.objects.create(
+            device_id="SEAS-2",
+            imei="123456789012347",
+            device_name="SAES v1 Naguru",
+            phone_number="0700000002",
+            version_number="1",
+            production_stage="Deployed",
+            device_type=Device.DeviceType.MPU,
+        )
+        self.start = timezone.make_aware(datetime(2026, 6, 12, 0, 0, 0))
+        old_env = EnvironmentalParameter.objects.create(
+            device=self.device,
+            temperature=20.0,
+            pressure=868.0,
+            humidity=80.0,
+            air_quality=70.0,
+            power_usage=8.0,
+            db_level=50.0,
+        )
+        new_env = EnvironmentalParameter.objects.create(
+            device=self.device,
+            temperature=21.0,
+            pressure=869.0,
+            humidity=81.0,
+            air_quality=71.0,
+            power_usage=8.1,
+            db_level=60.0,
+        )
+        set_timestamp(old_env, "created_at", self.start - timedelta(days=2))
+        set_timestamp(new_env, "created_at", self.start + timedelta(hours=2))
+
+        old_inference = SoundInferenceData.objects.create(
+            device=self.device,
+            inference_probability=0.1,
+            inference_class="traffic",
+            inferred_audio_name="old.wav",
+        )
+        new_inference = SoundInferenceData.objects.create(
+            device=self.device,
+            inference_probability=0.9,
+            inference_class="generator",
+            inferred_audio_name="new.wav",
+        )
+        set_timestamp(old_inference, "created_at", self.start - timedelta(days=2))
+        set_timestamp(new_inference, "created_at", self.start + timedelta(hours=3))
+
+    def test_environmental_history_filters_by_device_id_and_date(self):
+        response = self.client.get(
+            reverse(
+                "environmentalparameter-by-device-id-history",
+                kwargs={"device_id": self.device.device_id},
+            ),
+            {
+                "start_date": self.start.isoformat(),
+                "end_date": (self.start + timedelta(days=1)).isoformat(),
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["device"]["device_id"], "SEAS-2")
+        self.assertEqual(response.data["results"][0]["db_level"], 60.0)
+        self.assertEqual(response.data["results"][0]["temperature"], 21.0)
+
+    def test_sound_inference_history_filters_by_device_id_and_date(self):
+        response = self.client.get(
+            reverse(
+                "soundinferencedata-by-device-id-history",
+                kwargs={"device_id": self.device.device_id},
+            ),
+            {
+                "start_date": self.start.isoformat(),
+                "end_date": (self.start + timedelta(days=1)).isoformat(),
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"][0]["inference_class"], "generator")
+        self.assertEqual(response.data["results"][0]["inference_probability"], 0.9)
+
+    def test_latest_ai_endpoints_remain_unchanged(self):
+        env_response = self.client.get(
+            reverse(
+                "environmentalparameter-by-device-id",
+                kwargs={"device_id": self.device.device_id},
+            )
+        )
+        inference_response = self.client.get(
+            reverse(
+                "soundinferencedata-by-device-id",
+                kwargs={"device_id": self.device.device_id},
+            )
+        )
+
+        self.assertEqual(env_response.status_code, 200)
+        self.assertNotIn("results", env_response.data)
+        self.assertEqual(env_response.data["db_level"], 60.0)
+        self.assertEqual(inference_response.status_code, 200)
+        self.assertNotIn("results", inference_response.data)
+        self.assertEqual(inference_response.data["inference_class"], "generator")
+
+
 class EnvironmentalParameterExportCsvTest(TestCase):
     def setUp(self):
         self.device = Device.objects.create(device_id="device_001")
@@ -95,7 +489,7 @@ class EnvironmentalParameterExportCsvTest(TestCase):
         self.assertEqual(response["Content-Type"], "text/csv")
         content = response.content.decode()
         self.assertIn(
-            "id,device,temperature,pressure,humidity,air_quality,ram_value,system_temperature,power_usage,created_at",
+            "id,device,temperature,pressure,humidity,air_quality,ram_value,system_temperature,power_usage,db_level,created_at",
             content,
         )
         self.assertTrue(len(content.splitlines()) > 1)  # header + data

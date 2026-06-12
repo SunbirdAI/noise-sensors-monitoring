@@ -23,6 +23,23 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 ENVIRONMENT = os.getenv("ENVIRONMENT", default="development")
 
+
+def env_list(name, default):
+    raw_value = os.getenv(name)
+    if not raw_value:
+        return default
+    return [
+        item.strip() for item in raw_value.replace(",", " ").split() if item.strip()
+    ]
+
+
+def env_bool(name, default=False):
+    raw_value = os.getenv(name)
+    if raw_value is None:
+        return default
+    return raw_value.strip().lower() in {"1", "true", "yes", "on"}
+
+
 if ENVIRONMENT == "production":
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
@@ -97,8 +114,23 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-CORS_ALLOW_ALL_ORIGINS = False
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "https://noise.sunbird.ai", "https://sunbirdai.github.io"]
+CORS_ALLOW_ALL_ORIGINS = env_bool("CORS_ALLOW_ALL_ORIGINS", False)
+CORS_ALLOWED_ORIGINS = env_list(
+    "CORS_ALLOWED_ORIGINS",
+    [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "https://noise.sunbird.ai",
+        "https://noise-portal.vercel.app",
+        "https://sunbirdai.github.io",
+    ],
+)
+CORS_ALLOW_METHODS = env_list(
+    "CORS_ALLOW_METHODS",
+    ["GET", "HEAD", "OPTIONS", "POST", "PUT", "PATCH", "DELETE"],
+)
 
 ROOT_URLCONF = "noise_dashboard.urls"
 

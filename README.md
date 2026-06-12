@@ -44,6 +44,8 @@ ENVIRONMENT=development
 DEBUG=False
 SECRET_KEY=local-dev-secret-key
 ALLOWED_HOSTS=localhost 127.0.0.1
+CORS_ALLOW_ALL_ORIGINS=False
+CORS_ALLOWED_ORIGINS=http://localhost:3000 http://127.0.0.1:3000 http://localhost:5173 http://127.0.0.1:5173
 
 MQTT_CLIENT_NAME=local_noise_monitor
 MOSQUITTO_URL=Mosquitto
@@ -62,6 +64,10 @@ AWS_STORAGE_BUCKET_NAME=<insert-bucket-name>
 
 For a purely local database run, do not add `RDS_DB_NAME`, `RDS_HOSTNAME`,
 `RDS_PASSWORD`, `RDS_PORT`, `RDS_USERNAME`, or `DATABASE_URL` to `.env`.
+
+For deployed frontends, keep `CORS_ALLOW_ALL_ORIGINS=False` and include each
+trusted dashboard origin in `CORS_ALLOWED_ORIGINS`, for example
+`https://noise.sunbird.ai https://noise-portal.vercel.app`.
 
 ### 3. Start the Docker services
 
@@ -178,6 +184,44 @@ docker compose exec web python manage.py shell
 ## API documentation
 This project includes an API that serves our public `noise portal` front end app. <br/>
 The documentation for the API endpoints is in this repository's wiki, [here](https://github.com/SunbirdAI/noise-sensors-monitoring/wiki/Noise-sensors-monitoring-API-docs).
+
+### Historical metrics for the public dashboard
+
+The public noise dashboard can request server-side date ranges for device detail
+charts. All timestamps should be sent as ISO 8601 datetimes; the API returns
+range metadata using the configured timezone, `Africa/Kampala` by default.
+
+Useful endpoints:
+
+```text
+GET /device_metrics/device/<device_uuid>/
+GET /device_metrics/device/<device_uuid>
+GET /device_metrics/device/by-device-id/<device_id>/history/
+GET /device_metrics/device/by-device-id/<device_id>/aggregates/
+GET /device_metrics/environmental-parameters/by-device-id/<device_id>/history/
+GET /device_metrics/sound-inference-data/by-device-id/<device_id>/history/
+```
+
+History endpoints support:
+
+```text
+start_date=<ISO datetime>
+end_date=<ISO datetime>
+page=<number>
+page_size=<1-500>
+ordering=-time_uploaded|time_uploaded
+```
+
+SEAS environmental and inference history endpoints use `created_at` for
+ordering. Aggregate endpoints support `granularity=raw|hourly|daily` and
+`timezone=Africa/Kampala`; `ordering=timestamp|-timestamp`; and the same
+`page`/`page_size` limits. Raw aggregate pages are paginated at the database
+level. Hourly and daily aggregate buckets are grouped by the database and then
+paginated. `median_db_level` is returned for raw single-reading rows and is
+`null` for grouped buckets until database-level percentile support is added.
+There is no hard maximum date span, but callers should keep `page_size` at or
+below 500 and prefer `hourly` or `daily` aggregates for longer ranges such as
+30 days or 3 months.
 
 
 ## Deployment Steps

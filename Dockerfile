@@ -1,5 +1,5 @@
-# Pull base image
-FROM python:3.8
+# Pull base image. Keep this aligned with runtime.txt for Heroku Docker builds.
+FROM python:3.11.11
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
