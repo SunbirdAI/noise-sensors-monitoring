@@ -753,9 +753,9 @@ a { color: var(--primary); }
 .auth-logo-img {
   border-radius: 8px;
   flex-shrink: 0;
-  height: 3.75rem;
+  height: auto !important;
   object-fit: contain;
-  width: 3.75rem;
+  width: 160px !important;
 }
 .auth-header strong {
   color: var(--ink);

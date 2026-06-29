@@ -135,37 +135,36 @@ a { color: var(--primary); }
 /* Logo area */
 .sidebar-logo {
   align-items: center;
-  background: #080f1d;           /* slightly darker than sidebar for contrast */
+  background: #080f1d;
   border-bottom: 1px solid var(--sidebar-border);
   display: flex;
   justify-content: center;
   gap: .65rem;
-  min-height: 5rem;
-  padding: .75rem 1rem;
+
+  /* increase this so the bigger logo has space */
+  min-height: 6.5rem;
+
+  padding: 1rem;
   text-decoration: none;
   flex-shrink: 0;
 }
-.sidebar-logo:hover, .sidebar-logo:focus {
+
+.sidebar-logo:hover,
+.sidebar-logo:focus {
   background: #080f1d;
   text-decoration: none;
 }
 
-/* The square icon (logo.png) */
+/* The square icon */
 .sidebar-logo-icon {
   flex-shrink: 0;
-  height: 3.5rem;
-  width:  3.5rem;
-  object-fit: contain;
-  border-radius: 6px;
-}
 
-/* The full horizontal wordmark (logo1.png) — hidden by default, shown when sidebar is wide */
-.sidebar-logo-full {
-  height: 1.45rem;
-  width: auto;
-  max-width: 8rem;
+  /* increase logo size here */
+  width: 5rem;
+  height: 5rem;
+
   object-fit: contain;
-  display: none;
+  border-radius: 9px;
 }
 
 /* Navigation */
@@ -753,9 +752,9 @@ a { color: var(--primary); }
 .auth-logo-img {
   border-radius: 8px;
   flex-shrink: 0;
-  height: 3.75rem;
+  height: auto !important;
   object-fit: contain;
-  width: 3.75rem;
+  width: 160px !important;
 }
 .auth-header strong {
   color: var(--ink);

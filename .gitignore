@@ -7,6 +7,7 @@ __pycache__
 .vscode
 .env
 .env.example
+.DS_Store
 *.csv
 *.ipynb
 data

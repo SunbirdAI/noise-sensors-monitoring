@@ -21,6 +21,14 @@ class DeviceMetrics(models.Model):
     data_balance = models.PositiveIntegerField()
     time_uploaded = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=["device", "-time_uploaded"],
+                name="devmetrics_device_time_idx",
+            ),
+        ]
+
 
 class EnvironmentalParameter(models.Model):
     device = models.ForeignKey(
@@ -49,6 +57,12 @@ class EnvironmentalParameter(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+        indexes = [
+            models.Index(
+                fields=["device", "-created_at"],
+                name="envparam_device_created_idx",
+            ),
+        ]
 
     def __str__(self):
         return f"{self.device.device_id} - Temp: {self.temperature}, Pressure: {self.pressure}, Humidity: {self.humidity}"
@@ -77,6 +91,12 @@ class SoundInferenceData(models.Model):
     class Meta:
         verbose_name_plural = "Sound Inference Data"
         ordering = ["-created_at"]
+        indexes = [
+            models.Index(
+                fields=["device", "-created_at"],
+                name="soundinf_device_created_idx",
+            ),
+        ]
 
     def __str__(self):
         return f"{self.device.device_id} - {self.inference_class}: {self.inference_probability}"

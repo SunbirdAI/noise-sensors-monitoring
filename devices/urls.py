@@ -19,9 +19,11 @@ from .views import (
 )
 
 router = SimpleRouter()
-router.register("config", DeviceConfigurationViewSet)
-router.register("location_metrics", LocationMetricsViewSet)
-router.register("location_recordings", LocationRecordingsViewSet)
+router.register("config", DeviceConfigurationViewSet, basename="device-config")
+router.register("location_metrics", LocationMetricsViewSet, basename="location-metrics")
+router.register(
+    "location_recordings", LocationRecordingsViewSet, basename="location-recordings"
+)
 router.register(r"devices", DeviceViewSet, basename="device")
 
 urlpatterns = [
