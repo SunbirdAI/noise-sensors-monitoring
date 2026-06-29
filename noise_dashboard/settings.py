@@ -43,8 +43,8 @@ def env_bool(name, default=False):
 if ENVIRONMENT == "production":
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    # SECURE_SSL_REDIRECT = True
-    # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = env_bool("SECURE_SSL_REDIRECT", True)
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # S3 static-file storage is opt-in: set USE_S3_STATIC=True in .env for deployed
 # environments.  When running locally, leave it unset so {% static %} generates
@@ -126,6 +126,10 @@ CORS_ALLOWED_ORIGINS = env_list(
         "https://noise-portal.vercel.app",
         "https://sunbirdai.github.io",
     ],
+)
+CSRF_TRUSTED_ORIGINS = env_list(
+    "CSRF_TRUSTED_ORIGINS",
+    [origin for origin in CORS_ALLOWED_ORIGINS if origin.startswith("https://")],
 )
 CORS_ALLOW_METHODS = env_list(
     "CORS_ALLOW_METHODS",

@@ -46,6 +46,7 @@ SECRET_KEY=local-dev-secret-key
 ALLOWED_HOSTS=localhost 127.0.0.1
 CORS_ALLOW_ALL_ORIGINS=False
 CORS_ALLOWED_ORIGINS=http://localhost:3000 http://127.0.0.1:3000 http://localhost:5173 http://127.0.0.1:5173
+CSRF_TRUSTED_ORIGINS=https://noise.sunbird.ai https://noise-portal.vercel.app https://sunbirdai.github.io
 
 MQTT_CLIENT_NAME=local_noise_monitor
 MOSQUITTO_URL=Mosquitto
@@ -68,6 +69,11 @@ For a purely local database run, do not add `RDS_DB_NAME`, `RDS_HOSTNAME`,
 For deployed frontends, keep `CORS_ALLOW_ALL_ORIGINS=False` and include each
 trusted dashboard origin in `CORS_ALLOWED_ORIGINS`, for example
 `https://noise.sunbird.ai https://noise-portal.vercel.app`.
+
+If the app is deployed behind a reverse proxy or load balancer, keep
+`SECURE_PROXY_SSL_HEADER=HTTP_X_FORWARDED_PROTO,https` and
+`SECURE_SSL_REDIRECT=True` in production so Django correctly recognizes HTTPS
+requests and CSRF validation stays aligned with the browser origin.
 
 ### 3. Start the Docker services
 
