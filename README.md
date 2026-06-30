@@ -75,6 +75,11 @@ If the app is deployed behind a reverse proxy or load balancer, keep
 `SECURE_SSL_REDIRECT=True` in production so Django correctly recognizes HTTPS
 requests and CSRF validation stays aligned with the browser origin.
 
+If MCU devices still post over plain HTTP, add those upload/config paths to
+`SECURE_REDIRECT_EXEMPT` so SecurityMiddleware does not redirect their POST
+requests to HTTPS. The default exemption list already includes
+`/devices/config/`, `/audio/`, and `/device_metrics/`.
+
 ### 3. Start the Docker services
 
 Create the shared Docker network once:

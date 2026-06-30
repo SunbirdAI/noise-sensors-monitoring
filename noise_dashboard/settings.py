@@ -45,6 +45,10 @@ if ENVIRONMENT == "production":
     CSRF_COOKIE_SECURE = True
     SECURE_SSL_REDIRECT = env_bool("SECURE_SSL_REDIRECT", True)
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_REDIRECT_EXEMPT = env_list(
+        "SECURE_REDIRECT_EXEMPT",
+        [r"^devices/config/", r"^audio/", r"^device_metrics/"],
+    )
 
 # S3 static-file storage is opt-in: set USE_S3_STATIC=True in .env for deployed
 # environments.  When running locally, leave it unset so {% static %} generates
