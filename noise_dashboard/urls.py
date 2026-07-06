@@ -36,6 +36,7 @@ urlpatterns = [
     path("audio/", include("recordings.urls")),
     path("device_metrics/", include("device_metrics.urls")),
     path("analysis/", include("analysis.urls")),
+    path("advisor/", include("advisor.urls")),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="docs"),
     path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
