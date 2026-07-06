@@ -40,6 +40,16 @@ def env_bool(name, default=False):
     return raw_value.strip().lower() in {"1", "true", "yes", "on"}
 
 
+def env_int(name, default):
+    raw_value = os.getenv(name)
+    if raw_value is None:
+        return default
+    try:
+        return int(raw_value)
+    except ValueError:
+        return default
+
+
 if ENVIRONMENT == "production":
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
@@ -95,6 +105,7 @@ INSTALLED_APPS = [
     "recordings.apps.RecordingsConfig",
     "device_metrics.apps.DeviceMetricsConfig",
     "analysis.apps.AnalysisConfig",
+    "advisor",
 ]
 
 # Daily metrics aggregation job
@@ -257,6 +268,18 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
 
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+INSIGHT_TTL_SECONDS = env_int("INSIGHT_TTL_SECONDS", 43200)
+
+# Noise Advisor uses Django's Postgres-backed cache. Run
+# `python manage.py createcachetable advisor_cache` once during deploy.
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "advisor_cache",
+    }
+}
+
 # email settings.
 EMAIL_BACKEND = "django.core.mail.backends.smpt.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
@@ -270,6 +293,9 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 25,  # Number of items per page
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "60/hour",
+    },
 }
 
 SPECTACULAR_SETTINGS = {
